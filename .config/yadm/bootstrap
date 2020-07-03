@@ -1,0 +1,54 @@
+#!/bin/bash
+
+export SYSTEM_TYPE=$(uname -s)
+
+export BOOTSTRAP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $BOOTSTRAP_DIR
+
+
+if [ "$SYSTEM_TYPE" = "Darwin" ]; then
+  echo "Bootstraping Xcode"
+  ./scripts/xcode.sh
+
+  echo "Bootstraping macOS"
+  ./scripts/macos.sh
+
+  echo "Bootstraping Homebrew"
+  ./scripts/homebrew.sh
+
+  sudo xcodebuild -license
+
+  echo "Bootstraping dnsmasq"
+  ./scripts/dnsmasq.sh
+fi
+
+echo "Boostrapping ZSH"
+./scripts/zsh.sh
+
+echo "Bootstraping asdf"
+./scripts/asdf.sh
+
+# echo "Bootstraping Rust"
+# ./scripts/rust.sh
+
+echo "Bootstraping Cron"
+./scripts/cron.sh
+
+echo "Bootstraping Vim"
+./scripts/vim.sh
+
+echo "Bootstraping Emacs"
+./scripts/emacs.sh
+
+echo "Bootstraping tmux"
+./scripts/tmux.sh
+
+echo "Bootstrapping iTerm2"
+./scripts/iterm.sh
+
+
+if [ "$SYSTEM_TYPE" = "Darwin" ]; then
+  for app in "Dock" "Finder" "Mail" "Messages" "Safari" "SystemUIServer" "Terminal"; do
+   killall "${app}" > /dev/null 2>&1
+  done
+fi

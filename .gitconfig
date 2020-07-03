@@ -1,0 +1,60 @@
+[user]
+  name = Alexander Madyankin
+  email = alexander@madyankin.name
+
+[color]
+  ui = auto
+
+[color "branch"]
+  current = green reverse
+  local = green
+  remote = yellow
+
+[color "diff"]
+  meta = yellow bold
+  frag = magenta bold
+  old = red bold
+  new = green bold
+
+[color "status"]
+  added = green
+  changed = yellow
+  untracked = cyan
+
+[alias]
+  st = status
+  ci = commit
+  br = branch
+  co = checkout
+  df = diff
+  dc = diff --cached
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  lol = log --graph --decorate --pretty=oneline --abbrev-commit
+  lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+  ls = ls-files
+
+  # Show files ignored by git:
+  ign = ls-files -o -i --exclude-standard
+
+[core]
+  quotepath = false
+  autocrlf = input
+  excludesfile = ~/.gitignore
+  precomposeunicode = false
+  pager = diff-so-fancy | less --tabs=4 -RFX
+
+[push]
+  default = simple
+
+[filter "lfs"]
+  clean = git-lfs clean %f
+  smudge = git-lfs smudge %f
+  required = true
+
+[diff]
+  compactionHeuristic = true
+
+[merge]
+  tool = opendiff
+[url "git@github.com:"]
+	insteadOf = https://github.com/

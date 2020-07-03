@@ -1,0 +1,48 @@
+*.TODO
+*.sublime-project
+*.sublime-workspace
+.idea
+*.dump
+.tags_sorted_by_file
+.tags
+.gemtags
+.coffeetags
+.sass-cache
+*.swp
+.vscode
+*.code-workspace
+jsconfig.json
+_vimrc_local.vim
+
+# Rails
+public/uploads
+models.dot
+models.png
+models.svg
+timecop_hack.rb
+
+# Node
+node_modules
+bower_components
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+
+# vagrant
+provisioning
+.vagrant/
+.tern-port
+.tern-project
+Vagrantfile
+
+.vimlocal
+.tool-versions
+.nvmrc

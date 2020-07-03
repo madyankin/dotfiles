@@ -1,0 +1,2 @@
+# minute hour day_of_month month day_of_week command_to_execute
+0 * * * * $HOME/Org/commit.sh
