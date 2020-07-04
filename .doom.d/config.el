@@ -38,8 +38,12 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
-(add-to-list 'load-path "~/.doom.d/vendor")
-(require 'auto-dark-emacs)
+(add-hook 'ns-system-appearance-change-functions
+          #'(lambda (appearance)
+              (mapc #'disable-theme custom-enabled-themes)
+              (pcase appearance
+                ('light (load-theme 'doom-one-light t))
+                ('dark (load-theme 'doom-dracula t)))))
 
 
 ;; Org related stuff
