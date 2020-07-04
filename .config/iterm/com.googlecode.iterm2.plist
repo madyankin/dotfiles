@@ -968,8 +968,10 @@
 	</dict>
 	<key>NSWindow Frame NSNavPanelAutosaveName</key>
 	<string>314 274 812 511 0 0 1440 877 </string>
+	<key>NSWindow Frame SUUpdateAlert</key>
+	<string>410 363 620 392 0 0 1440 877 </string>
 	<key>NSWindow Frame iTerm Window 0</key>
-	<string>331 164 970 627 0 0 1440 877 </string>
+	<string>328 120 970 627 0 0 1440 877 </string>
 	<key>New Bookmarks</key>
 	<array>
 		<dict>
@@ -1071,16 +1073,12 @@
 			</dict>
 			<key>Ansi 4 Color</key>
 			<dict>
-				<key>Alpha Component</key>
-				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.73333333333333328</real>
-				<key>Color Space</key>
-				<string>sRGB</string>
+				<real>0.97647058823529409</real>
 				<key>Green Component</key>
-				<real>0.35686274509803922</real>
+				<real>0.57647058823529407</real>
 				<key>Red Component</key>
-				<real>0.0</real>
+				<real>0.74117647058823533</real>
 			</dict>
 			<key>Ansi 5 Color</key>
 			<dict>
@@ -2377,6 +2375,7 @@
 	</array>
 	<key>NoSyncAllAppVersions</key>
 	<array>
+		<string>3.3.12</string>
 		<string>3.3.11</string>
 	</array>
 	<key>NoSyncBFPRecents</key>
@@ -2389,14 +2388,14 @@
 		<key>screenFrame</key>
 		<string>{{0, 0}, {1440, 900}}</string>
 		<key>topLeft</key>
-		<string>{43, 770}</string>
+		<string>{2, 877}</string>
 	</dict>
 	<key>NoSyncHaveUsedCopyMode</key>
 	<true/>
 	<key>NoSyncInstallationId</key>
 	<string>49D368CF-EE7F-43BD-9A6D-5C80EC4E78ED</string>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>41</integer>
+	<integer>44</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -3197,8 +3196,12 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2020-07-02T10:45:18Z</date>
+	<date>2020-07-04T05:00:03Z</date>
 	<key>SUSendProfileInfo</key>
+	<false/>
+	<key>SUUpdateGroupIdentifier</key>
+	<integer>2370392538</integer>
+	<key>SUUpdateRelaunchingMarker</key>
 	<false/>
 	<key>SoundForEsc</key>
 	<false/>
@@ -3209,7 +3212,7 @@
 	<key>findMode_iTerm</key>
 	<integer>0</integer>
 	<key>iTerm Version</key>
-	<string>3.3.11</string>
+	<string>3.3.12</string>
 	<key>kCPKSelectionViewPreferredModeKey</key>
 	<integer>0</integer>
 	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
