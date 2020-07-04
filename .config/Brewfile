@@ -17,7 +17,6 @@ brew 'hivemind'
 brew 'jq'
 brew 'mas'
 brew 'moreutils'
-# brew 'postgresql', restart_service: true
 brew 'readline'
 brew 'reattach-to-user-namespace'
 brew 'speedtest-cli'
@@ -42,6 +41,7 @@ cask 'focus'
 # cask 'fork'
 # cask 'genymotion'
 # cask 'google-chrome'
+cask 'guitar-pro'
 cask 'iina'
 cask 'imagealpha'
 cask 'imageoptim'
@@ -60,6 +60,7 @@ cask 'visual-studio-code'
 cask 'tomighty'
 cask 'transmission'
 cask 'viscosity'
+cask 'vlc'
 cask 'zoomus'
 
 cask 'font-jetbrains-mono'
@@ -73,7 +74,7 @@ mas 'Day One', id: 1055511498
 mas 'Euclid', id: 656423396
 mas 'Flashcard Hero', id: 650802274
 mas 'iUnarchive', id: 418517475
-mas 'iA Writer', id: 775737590
+mas 'Metronome X', id: 1222424189
 mas 'MindNode', id: 992076693
 mas 'Pixel Winch', id: 735066709
 mas 'Reeder', id: 880001334
