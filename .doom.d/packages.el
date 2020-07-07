@@ -47,7 +47,5 @@
 
 (package! org-roam)
 (package! org-journal)
-(package! deft)
 (package! org-download)
 (package! multiple-cursors)
-(package! neotree)

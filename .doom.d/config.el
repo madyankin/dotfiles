@@ -9,8 +9,6 @@
 
  display-line-numbers-type t
 
- projectfile-project-search-path '("~/Projects")
-
  org-bullets-bullet-list '("·")
  org-support-shift-select t
  org-catch-invisible-edits 'smart
@@ -259,3 +257,22 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "s-3") (kbd "C-x 3"))  ;; Cmd-3 split vertically
 (global-set-key (kbd "s-0") (kbd "C-x 0"))  ;; Cmd-0...
 (global-set-key (kbd "s-w") (kbd "C-x 0"))  ;; ...and Cmd-w to close current window
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   '("c342ef444e7aca36f4b39a8e2848c4ba793d51c58fdb520b8ed887766ed6d40b" default))
+ '(deft-default-extension "org" t)
+ '(deft-directory "~/Org/zettelkasten" t)
+ '(deft-recursive t t)
+ '(org-journal-date-format "%A, %d %B %Y")
+ '(org-journal-dir "~/Org/journal")
+ '(org-journal-file-format "%Y-%m-%d.org"))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
