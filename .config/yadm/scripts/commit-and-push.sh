@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source $HOME/.zshenv
 cd $HOME
 
 yadm add `yadm ls-tree master -r --name-only`
