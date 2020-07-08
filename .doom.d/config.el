@@ -83,8 +83,9 @@
 
 (use-package! deft
   :after org
-  :bind ("C-c n d" . deft)
+  :bind ("C-M-S-s-d" . deft)
   :custom
+  (deft-new-file-format "%Y-%m-%dT%H%M")
   (deft-recursive t)
   (deft-default-extension "org")
   (deft-directory my-zettelkasten-directory))
