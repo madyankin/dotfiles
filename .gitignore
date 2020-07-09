@@ -46,3 +46,6 @@ Vagrantfile
 .vimlocal
 .tool-versions
 .nvmrc
+
+# Xcode
+outpunk.xcuserdatad
