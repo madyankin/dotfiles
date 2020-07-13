@@ -70,6 +70,7 @@ g++-run() {
     g++ -lstdc++ -std=c++14 -pipe -O2 -Wall $1 && ./a.out
 }
 
+
 # Codi
 # Usage: codi [filetype] [filename]
 codi() {
