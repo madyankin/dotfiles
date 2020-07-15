@@ -1,4 +1,5 @@
 # minute hour day_of_month month day_of_week command_to_execute
 
-0     *     *     *     *     $HOME/Org/commit.sh
+@reboot                       rm -rf $HOME/Library/Developer/Xcode/DerivedData
+0     *     *     *     *     $HOME/Org/utils/commit.sh
 0     0/2   *     *     *     $HOME/.config/yadm/scripts/commit-and-push.sh

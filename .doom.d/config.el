@@ -125,6 +125,9 @@
   (setq-default org-download-timestamp "%Y-%m-%d_%H-%M-%S_"))
 
 
+(use-package ox-hugo
+  :after ox)
+
 
 (setq default-input-method "russian-computer")
 
@@ -267,11 +270,12 @@ point reaches the beginning or end of the buffer, stop there."
  '(custom-safe-themes
    '("c342ef444e7aca36f4b39a8e2848c4ba793d51c58fdb520b8ed887766ed6d40b" default))
  '(deft-default-extension "org" t)
- '(deft-directory "~/Org/zettelkasten" t)
- '(deft-recursive t t)
+ '(deft-directory "~/Org/zettelkasten")
+ '(deft-recursive t)
  '(org-journal-date-format "%A, %d %B %Y")
  '(org-journal-dir "~/Org/journal")
- '(org-journal-file-format "%Y-%m-%d.org"))
+ '(org-journal-file-format "%Y-%m-%d.org")
+ '(package-selected-packages '(ox-hugo)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
