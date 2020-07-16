@@ -49,4 +49,5 @@
 (package! org-roam)
 (package! org-journal)
 (package! org-download)
+(package! org-jira)
 (package! multiple-cursors)

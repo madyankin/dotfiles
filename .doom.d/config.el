@@ -16,6 +16,8 @@
 
  my-zettelkasten-directory (concat org-directory "zettelkasten")
  my-journal-directory (concat org-directory "journal")
+
+ jiralib-url "https://evilmartians.atlassian.net/"
 )
 
 
