@@ -264,6 +264,10 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "s-3") (kbd "C-x 3"))  ;; Cmd-3 split vertically
 (global-set-key (kbd "s-0") (kbd "C-x 0"))  ;; Cmd-0...
 (global-set-key (kbd "s-w") (kbd "C-x 0"))  ;; ...and Cmd-w to close current window
+;;
+;;
+(load! "keybindings")
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
