@@ -38,14 +38,6 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
-(add-hook 'ns-system-appearance-change-functions
-          #'(lambda (appearance)
-              (mapc #'disable-theme custom-enabled-themes)
-              (pcase appearance
-                ('light (load-theme 'doom-one-light t))
-                ('dark (load-theme 'doom-dracula t)))))
-
-
 ;; Org related stuff
 
 (global-set-key (kbd "s-=") 'org-capture)
@@ -66,20 +58,45 @@
 
           ("j" "Journal" entry
            (function org-journal-find-location)
-           "** %(format-time-string org-journal-time-format)\n%i%?" :empty-lines 1))))
+           "** %(format-time-string org-journal-time-format)\n%i%?" :empty-lines 1)
+
+          ("n" "New note" plain
+           (file my/new-note-path)
+           "#+TITLE: %i%? \n#+ROAM_ALIAS: \"\" \n#+ROAM_TAGS: \n\n* References: \n"))))
+
+
+(setq my/new-note-timestamp-format "%Y-%m-%dT%H%M%S")
+
+(defun my/new-note-path ()
+  (concat my-zettelkasten-directory
+          "/"
+          (format-time-string my/new-note-timestamp-format)
+          ".org"))
 
 
 (use-package! org-roam
   :commands (org-roam-insert org-roam-find-file org-roam)
+
   :init
-  (setq org-roam-directory my-zettelkasten-directory)
-  (setq org-roam-graph-viewer "/usr/bin/open")
+  (setq org-roam-directory my-zettelkasten-directory
+        org-roam-graph-viewer "/usr/bin/open")
   (map! :leader
         :prefix "n"
-        :desc "Org-Roam-Insert" "i" #'org-roam-insert
-        :desc "Org-Roam-Find" "/" #'org-roam-find-file
-        :desc "Org-Roam-Buffer" "b" #'org-roam)
+        :desc "org-roam" "l" #'org-roam
+        :desc "org-roam-insert" "i" #'org-roam-insert
+        :desc "org-roam-switch-to-buffer" "b" #'org-roam-switch-to-buffer
+        :desc "org-roam-find-file" "f" #'org-roam-find-file
+        :desc "org-roam-show-graph" "g" #'org-roam-show-graph
+        :desc "org-roam-insert" "i" #'org-roam-insert
+        :desc "org-roam-capture" "c" #'org-roam-capture)
+
   :config
+  (setq org-roam-capture-templates
+        '(("d" "default" plain (function org-roam--capture-get-point)
+           "%? \n\n* References\n\n"
+           :file-name "%(format-time-string my/new-note-timestamp-format)"
+           :head "#+TITLE: ${title} \n#+ROAM_ALIAS: \"\" \n#+ROAM_TAGS: \n\n"
+           :unnarrowed t)))
   (org-roam-mode +1))
 
 
@@ -87,7 +104,7 @@
   :after org
   :bind ("C-M-S-s-d" . deft)
   :custom
-  (deft-new-file-format "%Y-%m-%dT%H%M")
+  (deft-new-file-format my/new-note-timestamp-format)
   (deft-recursive t)
   (deft-default-extension "org")
   (deft-directory my-zettelkasten-directory))
@@ -266,6 +283,7 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "s-w") (kbd "C-x 0"))  ;; ...and Cmd-w to close current window
 ;;
 ;;
+(load! "appearance")
 (load! "keybindings")
 
 (custom-set-variables
