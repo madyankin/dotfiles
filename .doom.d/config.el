@@ -16,6 +16,7 @@
 
  my-zettelkasten-directory (concat org-directory "zettelkasten")
  my-journal-directory (concat org-directory "journal")
+ my-org-templates-directory (concat org-directory "utils/templates/")
 
  jiralib-url "https://evilmartians.atlassian.net/"
 )
@@ -60,6 +61,10 @@
            (function org-journal-find-location)
            "** %(format-time-string org-journal-time-format)\n%i%?" :empty-lines 1)
 
+          ("w" "Week Summary in Journal" entry
+           (function org-journal-find-location)
+           (file (concat my-org-templates-directory "week-summary.org")))
+
           ("n" "New note" plain
            (file my/new-note-path)
            "#+TITLE: %i%? \n#+ROAM_ALIAS: \"\" \n#+ROAM_TAGS: \n\n* References: \n"))))
@@ -73,7 +78,6 @@
           (format-time-string my/new-note-timestamp-format)
           ".org"))
 
-
 (use-package! org-roam
   :commands (org-roam-insert org-roam-find-file org-roam)
 
@@ -86,7 +90,7 @@
         :desc "org-roam-insert" "i" #'org-roam-insert
         :desc "org-roam-switch-to-buffer" "b" #'org-roam-switch-to-buffer
         :desc "org-roam-find-file" "f" #'org-roam-find-file
-        :desc "org-roam-show-graph" "g" #'org-roam-show-graph
+        :desc "org-roam-graph-show" "g" #'org-roam-graph-show
         :desc "org-roam-insert" "i" #'org-roam-insert
         :desc "org-roam-capture" "c" #'org-roam-capture)
 
