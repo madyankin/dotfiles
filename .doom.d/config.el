@@ -61,9 +61,9 @@
            (function org-journal-find-location)
            "** %(format-time-string org-journal-time-format)\n%i%?" :empty-lines 1)
 
-          ("w" "Week Summary in Journal" entry
-           (function org-journal-find-location)
-           (file (concat my-org-templates-directory "week-summary.org")))
+          ;; ("w" "Week Summary in Journal" entry
+          ;;  (function org-journal-find-location)
+          ;;  (file (concat my-org-templates-directory "week-summary.org")))
 
           ("n" "New note" plain
            (file my/new-note-path)
