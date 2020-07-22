@@ -17,8 +17,6 @@
  my-zettelkasten-directory (concat org-directory "zettelkasten")
  my-journal-directory (concat org-directory "journal")
  my-org-templates-directory (concat org-directory "utils/templates/")
-
- jiralib-url "https://evilmartians.atlassian.net/"
 )
 
 
@@ -289,6 +287,7 @@ point reaches the beginning or end of the buffer, stop there."
 ;;
 (load! "appearance")
 (load! "keybindings")
+(load! "../.config/emacs.private")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
