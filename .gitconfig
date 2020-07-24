@@ -56,5 +56,3 @@
 
 [merge]
   tool = opendiff
-[url "git@github.com:"]
-	insteadOf = https://github.com/
