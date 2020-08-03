@@ -59,9 +59,10 @@
            (function org-journal-find-location)
            "** %(format-time-string org-journal-time-format)\n%i%?" :empty-lines 1)
 
-          ;; ("w" "Week Summary in Journal" entry
-          ;;  (function org-journal-find-location)
-          ;;  (file (concat my-org-templates-directory "week-summary.org")))
+          ("w" "Week summary" item
+           (file+olp+datetree "~/Org/utils/templates/week-summary.org"
+                              "* %?"
+                              :tree-type week))
 
           ("n" "New note" plain
            (file my/new-note-path)
@@ -121,6 +122,7 @@
         :desc "New journal entry" "j" #'(lambda () (interactive) (org-capture 1 "j"))
         :desc "New journal todo" "t" #'(lambda () (interactive) (org-capture 1 "t")))
   :custom
+  (org-journal-file-type 'weekly)
   (org-journal-file-format "%Y-%m-%d.org")
   (org-journal-date-format "%A, %d %B %Y")
   (org-journal-dir my-journal-directory))
@@ -287,7 +289,7 @@ point reaches the beginning or end of the buffer, stop there."
 ;;
 (load! "appearance")
 (load! "keybindings")
-(load! "../.config/emacs.private")
+(load! "../.config/emacs.private.el")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
