@@ -297,10 +297,10 @@ point reaches the beginning or end of the buffer, stop there."
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("c342ef444e7aca36f4b39a8e2848c4ba793d51c58fdb520b8ed887766ed6d40b" default))
+   '("7a994c16aa550678846e82edc8c9d6a7d39cc6564baaaacc305a3fdc0bd8725f" "0cb1b0ea66b145ad9b9e34c850ea8e842c4c4c83abe04e37455a1ef4cc5b8791" "c342ef444e7aca36f4b39a8e2848c4ba793d51c58fdb520b8ed887766ed6d40b" default))
  '(deft-default-extension "org" t)
- '(deft-directory "~/Org/zettelkasten")
- '(deft-recursive t)
+ '(deft-directory "~/Org/zettelkasten" t)
+ '(deft-recursive t t)
  '(org-journal-date-format "%A, %d %B %Y")
  '(org-journal-dir "~/Org/journal")
  '(org-journal-file-format "%Y-%m-%d.org")
