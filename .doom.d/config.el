@@ -37,6 +37,25 @@
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
 
+
+(defun my/calendar-week-number ()
+  (car
+   (calendar-iso-from-absolute
+   (calendar-absolute-from-gregorian
+    (calendar-current-date)))))
+
+(defun my/year-progress ()
+  (concat
+   "Текущая неделя:\n"
+   (number-to-string (my/calendar-week-number))
+   "/52 ["
+   (make-string (my/calendar-week-number) ?=)
+   (make-string (- 52 (my/calendar-week-number)) ? )
+   "] "
+   (number-to-string (fround (/ (* 100 (my/calendar-week-number)) 52.0)))
+   "% года прошло"))
+
+
 ;; Org related stuff
 
 (global-set-key (kbd "s-=") 'org-capture)
