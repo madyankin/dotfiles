@@ -7,6 +7,7 @@ source ~/.zplug/init.zsh
 #zplug "themes/kphoen", from:oh-my-zsh, as:theme
 
 export SPACESHIP_GIT_SYMBOL=''
+export SPACESHIP_KUBECONTEXT_SHOW=false
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
 zplug "lib/completion", from:oh-my-zsh
