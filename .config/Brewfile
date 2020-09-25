@@ -27,7 +27,6 @@ brew 'zopfli'
 cask 'alfred'
 cask 'arq'
 cask 'appcleaner'
-cask 'blockblock'
 # cask 'cocoarestclient
 cask 'docker'
 cask 'dropbox'
@@ -43,7 +42,7 @@ cask 'iina'
 cask 'imagealpha'
 cask 'imageoptim'
 cask 'iterm2'
-cask 'java'
+# cask 'java'
 cask 'karabiner-elements'
 cask 'keybase'
 cask 'little-snitch'
@@ -51,8 +50,8 @@ cask 'qlcolorcode'
 cask 'qlmarkdown'
 cask 'qlstephen'
 cask 'webpquicklook'
-cask 'react-native-debugger'
-cask 'sketch'
+# cask 'react-native-debugger'
+# cask 'sketch'
 cask 'spectacle'
 cask 'visual-studio-code'
 cask 'tomighty'
@@ -67,7 +66,7 @@ mas '1Password', id: 443987910
 mas 'Amphetamine', id: 937984704
 mas 'AudioBookBinder', id: 413969927
 mas 'DaisyDisk', id: 411643860
-mas 'Day One', id: 1055511498
+# mas 'Day One', id: 1055511498
 # mas 'Daum Equation Editor', id: 540665783
 mas 'Euclid', id: 656423396
 mas 'Flashcard Hero', id: 650802274
