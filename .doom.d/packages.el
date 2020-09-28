@@ -51,3 +51,4 @@
 (package! org-download)
 (package! org-jira)
 (package! multiple-cursors)
+(package! reverse-im)
