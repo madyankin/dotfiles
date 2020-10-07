@@ -16,6 +16,9 @@ if [ "$SYSTEM_TYPE" = "Darwin" ]; then
   echo "Bootstraping Homebrew"
   ./scripts/homebrew.sh
 
+    echo "Bootstraping whalebrew"
+  ./scripts/whalebrew.sh
+
   sudo xcodebuild -license
 
   echo "Bootstraping dnsmasq"

@@ -20,6 +20,7 @@ brew 'reattach-to-user-namespace'
 brew 'speedtest-cli'
 brew 'the_silver_searcher'
 # brew 'watchman'
+brew 'whalebrew'
 brew 'yadm'
 brew 'zopfli'
 
