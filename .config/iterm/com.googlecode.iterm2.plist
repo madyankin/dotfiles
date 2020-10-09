@@ -3242,7 +3242,7 @@
 	<key>NoSyncInstallationId</key>
 	<string>49D368CF-EE7F-43BD-9A6D-5C80EC4E78ED</string>
 	<key>NoSyncLaunchExperienceControllerRunCount</key>
-	<integer>87</integer>
+	<integer>146</integer>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile</key>
 	<true/>
 	<key>NoSyncNeverRemindPrefsChangesLostForFile_selection</key>
@@ -3997,6 +3997,8 @@
 	<real>613917541.14108098</real>
 	<key>OnlyWhenMoreTabs</key>
 	<false/>
+	<key>PMPrintingExpandedStateForPrint2</key>
+	<false/>
 	<key>PointerActions</key>
 	<dict>
 		<key>Button,1,1,,</key>
@@ -4032,6 +4034,8 @@
 	</dict>
 	<key>PrefsCustomFolder</key>
 	<string>/Users/outpunk/.config/iterm</string>
+	<key>Print In Black And White</key>
+	<true/>
 	<key>PromptOnQuit</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
@@ -4043,7 +4047,7 @@
 	<key>SUHasLaunchedBefore</key>
 	<true/>
 	<key>SULastCheckTime</key>
-	<date>2020-07-31T15:38:22Z</date>
+	<date>2020-10-08T06:32:49Z</date>
 	<key>SUSendProfileInfo</key>
 	<false/>
 	<key>SUUpdateGroupIdentifier</key>
