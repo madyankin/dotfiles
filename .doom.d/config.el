@@ -7,12 +7,14 @@
  doom-font (font-spec :family "JetBrains Mono" :size 14)
  doom-theme 'doom-dracula
 
- display-line-numbers-type t
+ display-line-numbers-type nil
 
  org-bullets-bullet-list '("·")
  org-support-shift-select t
  org-catch-invisible-edits 'smart
  org-directory "~/Org/"
+ org-link-file-path-type 'relative
+
 
  my-zettelkasten-directory (concat org-directory "zettelkasten")
  my-journal-directory (concat org-directory "journal")
