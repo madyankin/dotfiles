@@ -4,7 +4,7 @@
  user-full-name "Alexander Madyankin"
  user-mail-address "alexander@madyankin.name"
 
- doom-font (font-spec :family "JetBrains Mono" :size 14 :weight "Light")
+ doom-font (font-spec :family "JetBrains Mono" :size 14)
  doom-theme 'doom-dracula
 
  display-line-numbers-type nil
