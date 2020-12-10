@@ -14,7 +14,7 @@
  org-catch-invisible-edits 'smart
  org-directory "~/Org/"
  org-link-file-path-type 'relative
-
+ org-agenda-files (directory-files-recursively "~/org/" "\\.org$")
 
  my-zettelkasten-directory (concat org-directory "zettelkasten")
  my-journal-directory (concat org-directory "journal")
