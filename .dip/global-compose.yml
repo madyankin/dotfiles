@@ -1,0 +1,12 @@
+version: "2.4"
+
+services:
+  kali:
+    command: bash
+    # image: kalilinux/kali-rolling
+    image: kali
+    volumes:
+      - ${PWD}:/${PWD}:cached
+    working_dir: ${PWD}
+    tmpfs:
+      - /tmp
