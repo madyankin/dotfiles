@@ -48,7 +48,6 @@ bindkey -e
 
 alias de='docker exec -i -t'
 alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
-alias vim='nvim'
 alias rld='source ~/.zshrc'
 
 # Change iterm2 profile. Usage it2prof ProfileName (case sensitive)
