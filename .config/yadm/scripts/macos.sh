@@ -149,9 +149,11 @@ defaults write com.apple.messageshelper.MessageController SOInputLineSettings -d
 # Install SF Mono font
 cp -v /Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SFMono-* ~/Library/Fonts
 
+# Make fonts crispy
+defaults -currentHost write -g AppleFontSmoothing -int 0
+
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-
 
 # Dock, Dashboard, and hot corners
 
