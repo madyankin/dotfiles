@@ -1,7 +1,8 @@
 " download vim-plug if missing
-if empty(glob("~/.local/share/nvim/site/autoload/plug.vim"))
-  silent! execute '!curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * silent! PlugInstall
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 call plug#begin()
@@ -29,20 +30,12 @@ Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 " Searching
 Plug 'mileszs/ack.vim'
 
-" Building & linting
-Plug 'w0rp/ale'
-Plug 'skywind3000/asyncrun.vim'
-Plug 'sbdchd/neoformat'
-
 " Languages
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
 Plug 'maxmellon/vim-jsx-pretty', { 'for': 'javascript' } 
 Plug 'mustache/vim-mustache-handlebars', { 'for': 'handlebars'  }
 Plug 'soli/prolog-vim', { 'for': 'swiprolog' }
 Plug 'l04m33/vlime', { 'rtp': 'vim/' }
-
-" Use release branch
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 
 " Rust
@@ -61,8 +54,6 @@ Plug 'LucHermitte/local_vimrc'
 Plug 'metakirby5/codi.vim' " scratchpad
 
 call plug#end()
-
-
 
 " Hack to switch to the left pane in tmux
 nnoremap <silent> <BS> :TmuxNavigateLeft<cr>
@@ -98,8 +89,6 @@ set rnu " Relative line numbers
 
 
 " Linting * building
-
-let &runtimepath.=',~/.config/nvim/bundle/ale'
 
 filetype plugin on
 

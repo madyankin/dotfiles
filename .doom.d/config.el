@@ -63,6 +63,7 @@
 
 (global-set-key (kbd "s-=") 'org-capture)
 
+
 (after! org
   (map! :map org-mode-map
         :n "M-j" #'org-metadown
@@ -124,6 +125,15 @@
            :unnarrowed t)))
   (org-roam-mode +1))
 
+(use-package ob-C :ensure nil :after org)
+(use-package ob-emacs-lisp :ensure nil :after org)
+(use-package ob-java :ensure nil :after org)
+(use-package ob-js :ensure nil :after org)
+(use-package ob-makefile :ensure nil :after org)
+(use-package ob-org :ensure nil :after org)
+(use-package ob-python :ensure nil :after org)
+(use-package ob-ruby :ensure nil :after org)
+(use-package ob-shell :ensure nil :after org)
 
 (use-package! deft
   :after org

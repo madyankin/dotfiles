@@ -37,9 +37,6 @@ echo "Bootstraping asdf"
 echo "Bootstraping Cron"
 ./scripts/cron.sh
 
-echo "Bootstraping Vim"
-./scripts/vim.sh
-
 echo "Bootstraping Emacs"
 ./scripts/emacs.sh
 
