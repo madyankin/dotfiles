@@ -154,8 +154,8 @@
         :desc "New journal entry" "j" #'(lambda () (interactive) (org-capture 1 "j"))
         :desc "New journal todo" "t" #'(lambda () (interactive) (org-capture 1 "t")))
   :custom
-  (org-journal-file-type 'weekly)
-  (org-journal-file-format "%Y-%m-%d.org")
+  (org-journal-file-type 'monthly)
+  (org-journal-file-format "%Y-%m.org")
   (org-journal-date-format "%A, %d %B %Y")
   (org-journal-dir my-journal-directory))
 
