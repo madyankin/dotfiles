@@ -125,15 +125,15 @@
            :unnarrowed t)))
   (org-roam-mode +1))
 
-(use-package ob-C :ensure nil :after org)
-(use-package ob-emacs-lisp :ensure nil :after org)
-(use-package ob-java :ensure nil :after org)
-(use-package ob-js :ensure nil :after org)
-(use-package ob-makefile :ensure nil :after org)
-(use-package ob-org :ensure nil :after org)
-(use-package ob-python :ensure nil :after org)
-(use-package ob-ruby :ensure nil :after org)
-(use-package ob-shell :ensure nil :after org)
+(use-package! ob-C :after org)
+(use-package! ob-emacs-lisp :after org)
+(use-package! ob-java :after org)
+(use-package! ob-js :after org)
+(use-package! ob-makefile :after org)
+(use-package! ob-org :after org)
+(use-package! ob-python :after org)
+(use-package! ob-ruby :after org)
+(use-package! ob-shell :after org)
 
 (use-package! deft
   :after org
