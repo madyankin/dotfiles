@@ -112,7 +112,7 @@
         :desc "org-roam-insert" "i" #'org-roam-insert
         :desc "org-roam-switch-to-buffer" "b" #'org-roam-switch-to-buffer
         :desc "org-roam-find-file" "f" #'org-roam-find-file
-        :desc "org-roam-graph-show" "g" #'org-roam-graph-show
+        :desc "org-roam-graph" "g" #'org-roam-graph
         :desc "org-roam-insert" "i" #'org-roam-insert
         :desc "org-roam-capture" "c" #'org-roam-capture)
 
