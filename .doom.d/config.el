@@ -14,7 +14,7 @@
  org-catch-invisible-edits 'smart
  org-directory "~/Dropbox/Org/"
  org-link-file-path-type 'relative
- org-agenda-files (directory-files-recursively "~/Dropbox/org/" "\\.org$")
+ org-agenda-files (directory-files-recursively "~/Dropbox/Org/" "\\.org$")
  org-todo-keywords '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)"))
 
  my-zettelkasten-directory (concat org-directory "zettelkasten")
