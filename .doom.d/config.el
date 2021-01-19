@@ -12,7 +12,7 @@
  org-bullets-bullet-list '("·")
  org-support-shift-select t
  org-catch-invisible-edits 'smart
- org-directory "~/Dropbox/Org/"
+ org-directory "/Users/outpunk/Dropbox/Org/"
  org-link-file-path-type 'relative
  org-agenda-files (directory-files-recursively "~/Dropbox/Org/" "\\.org$")
  org-todo-keywords '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)"))
