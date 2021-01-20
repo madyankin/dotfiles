@@ -12,7 +12,7 @@ export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS=""
 
-export EDITOR=nvim
+export EDITOR=vim
 export REACT_EDITOR=code
 
 export ANDROID_HOME=${HOME}/Library/Android/sdk
