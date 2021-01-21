@@ -6,6 +6,7 @@ tap 'homebrew/core'
 tap 'homebrew/services'
 
 brew 'bat'
+brew 'blockblock'
 brew 'cloc'
 brew 'diff-so-fancy'
 brew 'dnsmasq', restart_service: true
