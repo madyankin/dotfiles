@@ -1,26 +1,26 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-(setq
- user-full-name "Alexander Madyankin"
- user-mail-address "alexander@madyankin.name"
+(setq user-full-name "Alexander Madyankin"
+      user-mail-address "alexander@madyankin.name"
 
- doom-font (font-spec :family "JetBrains Mono" :size 14)
- doom-theme 'doom-dracula
+      doom-font (font-spec :family "JetBrains Mono" :size 14)
+      doom-theme 'doom-dracula
 
- display-line-numbers-type nil
+      display-line-numbers-type nil
+      load-prefer-newer t
+      company-idle-delay nil)
 
- org-bullets-bullet-list '("·")
- org-support-shift-select t
- org-catch-invisible-edits 'smart
- org-directory "/Users/outpunk/Dropbox/Org/"
- org-link-file-path-type 'relative
- org-agenda-files (directory-files-recursively "~/Dropbox/Org/" "\\.org$")
- org-todo-keywords '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)"))
+(setq org-bullets-bullet-list '("·")
+      org-support-shift-select t
+      org-catch-invisible-edits 'smart
+      org-directory "/Users/outpunk/Dropbox/Org/"
+      org-link-file-path-type 'relative
+      org-agenda-files (directory-files-recursively "~/Dropbox/Org/" "\\.org$")
+      org-todo-keywords '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)"))
 
- my-zettelkasten-directory (concat org-directory "zettelkasten")
- my-journal-directory (concat org-directory "journal")
- my-org-templates-directory (concat org-directory "utils/templates/")
-)
+      my-zettelkasten-directory (concat org-directory "zettelkasten")
+      my-journal-directory (concat org-directory "journal")
+      my-org-templates-directory (concat org-directory "utils/templates/"))
 
 
 ;; Here are some additional functions/macros that could help you configure Doom:
