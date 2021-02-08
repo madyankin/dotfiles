@@ -47,6 +47,10 @@
 (global-set-key (kbd "s-=") 'org-capture)
 
 
+(defun org-babel-execute:typescript (body params)
+  (let ((org-babel-js-cmd "npx ts-node < "))
+    (org-babel-execute:js body params)))
+
 (after! org
   (map! :map org-mode-map
         :n "M-j" #'org-metadown
@@ -136,7 +140,7 @@
         :desc "New journal entry" "j" #'(lambda () (interactive) (org-capture 1 "j"))
         :desc "New journal todo" "t" #'(lambda () (interactive) (org-capture 1 "t")))
   :custom
-  (org-journal-file-type 'monthly)
+  (org-journal-file-type 'weekly)
   (org-journal-file-format "%Y-%m.org")
   (org-journal-date-format "%A, %d %B %Y")
   (org-journal-dir my-journal-directory))
