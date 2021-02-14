@@ -105,6 +105,7 @@
   :config
   (setq org-roam-capture-templates
         '(("d" "default" plain (function org-roam--capture-get-point)
+
            "%? \n\n* References\n\n"
            :file-name "%(format-time-string my/new-note-timestamp-format)"
            :head "#+TITLE: ${title} \n#+ROAM_ALIAS: \"\" \n#+ROAM_TAGS: \n\n"
