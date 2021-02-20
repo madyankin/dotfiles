@@ -11,6 +11,7 @@ call plug#begin()
 Plug 'ayu-theme/ayu-vim'
 Plug 'itchyny/lightline.vim'
 Plug 'airblade/vim-gitgutter'
+Plug 'dracula/vim', { 'as': 'dracula' }
 
 " Editing
 Plug 'editorconfig/editorconfig-vim'
