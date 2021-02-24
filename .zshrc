@@ -97,7 +97,4 @@ source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 
-
-
-
-
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
