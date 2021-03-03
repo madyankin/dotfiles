@@ -48,6 +48,6 @@
 (package! org-roam)
 (package! org-journal)
 (package! org-download)
-(package! org-jira)
+(package! org-drill)
 (package! multiple-cursors)
 (package! reverse-im)
