@@ -11,7 +11,7 @@
       org-log-done 'time
       org-log-into-drawer t
       org-agenda-start-with-log-mode t
-      org-directory "/Users/outpunk/Dropbox/Org/"
+      org-directory "~/Dropbox/Org/"
       org-link-file-path-type 'relative
       org-agenda-files (directory-files-recursively "~/Dropbox/Org/" "\\.org$")
       org-todo-keywords '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)"))
