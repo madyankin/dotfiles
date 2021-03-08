@@ -6,24 +6,36 @@ export BOOTSTRAP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $BOOTSTRAP_DIR
 
 
-if [ "$SYSTEM_TYPE" = "Darwin" ]; then
-  echo "Bootstraping Xcode"
-  ./scripts/xcode.sh
+case "$OSTYPE" in
+	darwin*)
+  		echo "Bootstraping Xcode"
+  		./scripts/xcode.sh
 
-  echo "Bootstraping macOS"
-  ./scripts/macos.sh
+  		echo "Bootstraping macOS"
+  		./scripts/macos.sh
 
-  echo "Bootstraping Homebrew"
-  ./scripts/homebrew.sh
+  		echo "Bootstraping Homebrew"
+  		./scripts/homebrew.sh
 
-    echo "Bootstraping whalebrew"
-  ./scripts/whalebrew.sh
+    		echo "Bootstraping whalebrew"
+  		./scripts/whalebrew.sh
 
-  sudo xcodebuild -license
+  		sudo xcodebuild -license
 
-  echo "Bootstraping dnsmasq"
-  ./scripts/dnsmasq.sh
-fi
+  		echo "Bootstraping dnsmasq"
+  		./scripts/dnsmasq.sh
+		
+		echo "Bootstrapping iTerm2"
+		./scripts/iterm.sh
+		;;
+	
+	linux*)
+  		echo "Bootstraping Linux"
+  		./scripts/linux.sh
+		;;
+	*) ;;
+esac
+
 
 echo "Boostrapping ZSH"
 ./scripts/zsh.sh
@@ -42,9 +54,6 @@ echo "Bootstraping Emacs"
 
 echo "Bootstraping tmux"
 ./scripts/tmux.sh
-
-echo "Bootstrapping iTerm2"
-./scripts/iterm.sh
 
 
 if [ "$SYSTEM_TYPE" = "Darwin" ]; then

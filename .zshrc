@@ -46,18 +46,8 @@ export CLICOLOR_FORCE=1
 setopt auto_cd
 bindkey -e
 
-alias de='docker exec -i -t'
-alias subl='/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl'
 alias rld='source ~/.zshrc'
-
-# Change iterm2 profile. Usage it2prof ProfileName (case sensitive)
-it2prof() { echo -e "\033]50;SetProfile=$1\a" }
-
-
-alias ya="yadm add"
-alias ycm="yadm commit -m"
-alias yp="yadm push"
-
+alias de='docker exec -i -t'
 alias dstats='docker stats --format "table {{.Name}}:\t{{.MemUsage}}\t{{.CPUPerc}}"'
 
 git-clean-branches() {
@@ -70,7 +60,6 @@ g++-run() {
     g++ -lstdc++ -std=c++14 -pipe -O2 -Wall $1 && ./a.out
 }
 
-alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
 
 # Codi
 # Usage: codi [filetype] [filename]
@@ -88,13 +77,22 @@ codi() {
 }
 
 
+case "$OSTYPE" in
+	darwin*)
+		export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+		alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
+		source /usr/local/opt/asdf/asdf.sh
+		source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
+		;;
+	linux*)
+		alias bat="batcat"
+		export MANPAGER="sh -c 'col -bx | batcat -l man -p'"
+		;;
+	*) ;;
+esac
 
-
-source /usr/local/opt/asdf/asdf.sh
-source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
 
 [ -s "$HOME/.zshenv" ] && source $HOME/.zshenv
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
