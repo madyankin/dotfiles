@@ -51,3 +51,4 @@
 (package! org-drill)
 (package! multiple-cursors)
 (package! reverse-im)
+(package! anki-editor)
