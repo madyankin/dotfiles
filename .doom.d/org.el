@@ -42,11 +42,11 @@
    org-capture-templates
         '(("t" "TODO in Journal" entry
            (function org-journal-find-location)
-           "*** TODO %i%?" :empty-lines 1)
+           "*** TODO %i%" :empty-lines 1)
 
           ("j" "Journal" entry
            (function org-journal-find-location)
-           "** %(format-time-string org-journal-time-format)\n%i%?" :empty-lines 1)
+           "** %i%?\n" :empty-lines 1)
 
           ("w" "Week summary" entry
            (function buffer-file-name)
@@ -127,7 +127,7 @@
 
 ;; Org journal fn for capture
 (defun org-journal-find-location ()
-  (org-journal-new-entry t) (goto-char (point-min)))
+  (org-journal-new-entry t) (goto-char (point-max)))
 
 
 ;; Drawing diagrams with Graphviz in org-mode
