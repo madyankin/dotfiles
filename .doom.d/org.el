@@ -17,6 +17,8 @@
       org-todo-keywords '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)"))
       org-habit-show-habits t
 
+      org-drill-scope 'directory
+
       my-zettelkasten-directory (concat org-directory "zettelkasten")
       my-journal-directory (concat org-directory "journal")
       my-org-templates-directory (concat org-directory "utils/templates/"))

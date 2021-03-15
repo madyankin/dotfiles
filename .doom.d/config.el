@@ -12,7 +12,8 @@
 
 
 
- (global-auto-revert-mode t)
+(global-auto-revert-mode t)
+(pdf-tools-install)
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
