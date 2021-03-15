@@ -54,3 +54,5 @@
 (package! anki-editor)
 (package! org-noter)
 (package! pdf-tools)
+(package! org-pdftools)
+(package! org-noter-pdftools)
