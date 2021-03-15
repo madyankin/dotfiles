@@ -21,14 +21,12 @@
 
       my-zettelkasten-directory (concat org-directory "zettelkasten")
       my-journal-directory (concat org-directory "journal")
-      my-org-templates-directory (concat org-directory "utils/templates/"))
+      my-org-templates-directory (concat org-directory "utils/templates/")
+      my-org-noter-directory (concat org-directory "reading"))
 
 (setq org-habit-graph-column 60)
 
 
-(defun org-babel-execute:typescript (body params)
-  (let ((org-babel-js-cmd "npx ts-node < "))
-    (org-babel-execute:js body params)))
 
 (after! org
   (map! :map org-mode-map
@@ -192,3 +190,43 @@
       )))
 
 (add-hook 'org-trigger-hook 'my/space-repeat-if-tag-spaced)
+
+
+;; Org noter
+
+(use-package org-noter
+  :after org
+  :ensure t
+  :init (map! :leader
+        :prefix "n"
+        :desc "Noter: Yank from PDF" "p" #'org-noter-yank)
+  :config (setq org-noter-separate-notes-from-heading t
+                org-noter-notes-search-path my-org-noter-directory))
+
+(defun pdf-view-kill-ring-save-to-file ()
+  "Personal function to copy the region to a temporary file. Used
+   in conjunction with quote-process.rb for further processing,
+   and org-noter-yank."
+  (interactive)
+  ;; Delete and recreate quote-process file -- we don't want to append.
+  (shell-command "rm /tmp/quote-process")
+  (shell-command "touch /tmp/quote-process")
+  (pdf-view-assert-active-region)
+  (let* ((txt (pdf-view-active-region-text)))
+    (pdf-view-deactivate-region)
+    (write-region
+     (mapconcat 'identity txt "\n") nil "/tmp/quote-process" 'append)))
+
+(defun org-noter-yank ()
+  "Send highlighted region of PDF to Org-noter note."
+  (interactive)
+  (setq inhibit-message t) ;; Avoid annoying messages
+  (pdf-view-kill-ring-save-to-file)
+  (shell-command (concat "ruby ~/.doom.d/clean-pdf-quote.rb"))
+  (setq quote-process
+        (file-string "/tmp/quote-process"))
+  (kill-new quote-process)
+  (org-noter-insert-note-toggle-no-questions)
+  (org-yank)
+  (fill-paragraph)
+  (setq inhibit-message nil))
