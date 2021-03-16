@@ -197,20 +197,10 @@
 (use-package org-noter
   :after org
   :ensure t
-  :init
-        (map! :leader
-              :prefix "n"
-              :desc "Noter: Yank from PDF" "p" #'org-noter-yank)
   :config
         (setq org-noter-separate-notes-from-heading t
               org-noter-notes-search-path my-org-noter-directory)
         (require 'org-noter-pdftools))
-
-
-(use-package org-noter
-  :config
-  ;; Your org-noter config ........
-  (require 'org-noter-pdftools))
 
 (use-package org-pdftools
   :ensure t
@@ -219,63 +209,5 @@
 (use-package org-noter-pdftools
   :after org-noter
   :ensure t
-  :config
+  :config (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
 
-    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
-;;   ;; Add a function to ensure precise note is inserted
-;;   (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
-;;     (interactive "P")
-;;     (org-noter--with-valid-session
-;;      (let ((org-noter-insert-note-no-questions (if toggle-no-questions
-;;                                                    (not org-noter-insert-note-no-questions)
-;;                                                  org-noter-insert-note-no-questions))
-;;            (org-pdftools-use-isearch-link t)
-;;            (org-pdftools-use-freestyle-annot t))
-;;        (org-noter-insert-note (org-noter--get-precise-info)))))
-
-;;   ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
-;;   (defun org-noter-set-start-location (&optional arg)
-;;     "When opening a session with this document, go to the current location.
-;; With a prefix ARG, remove start location."
-;;     (interactive "P")
-;;     (org-noter--with-valid-session
-;;      (let ((inhibit-read-only t)
-;;            (ast (org-noter--parse-root))
-;;            (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
-;;        (with-current-buffer (org-noter--session-notes-buffer session)
-;;          (org-with-wide-buffer
-;;           (goto-char (org-element-property :begin ast))
-;;           (if arg
-;;               (org-entry-delete nil org-noter-property-note-location)
-;;             (org-entry-put nil org-noter-property-note-location
-;;                            (org-noter--pretty-print-location location))))))))
-;;   (with-eval-after-load 'pdf-annot
-;;     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
-
-(defun pdf-view-kill-ring-save-to-file ()
-  "Personal function to copy the region to a temporary file. Used
-   in conjunction with quote-process.rb for further processing,
-   and org-noter-yank."
-  (interactive)
-  ;; Delete and recreate quote-process file -- we don't want to append.
-  (shell-command "rm /tmp/quote-process")
-  (shell-command "touch /tmp/quote-process")
-  (pdf-view-assert-active-region)
-  (let* ((txt (pdf-view-active-region-text)))
-    (pdf-view-deactivate-region)
-    (write-region
-     (mapconcat 'identity txt "\n") nil "/tmp/quote-process" 'append)))
-
-(defun org-noter-yank ()
-  "Send highlighted region of PDF to Org-noter note."
-  (interactive)
-  (setq inhibit-message t) ;; Avoid annoying messages
-  (pdf-view-kill-ring-save-to-file)
-  (shell-command (concat "ruby ~/.doom.d/clean-pdf-quote.rb"))
-  (setq quote-process
-        (file-string "/tmp/quote-process"))
-  (kill-new quote-process)
-  (org-noter-insert-note-toggle-no-questions)
-  (org-yank)
-  (fill-paragraph)
-  (setq inhibit-message nil))
