@@ -20,11 +20,11 @@
       org-drill-scope 'directory
 
       my-zettelkasten-directory (concat org-directory "zettelkasten")
-      my-journal-directory (concat org-directory "journal")
+      my-journal-directory org-directory
       my-org-templates-directory (concat org-directory "utils/templates/")
-      my-org-noter-directory (concat org-directory "reading"))
+      my-org-noter-directory (concat org-directory "reading")
 
-(setq org-habit-graph-column 60)
+      org-habit-graph-column 60)
 
 
 
@@ -120,8 +120,8 @@
         :desc "New journal entry" "j" #'(lambda () (interactive) (org-capture 1 "j"))
         :desc "New journal todo" "t" #'(lambda () (interactive) (org-capture 1 "t")))
   :custom
-  (org-journal-file-type 'monthly)
-  (org-journal-file-format "%Y-%m.org")
+  (org-journal-file-type 'yearly)
+  (org-journal-file-format "journal.org")
   (org-journal-date-format "%A, %d %B %Y")
   (org-journal-dir my-journal-directory))
 
@@ -210,4 +210,5 @@
   :after org-noter
   :ensure t
   :config (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
+
 
