@@ -41,11 +41,11 @@
    org-image-actual-width 400
    org-capture-templates
         '(("t" "TODO in Journal" entry
-           (function org-journal-find-location)
+           entry (file+datetree "~/Org/journal.org")
            "*** TODO %i%" :empty-lines 1)
 
-          ("j" "Journal" entry
-           (function org-journal-find-location)
+          ("j" "Journal"
+           entry (file+datetree "~/Org/journal.org")
            "** %i%?\n" :empty-lines 1)
 
           ("w" "Week summary" entry
@@ -125,9 +125,6 @@
   (org-journal-date-format "%A, %d %B %Y")
   (org-journal-dir my-journal-directory))
 
-;; Org journal fn for capture
-(defun org-journal-find-location ()
-  (org-journal-new-entry t) (goto-char (point-max)))
 
 
 ;; Drawing diagrams with Graphviz in org-mode
