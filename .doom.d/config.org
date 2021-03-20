@@ -1,7 +1,21 @@
+#+TITLE: My Doom Emacs
+#+PROPERTY: header-args :tangle config.el
+
+* Inspiration
+- https://dangirsh.org/projects/doom-config.html
+- https://github.com/zzamboni/dot-doom/blob/master/doom.org
+- [[https://github.com/sunnyhasija/Academic-Doom-Emacs-Config/blob/master/README.org][An Academic’s Opinionated DOOM Emacs Config]]
+
+
+* Name and Email
+#+BEGIN_SRC elisp
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 (setq user-full-name "Alexander Madyankin"
       user-mail-address "alexander@madyankin.name")
+#+END_SRC
 
+* Visual Settings
+#+begin_src elisp
 (setq doom-font (font-spec :family "JetBrains Mono" :size 14)
       doom-theme 'doom-dracula
 
@@ -16,15 +30,27 @@
                 ('light (load-theme 'doom-one-light t))
                 ('dark (load-theme 'doom-dracula t)))))
 
+#+end_src
+
+
+* Directories
+#+begin_src elisp
 (setq my/home-dir "~"
       my/org-dir (concat my/home-dir "/Dropbox/Org/")
       my/org-templates-dir (concat my/org-dir "utils/templates/")
       my/journal-dir my/org-dir
       my/zettels-dir (concat my/org-dir "zettelkasten"))
+#+end_src
 
+* Battery
+It's useful to see the battery status in fullscreen mode
+#+begin_src elisp
 (unless (equal "Battery status not available" (battery))
   (display-battery-mode 1))
+#+end_src
 
+* Not sorted yet
+#+begin_src elisp
 (global-auto-revert-mode t)
 (pdf-tools-install)
 
@@ -181,6 +207,11 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "s-3") (kbd "C-x 3"))  ;; Cmd-3 split vertically
 (global-set-key (kbd "s-0") (kbd "C-x 0"))  ;; Cmd-0...
 (global-set-key (kbd "s-w") (kbd "C-x 0"))  ;; ...and Cmd-w to close current window
+#+end_src
+
+* Key bindings
+
+#+begin_src elisp
 
 (if (eq system-type 'darwin)
   (define-key global-map (kbd "S-c") 'kill-ring-save)
@@ -194,7 +225,10 @@ point reaches the beginning or end of the buffer, stop there."
   (reverse-im-input-methods '("russian-computer"))
   :config
   (reverse-im-mode t))
+#+end_src
 
+* Org stuff
+#+begin_src elisp
 ;;; org.el -*- lexical-binding: t; -*-
 
 (global-set-key (kbd "s-=") 'org-capture)
@@ -395,3 +429,4 @@ point reaches the beginning or end of the buffer, stop there."
   :after org-noter
   :ensure t
   :config (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
+#+end_src
