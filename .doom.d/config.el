@@ -197,6 +197,9 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;;; org.el -*- lexical-binding: t; -*-
 
+(setq org-latex-create-formula-image-program 'dvisvgm)
+
+
 (global-set-key (kbd "s-=") 'org-capture)
 
 (require 'org-habit)
