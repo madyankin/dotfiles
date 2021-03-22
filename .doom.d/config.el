@@ -195,6 +195,12 @@ point reaches the beginning or end of the buffer, stop there."
   :config
   (reverse-im-mode t))
 
+(require 'org-drill)
+
+(setq org-drill-scope 'directory)
+
+(defun org-drill-entry-empty-p () nil)
+
 ;;; org.el -*- lexical-binding: t; -*-
 
 (setq org-latex-create-formula-image-program 'dvisvgm)
@@ -203,7 +209,6 @@ point reaches the beginning or end of the buffer, stop there."
 (global-set-key (kbd "s-=") 'org-capture)
 
 (require 'org-habit)
-(require 'org-drill)
 
 (setq org-bullets-bullet-list '("·")
       org-support-shift-select t
@@ -216,10 +221,7 @@ point reaches the beginning or end of the buffer, stop there."
       org-agenda-files (directory-files-recursively my/org-dir "\\.org$")
       org-todo-keywords '((sequence "TODO(t)" "WAIT(w@/!)" "|" "DONE(d!)" "CANCELED(c@)"))
       org-habit-show-habits t
-      org-drill-scope 'directory
       org-habit-graph-column 60)
-
-
 
 (after! org
   (map! :map org-mode-map
