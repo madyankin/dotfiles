@@ -401,3 +401,18 @@ point reaches the beginning or end of the buffer, stop there."
   :after org-noter
   :ensure t
   :config (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
+
+(use-package org-roam-server
+  :ensure t
+  :config
+  (setq org-roam-server-host "127.0.0.1"
+        org-roam-server-port 8080
+        org-roam-server-authenticate nil
+        org-roam-server-export-inline-images t
+        org-roam-server-serve-files nil
+        org-roam-server-served-file-extensions '("pdf" "mp4" "ogv" "png" "jpg")
+        org-roam-server-network-poll t
+        org-roam-server-network-arrows nil
+        org-roam-server-network-label-truncate t
+        org-roam-server-network-label-truncate-length 60
+        org-roam-server-network-label-wrap-length 20))

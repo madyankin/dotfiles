@@ -56,3 +56,4 @@
 (package! pdf-tools)
 (package! org-pdftools)
 (package! org-noter-pdftools)
+(package! org-roam-server)
