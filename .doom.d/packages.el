@@ -51,7 +51,6 @@
 (package! org-drill)
 (package! multiple-cursors)
 (package! reverse-im)
-(package! anki-editor)
 (package! org-noter)
 (package! pdf-tools)
 (package! org-pdftools)

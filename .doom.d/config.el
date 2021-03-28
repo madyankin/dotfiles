@@ -338,11 +338,6 @@ point reaches the beginning or end of the buffer, stop there."
   (setq-default org-download-timestamp "%Y-%m-%d_%H-%M-%S_"))
 
 
-(use-package! anki-editor
-  :after or
-  :config
-  (setq anki-editor-create-decks 't))
-
 ;; https://ag91.github.io/blog/2020/09/04/the-poor-org-user-spaced-repetition/
 (defun my/space-repeat-if-tag-spaced (e)
   "Resets the header on the TODO states and increases the date according to a suggested spaced repetition interval."
