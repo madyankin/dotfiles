@@ -1,10 +1,10 @@
 export PATH="./bin:$PATH"
+
 export PATH="$PATH:./node_modules/.bin"
 export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.bin:$PATH"
 export PATH="$PATH:$HOME/.emacs.d/bin"
-export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
 
 export LC_ALL=en_US.UTF-8
 
@@ -15,8 +15,11 @@ export FZF_DEFAULT_OPTS=""
 export EDITOR=vim
 export REACT_EDITOR=code
 
-export ANDROID_HOME=${HOME}/Library/Android/sdk
-export PATH=${PATH}:${ANDROID_HOME}/emulator
-export PATH=${PATH}:${ANDROID_HOME}/tools/bin
-export PATH=${PATH}:${ANDROID_HOME}/tools
-export PATH=${PATH}:${ANDROID_HOME}/platform-tools
+#export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
+#export ANDROID_HOME=${HOME}/Library/Android/sdk
+#export PATH=${PATH}:${ANDROID_HOME}/emulator
+#export PATH=${PATH}:${ANDROID_HOME}/tools/bin
+#export PATH=${PATH}:${ANDROID_HOME}/tools
+#export PATH=${PATH}:${ANDROID_HOME}/platform-tools
+
+export PATH=${PATH}:/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin
