@@ -202,6 +202,11 @@ point reaches the beginning or end of the buffer, stop there."
 
 (defun org-drill-entry-empty-p () nil)
 
+(use-package anki-editor
+  :after org-noter
+  :config
+  (setq anki-editor-create-decks 't))
+
 ;;; org.el -*- lexical-binding: t; -*-
 
 (setq org-latex-create-formula-image-program 'dvisvgm)
