@@ -198,7 +198,8 @@ point reaches the beginning or end of the buffer, stop there."
 
 (require 'org-drill)
 
-(setq org-drill-scope 'directory)
+(setq org-drill-scope 'agenda)
+(setq org-drill-add-random-noise-to-intervals-p t)
 
 (defun org-drill-entry-empty-p () nil)
 

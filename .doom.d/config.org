@@ -238,7 +238,8 @@ point reaches the beginning or end of the buffer, stop there."
 #+begin_src elisp
 (require 'org-drill)
 
-(setq org-drill-scope 'directory)
+(setq org-drill-scope 'agenda)
+(setq org-drill-add-random-noise-to-intervals-p t)
 #+end_src
 
 Never ignore "empty" cards, I need them:
