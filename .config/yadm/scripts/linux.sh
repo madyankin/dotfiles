@@ -3,6 +3,7 @@
 echo "Installing packages"
 sudo apt update
 sudo apt install \
+    build-essentials \
     gcc \
     git \
     bat \
