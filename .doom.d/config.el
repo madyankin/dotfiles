@@ -18,7 +18,7 @@
 (add-hook 'window-setup-hook 'toggle-frame-maximized t)
 
 (setq my/home-dir "~"
-      my/org-dir (concat my/home-dir "/Dropbox/Org/")
+      my/org-dir (concat my/home-dir "/Documents/Org/")
       my/org-templates-dir (concat my/org-dir "utils/templates/")
       my/journal-dir my/org-dir
       my/zettels-dir (concat my/org-dir "zettelkasten"))
@@ -202,11 +202,6 @@ point reaches the beginning or end of the buffer, stop there."
 (setq org-drill-add-random-noise-to-intervals-p t)
 
 (defun org-drill-entry-empty-p () nil)
-
-(use-package anki-editor
-  :after org-noter
-  :config
-  (setq anki-editor-create-decks 't))
 
 ;;; org.el -*- lexical-binding: t; -*-
 

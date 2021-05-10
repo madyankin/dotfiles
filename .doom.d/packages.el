@@ -56,4 +56,3 @@
 (package! org-pdftools)
 (package! org-noter-pdftools)
 (package! org-roam-server)
-(package! anki-editor)

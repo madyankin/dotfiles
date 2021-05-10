@@ -42,7 +42,7 @@ Start with maximized windows
 * Directories
 #+begin_src elisp
 (setq my/home-dir "~"
-      my/org-dir (concat my/home-dir "/Dropbox/Org/")
+      my/org-dir (concat my/home-dir "/Documents/Org/")
       my/org-templates-dir (concat my/org-dir "utils/templates/")
       my/journal-dir my/org-dir
       my/zettels-dir (concat my/org-dir "zettelkasten"))
@@ -245,18 +245,6 @@ point reaches the beginning or end of the buffer, stop there."
 Never ignore "empty" cards, I need them:
 #+begin_src elisp
 (defun org-drill-entry-empty-p () nil)
-#+end_src
-
-** Anki editor
-
-- https://rgoswami.me/posts/anki-decks-orgmode/
-- https://yiufung.net/post/anki-org/
-
-#+begin_src elisp
-(use-package anki-editor
-  :after org-noter
-  :config
-  (setq anki-editor-create-decks 't))
 #+end_src
 
 ** Other
