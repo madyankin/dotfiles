@@ -247,6 +247,7 @@ Never ignore "empty" cards, I need them:
 (defun org-drill-entry-empty-p () nil)
 #+end_src
 
+
 ** Other
 
 #+begin_src elisp
