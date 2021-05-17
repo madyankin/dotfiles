@@ -21,7 +21,8 @@
       my/org-dir (concat my/home-dir "/Documents/Org/")
       my/org-templates-dir (concat my/org-dir "utils/templates/")
       my/journal-dir my/org-dir
-      my/zettels-dir (concat my/org-dir "zettelkasten"))
+      my/zettels-dir (concat my/org-dir "zettelkasten")
+      my/journal-dir (concat my/org-dir "journal"))
 
 (unless (equal "Battery status not available" (battery))
   (display-battery-mode 1))
@@ -196,6 +197,21 @@ point reaches the beginning or end of the buffer, stop there."
   :config
   (reverse-im-mode t))
 
+(use-package! org-journal
+  :after org
+  :defer t
+  :ensure t
+  :init
+  (map! :leader
+        :prefix "j"
+        :desc "Today journal file" "o" #'journal-file-today)
+  :custom
+  (org-journal-file-type 'daily)
+  (org-journal-file-format "%Y-%m-%d.org")
+  (org-journal-date-format "%A, %d %B %Y")
+  (org-journal-time-format "")
+  (org-journal-dir my/journal-dir))
+
 (require 'org-drill)
 
 (setq org-drill-scope 'agenda)
@@ -237,15 +253,7 @@ point reaches the beginning or end of the buffer, stop there."
   (setq
    org-image-actual-width 400
    org-capture-templates
-        '(("t" "TODO in Journal" entry
-           entry (file+datetree "~/Org/journal.org")
-           "*** TODO %i%" :empty-lines 1)
-
-          ("j" "Journal"
-           entry (file+datetree "~/Org/journal.org")
-           "** %i%?\n" :empty-lines 1)
-
-          ("w" "Week summary" entry
+          '(("w" "Week summary" entry
            (function buffer-file-name)
            "** %(format-time-string org-journal-date-format)\n%i%?" :empty-lines 1)
 
@@ -307,19 +315,6 @@ point reaches the beginning or end of the buffer, stop there."
   (deft-directory org-directory))
 
 
-(use-package! org-journal
-  :after org
-  :init
-  (map! :leader
-        :prefix "j"
-        :desc "Today journal file" "o" #'org-journal-open-current-journal-file
-        :desc "New journal entry" "j" #'(lambda () (interactive) (org-capture 1 "j"))
-        :desc "New journal todo" "t" #'(lambda () (interactive) (org-capture 1 "t")))
-  :custom
-  (org-journal-file-type 'yearly)
-  (org-journal-file-format "journal.org")
-  (org-journal-date-format "%A, %d %B %Y")
-  (org-journal-dir my/journal-dir))
 
 
 
