@@ -49,3 +49,4 @@ Vagrantfile
 
 # Xcode
 outpunk.xcuserdatad
+.env
