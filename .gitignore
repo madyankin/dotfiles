@@ -1,3 +1,4 @@
+*.env
 *.TODO
 *.sublime-project
 *.sublime-workspace
