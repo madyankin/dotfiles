@@ -60,7 +60,6 @@ g++-run() {
     g++ -lstdc++ -std=c++14 -pipe -O2 -Wall $1 && ./a.out
 }
 
-
 # Codi
 # Usage: codi [filetype] [filename]
 codi() {
@@ -80,9 +79,12 @@ codi() {
 case "$OSTYPE" in
 	darwin*)
 		export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-		alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
-		source /usr/local/opt/asdf/asdf.sh
+		
+    alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
+		
+    source /usr/local/opt/asdf/asdf.sh
 		source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
+
 		;;
 	linux*)
 		alias bat="batcat"
