@@ -81,6 +81,7 @@ case "$OSTYPE" in
 		export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 		
     alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
+    alias subl="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 		
     source /usr/local/opt/asdf/asdf.sh
 		source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
