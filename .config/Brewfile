@@ -67,15 +67,12 @@ mas 'Amphetamine', id: 937984704
 mas 'AudioBookBinder', id: 413969927
 mas 'DaisyDisk', id: 411643860
 # mas 'Day One', id: 1055511498
-# mas 'Daum Equation Editor', id: 540665783
 mas 'Euclid', id: 656423396
-# mas 'Flashcard Hero', id: 650802274
+mas 'Flashcard Hero', id: 650802274
 mas 'Garage Band', id: 682658836
 mas 'The Unarchiver', id: 425424353
-mas 'Metronome X', id: 1222424189
 mas 'MindNode', id: 992076693
 mas 'Pixel Winch', id: 735066709
-mas 'Readkit', id: 588726889
 mas 'Slack', id: 803453959
 mas 'Telegram', id: 747648890
 mas 'Things3', id: 904280696
