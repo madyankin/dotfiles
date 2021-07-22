@@ -407,3 +407,9 @@ point reaches the beginning or end of the buffer, stop there."
         org-roam-server-network-label-truncate t
         org-roam-server-network-label-truncate-length 60
         org-roam-server-network-label-wrap-length 20))
+
+(use-package! anki-editor
+  :after org
+  :config
+  (setq anki-editor-create-decks t
+        anki-editor-org-tags-as-anki-tags t))

@@ -461,3 +461,12 @@ Never ignore "empty" cards, I need them:
         org-roam-server-network-label-truncate-length 60
         org-roam-server-network-label-wrap-length 20))
 #+end_src
+
+** Anki editor
+#+begin_src elisp
+(use-package! anki-editor
+  :after org
+  :config
+  (setq anki-editor-create-decks t
+        anki-editor-org-tags-as-anki-tags t))
+#+end_src
