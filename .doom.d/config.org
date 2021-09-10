@@ -239,7 +239,6 @@ point reaches the beginning or end of the buffer, stop there."
 (use-package! org-journal
   :after org
   :defer t
-  :ensure t
   :init
   (map! :leader
         :prefix "j"
@@ -306,7 +305,11 @@ Never ignore "empty" cards, I need them:
 
           ("n" "New note" plain
            (file my/new-note-path)
-           "#+TITLE: %i%? \n#+ROAM_ALIAS: \"\" \n#+ROAM_TAGS: \n\n* References: \n"))))
+           "#+TITLE: %i%? \n:PROPERTIES:\n#+ROAM_ALIASES:\n:END: \n\n")
+
+          ("a" "Anki card" plain
+           (function buffer-file-name)
+           "* %i%?\n:PROPERTIES:\n:ANKI_DECK: Main\n:ANKI_NOTE_TYPE: Basic\n:END:\n** Front\n** Back" :empty-lines 1))))
 
 
 (setq my/new-note-timestamp-format "%Y-%m-%dT%H%M%S")
