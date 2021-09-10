@@ -28,7 +28,6 @@
   (display-battery-mode 1))
 
 (global-auto-revert-mode t)
-(pdf-tools-install)
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
@@ -226,8 +225,6 @@ point reaches the beginning or end of the buffer, stop there."
 
 (global-set-key (kbd "s-=") 'org-capture)
 
-(require 'org-habit)
-
 (setq org-bullets-bullet-list '("·")
       org-support-shift-select t
       org-catch-invisible-edits 'smart
@@ -270,31 +267,8 @@ point reaches the beginning or end of the buffer, stop there."
           (format-time-string my/new-note-timestamp-format)
           ".org"))
 
-(use-package! org-roam
-  :commands (org-roam-insert org-roam-find-file org-roam)
-
-  :init
-  (setq org-roam-directory my/zettels-dir
-        org-roam-graph-viewer "/usr/bin/open")
-  (map! :leader
-        :prefix "n"
-        :desc "org-roam" "l" #'org-roam
-        :desc "org-roam-insert" "i" #'org-roam-insert
-        :desc "org-roam-switch-to-buffer" "b" #'org-roam-switch-to-buffer
-        :desc "org-roam-find-file" "f" #'org-roam-find-file
-        :desc "org-roam-graph" "g" #'org-roam-graph
-        :desc "org-roam-insert" "i" #'org-roam-insert
-        :desc "org-roam-capture" "c" #'org-roam-capture)
-
-  :config
-  (setq org-roam-capture-templates
-        '(("d" "default" plain (function org-roam--capture-get-point)
-
-           "%? \n\n* References\n\n"
-           :file-name "%(format-time-string my/new-note-timestamp-format)"
-           :head "#+TITLE: ${title} \n#+ROAM_ALIAS: \"\" \n#+ROAM_TAGS: \n\n"
-           :unnarrowed t)))
-  (org-roam-mode +1))
+(setq org-roam-directory my/zettels-dir
+      org-roam-graph-viewer "/usr/bin/open")
 
 (use-package! ob-C :after org)
 (use-package! ob-emacs-lisp :after org)
@@ -373,40 +347,6 @@ point reaches the beginning or end of the buffer, stop there."
       )))
 
 (add-hook 'org-trigger-hook 'my/space-repeat-if-tag-spaced)
-
-
-;; Org noter
-
-(use-package org-noter
-  :after org
-  :ensure t
-  :config
-        (setq org-noter-separate-notes-from-heading t)
-        (require 'org-noter-pdftools))
-
-(use-package org-pdftools
-  :ensure t
-  :hook (org-mode . org-pdftools-setup-link))
-
-(use-package org-noter-pdftools
-  :after org-noter
-  :ensure t
-  :config (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note))
-
-(use-package org-roam-server
-  :ensure t
-  :config
-  (setq org-roam-server-host "127.0.0.1"
-        org-roam-server-port 8080
-        org-roam-server-authenticate nil
-        org-roam-server-export-inline-images t
-        org-roam-server-serve-files nil
-        org-roam-server-served-file-extensions '("pdf" "mp4" "ogv" "png" "jpg")
-        org-roam-server-network-poll t
-        org-roam-server-network-arrows nil
-        org-roam-server-network-label-truncate t
-        org-roam-server-network-label-truncate-length 60
-        org-roam-server-network-label-wrap-length 20))
 
 (use-package! anki-editor
   :after org
