@@ -20,16 +20,13 @@ brew 'readline'
 brew 'reattach-to-user-namespace'
 brew 'speedtest-cli'
 brew 'the_silver_searcher'
-# brew 'watchman'
 brew 'whalebrew'
 brew 'yadm'
 brew 'zopfli'
 
 # cask 'android-studio'
-cask 'alfred'
 cask 'arq'
 cask 'appcleaner'
-# cask 'cocoarestclient
 cask 'docker'
 cask 'dropbox'
 cask 'dropshare'
@@ -45,16 +42,13 @@ cask 'imageoptim'
 # cask 'java'
 cask 'karabiner-elements'
 cask 'keybase'
-cask 'little-snitch'
 cask 'qlcolorcode'
 cask 'qlmarkdown'
 cask 'qlstephen'
 cask 'webpquicklook'
-# cask 'react-native-debugger'
 # cask 'sketch'
-cask 'spectacle'
+cask 'raycast'
 cask 'visual-studio-code'
-cask 'tomighty'
 cask 'transmission'
 cask 'viscosity'
 cask 'vlc'
@@ -68,7 +62,6 @@ mas 'AudioBookBinder', id: 413969927
 mas 'DaisyDisk', id: 411643860
 # mas 'Day One', id: 1055511498
 mas 'Euclid', id: 656423396
-mas 'Flashcard Hero', id: 650802274
 mas 'Garage Band', id: 682658836
 mas 'The Unarchiver', id: 425424353
 mas 'MindNode', id: 992076693
