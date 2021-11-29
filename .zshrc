@@ -20,7 +20,7 @@ zplug "plugins/bundler", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh
 zplug "plugins/docker-compose", from:oh-my-zsh
 zplug "plugins/git", from:oh-my-zsh
-zplug "plugins/osx", from:oh-my-zsh
+zplug "plugins/macos", from:oh-my-zsh
 zplug "plugins/react-native", from:oh-my-zsh
 zplug "plugins/npm", from:oh-my-zsh
 zplug "plugins/yarn", from:oh-my-zsh
@@ -83,8 +83,11 @@ case "$OSTYPE" in
     alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
     alias subl="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 		
-    source /usr/local/opt/asdf/asdf.sh
-		source /usr/local/opt/asdf/etc/bash_completion.d/asdf.bash
+    source $HOME/.asdf/asdf.sh
+    # append completions to fpath
+    fpath=(${ASDF_DIR}/completions $fpath)
+    # initialise completions with ZSH's compinit
+    autoload -Uz compinit && compinit
 
 		;;
 	linux*)

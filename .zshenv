@@ -1,6 +1,7 @@
 export PATH="./bin:$PATH"
 
 export PATH="$PATH:./node_modules/.bin"
+export PATH="/opt/homebrew/bin:$PATH"
 export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.bin:$PATH"

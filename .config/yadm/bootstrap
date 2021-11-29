@@ -23,7 +23,7 @@ case "$OSTYPE" in
   		sudo xcodebuild -license
 
   		echo "Bootstraping dnsmasq"
-  		./scripts/dnsmasq.sh
+  		#./scripts/dnsmasq.sh
 		
 		echo "Bootstrapping iTerm2"
 		./scripts/iterm.sh
