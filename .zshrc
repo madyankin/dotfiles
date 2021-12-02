@@ -8,6 +8,7 @@ source ~/.zplug/init.zsh
 
 export SPACESHIP_GIT_SYMBOL=''
 export SPACESHIP_KUBECONTEXT_SHOW=false
+export SPACESHIP_GCLOUD_SHOW=false
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
 zplug "lib/completion", from:oh-my-zsh
