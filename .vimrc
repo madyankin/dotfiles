@@ -235,7 +235,7 @@ endif
 
 
 " Tools
-let g:markdownfmt_autosave=1
+let g:markdownfmt_autosave=0
 
 
 " Hide tildas
