@@ -8,7 +8,6 @@ endif
 call plug#begin()
 
 " Appearance
-Plug 'ayu-theme/ayu-vim'
 Plug 'itchyny/lightline.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'dracula/vim', { 'as': 'dracula' }
@@ -74,11 +73,6 @@ syntax on
 filetype plugin indent on
 set autoindent
 
-"let ayucolor="light"  " for light version of theme
-let ayucolor="mirage" " for mirage version of theme
-"let ayucolor="dark"   " for dark version of theme
-
-colorscheme ayu
 
 let g:airline_theme='base16_railscasts'
 
