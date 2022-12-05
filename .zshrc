@@ -7,7 +7,7 @@ source ~/.zplug/init.zsh
 #zplug "themes/kphoen", from:oh-my-zsh, as:theme
 
 export SPACESHIP_GIT_SYMBOL=''
-export SPACESHIP_KUBECONTEXT_SHOW=false
+export SPACESHIP_KUBECTL_CONTEXT_SHOW=false
 export SPACESHIP_GCLOUD_SHOW=false
 zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
 
@@ -21,6 +21,7 @@ zplug "plugins/bundler", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh
 zplug "plugins/docker-compose", from:oh-my-zsh
 zplug "plugins/git", from:oh-my-zsh
+zplug "plugins/heroku", from:oh-my-zsh
 zplug "plugins/macos", from:oh-my-zsh
 zplug "plugins/react-native", from:oh-my-zsh
 zplug "plugins/npm", from:oh-my-zsh
