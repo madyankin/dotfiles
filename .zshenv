@@ -24,3 +24,4 @@ export REACT_EDITOR=code
 #export PATH=${PATH}:${ANDROID_HOME}/platform-tools
 
 export PATH=${PATH}:/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin
+. "$HOME/.cargo/env"
