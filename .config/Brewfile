@@ -9,7 +9,6 @@ brew 'cloc'
 brew 'diff-so-fancy'
 brew 'git'
 brew 'ffmpeg'
-brew 'hivemind'
 brew 'jq'
 brew 'mas'
 brew 'readline'
@@ -22,7 +21,6 @@ brew 'yadm'
 cask 'arq'
 cask 'appcleaner'
 cask 'docker'
-cask 'dropbox'
 cask 'dropshare'
 cask 'firefox'
 cask 'fliqlo'
@@ -39,10 +37,7 @@ cask 'qlcolorcode'
 cask 'qlmarkdown'
 cask 'qlstephen'
 cask 'webpquicklook'
-# cask 'sketch'
-cask 'visual-studio-code'
-cask 'transmission'
-cask 'viscosity'
+cask 'shifty'
 cask 'vlc'
 cask 'zoomus'
 
@@ -52,7 +47,7 @@ mas '1Password', id: 443987910
 mas 'Amphetamine', id: 937984704
 mas 'AudioBookBinder', id: 413969927
 mas 'DaisyDisk', id: 411643860
-# mas 'Day One', id: 1055511498
+mas 'Day One', id: 1055511498
 mas 'Euclid', id: 656423396
 mas 'Garage Band', id: 682658836
 mas 'The Unarchiver', id: 425424353
