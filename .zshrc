@@ -108,19 +108,8 @@ esac
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+MACHINE_SPECIFIC_CONF=~/.zshrc.machine-specific
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/madyankin/.asdf/installs/python/anaconda3-2022.10/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/madyankin/.asdf/installs/python/anaconda3-2022.10/etc/profile.d/conda.sh" ]; then
-        . "/Users/madyankin/.asdf/installs/python/anaconda3-2022.10/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/madyankin/.asdf/installs/python/anaconda3-2022.10/bin:$PATH"
-    fi
+if [[ -e $MACHINE_SPECIFIC_CONF ]]; then
+    source $MACHINE_SPECIFIC_CONF
 fi
-unset __conda_setup
-# <<< conda initialize <<<
-

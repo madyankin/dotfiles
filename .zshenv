@@ -16,6 +16,8 @@ export FZF_DEFAULT_OPTS=""
 export EDITOR=vim
 export REACT_EDITOR=code
 
+export BAT_THEME=base16
+
 #export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
 #export ANDROID_HOME=${HOME}/Library/Android/sdk
 #export PATH=${PATH}:${ANDROID_HOME}/emulator
@@ -24,4 +26,9 @@ export REACT_EDITOR=code
 #export PATH=${PATH}:${ANDROID_HOME}/platform-tools
 
 export PATH=${PATH}:/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin
-. "$HOME/.cargo/env"
+
+
+CARGO_ENV=~/.cargo/env
+if [[ -e $CARGO_ENV ]]; then
+    source $CARGO_ENV
+fi
