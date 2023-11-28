@@ -13,8 +13,7 @@ export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS=""
 
-export EDITOR=vim
-export REACT_EDITOR=code
+export EDITOR=nvim
 
 export BAT_THEME=base16
 
