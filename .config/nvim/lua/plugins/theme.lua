@@ -24,7 +24,7 @@ return {
 
       set_light_mode = function()
         vim.api.nvim_set_option("background", "light")
-        vim.cmd("colorscheme github_light_default")
+        vim.cmd("colorscheme github_light_tritanopia")
       end,
     },
   },
