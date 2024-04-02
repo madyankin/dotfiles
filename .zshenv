@@ -25,7 +25,7 @@ export BAT_THEME=base16
 #export PATH=${PATH}:${ANDROID_HOME}/platform-tools
 
 export PATH=${PATH}:/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin
-
+export GPG_TTY=$(tty)
 
 CARGO_ENV=~/.cargo/env
 if [[ -e $CARGO_ENV ]]; then
