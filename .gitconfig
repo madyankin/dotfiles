@@ -32,6 +32,7 @@
   lol = log --graph --decorate --pretty=oneline --abbrev-commit
   lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
   ls = ls-files
+  stag = tag -s
 
   # Show files ignored by git:
   ign = ls-files -o -i --exclude-standard
@@ -57,8 +58,14 @@
 [merge]
   tool = opendiff
 
+[commit]
+  gpgsign = true
+
 [url "ssh://git@github.com"]
 	insteadOf = https://github.com
+
+[includeIf "gitdir:~/Projects/"]
+  path = .gitconfig.personal
 
 [includeIf "gitdir:~/Code/"]
   path = .gitconfig.local
