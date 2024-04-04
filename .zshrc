@@ -113,3 +113,4 @@ MACHINE_SPECIFIC_CONF=~/.zshrc.machine-specific
 if [[ -e $MACHINE_SPECIFIC_CONF ]]; then
     source $MACHINE_SPECIFIC_CONF
 fi
+eval "$(gh copilot alias -- zsh)"
