@@ -9,20 +9,19 @@ fpath=(${ASDF_DIR}/completions $fpath)
 # initialise completions with ZSH's compinit
 autoload -Uz compinit && compinit
 
-
 asdf plugin-add python
-asdf install python 3.10.0
-asdf global python 3.10.0
+asdf install python latest
+asdf global python latest
 
 # Ruby
 asdf plugin-add ruby
-asdf install ruby 3.0.3
-asdf global ruby 3.0.3
+asdf install ruby latest
+asdf global ruby latest
 
 # Node
-brew install coreutils gnupg 
+brew install coreutils gnupg
 bash ~/.asdf/plugins/nodejs/bin/import-release-team-keyring
 asdf plugin-add nodejs
-asdf install nodejs 17.1.0
-asdf global nodejs 17.1.0
+asdf install nodejs latest
+asdf global nodejs latest
 npm i -g yarn

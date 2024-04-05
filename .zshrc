@@ -52,6 +52,7 @@ bindkey -e
 alias rld='source ~/.zshrc'
 alias de='docker exec -i -t'
 alias dstats='docker stats --format "table {{.Name}}:\t{{.MemUsage}}\t{{.CPUPerc}}"'
+alias sync-dotfiles='~/.config/yadm/scripts/commit-and-push.sh'
 
 git-clean-branches() {
     git fetch
