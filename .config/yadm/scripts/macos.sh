@@ -11,19 +11,21 @@ read HOST_NAME
 sudo -v
 
 # Keep-alive: update existing `sudo` time stamp until `.osx` has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
+while true; do
+	sudo -n true
+	sleep 60
+	kill -0 "$$" || exit
+done 2>/dev/null &
 
 ###############################################################################
 # General UI/UX                                                               #
 ###############################################################################
 
 # Set computer name (as done via System Preferences → Sharing)
-sudo scutil --set ComputerName  $HOST_NAME
-sudo scutil --set HostName      $HOST_NAME
+sudo scutil --set ComputerName $HOST_NAME
+sudo scutil --set HostName $HOST_NAME
 sudo scutil --set LocalHostName $HOST_NAME
 sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string $HOST_NAME
-
 
 # Disable opening and closing window animations
 defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
@@ -34,15 +36,11 @@ defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 # Disable local Time Machine snapshots
 sudo tmutil disablelocal
 
-
-
-
 # Show icons for hard drives, servers, and removable media on the desktop
 defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
 defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
 defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
 defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
-
 
 # Finder: show status bar
 defaults write com.apple.finder ShowStatusBar -bool true
@@ -65,18 +63,16 @@ defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
 defaults write com.apple.finder NewWindowTarget -string "PfLo"
 defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
 
-
 ###############################################################################
 # Screenshots                                                                 #
 ###############################################################################
 
 # Change  location
-mkdir $SCREENSHOTS_DIR > /dev/null 2>&1
+mkdir $SCREENSHOTS_DIR >/dev/null 2>&1
 defaults write com.apple.screencapture location -string $SCREENSHOTS_DIR
 
 # Disable shadows
 defaults write com.apple.screencapture disable-shadow -bool true
-
 
 ###############################################################################
 # Safari & WebKit                                                             #
@@ -113,14 +109,12 @@ defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
 # Enable “Do Not Track”
 defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
 
-
 ###############################################################################
 # Mail                                                                        #
 ###############################################################################
 
 # Copy email addresses as `foo@example.com` instead of `Foo Bar <foo@example.com>` in Mail.app
 defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
-
 
 ###############################################################################
 # Terminal
@@ -134,7 +128,6 @@ open "$HOME/.config/yadm/scripts/assets/ayu.terminal"
 sleep 1 # Wait a bit to make sure the theme is loaded
 defaults write com.apple.terminal "Default Window Settings" -string "ayu"
 defaults write com.apple.terminal "Startup Window Settings" -string "ayu"
-
 
 ###############################################################################
 # Messages                                                                    #
@@ -163,9 +156,11 @@ defaults write com.apple.dock mineffect -string "scale"
 # Minimize windows into their application’s icon
 defaults write com.apple.dock minimize-to-application -bool true
 
+# Drag windows using any part of the window with cmd+ctrl
+defaults write -g NSWindowShouldDragOnGesture YES
+
 # Disable noatime
 sudo cp ~/.config/yadm/scripts/assets/com.hdd.noatime.plist /Library/LaunchDaemons/
 sudo chown root:wheel /Library/LaunchDaemons/com.hdd.noatime.plist
-
 
 echo "Done. Note that some of these changes require a logout/restart to take effect."
