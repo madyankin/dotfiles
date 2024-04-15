@@ -53,6 +53,7 @@ alias rld='source ~/.zshrc'
 alias de='docker exec -i -t'
 alias dstats='docker stats --format "table {{.Name}}:\t{{.MemUsage}}\t{{.CPUPerc}}"'
 alias sync-dotfiles='~/.config/yadm/scripts/commit-and-push.sh'
+alias nvim-config='~/.config/nvim && nvim .'
 
 git-clean-branches() {
     git fetch
