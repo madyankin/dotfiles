@@ -18,6 +18,7 @@ return {
         "query",
         "regex",
         "ruby",
+        "terraform",
         "tsx",
         "typescript",
         "vim",
