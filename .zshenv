@@ -31,3 +31,4 @@ CARGO_ENV=~/.cargo/env
 if [[ -e $CARGO_ENV ]]; then
     source $CARGO_ENV
 fi
+
