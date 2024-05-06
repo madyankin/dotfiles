@@ -102,9 +102,9 @@
 (when (memq window-system '(mac ns))
   (add-to-list 'default-frame-alist '(ns-appearance . light)) ;; {light, dark}
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-  (setq auto-dark-emacs/dark-theme 'doom-dracula)
-  (setq auto-dark-emacs/light-theme 'doom-one-light)
-  (setq-default line-spacing 5))
+  (setq auto-dark-emacs/dark-theme 'github-dimmed)
+  (setq auto-dark-emacs/light-theme 'github-light)
+  (setq-default line-spacing 2))
 
 
 ;; ================
