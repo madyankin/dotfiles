@@ -14,6 +14,7 @@
 *.code-workspace
 jsconfig.json
 _vimrc_local.vim
+.direnv
 
 # Rails
 public/uploads
@@ -35,7 +36,6 @@ bower_components
 .Trashes
 ehthumbs.db
 Thumbs.db
-
 
 # vagrant
 provisioning
