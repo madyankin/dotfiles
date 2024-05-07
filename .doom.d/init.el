@@ -31,7 +31,6 @@
        doom-dashboard    ; a nifty splash screen for Emacs
        ;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
        ;;fill-column       ; a `fill-column' indicator
-       hul-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;;hydra
        ;;indent-guides     ; highlighted indent columns
        ;;minimap           ; show a map of the code on the side
@@ -40,7 +39,7 @@
        ;;neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
-       pretty-code       ; ligatures or substitute text with pretty symbols
+       ligatures       ; ligatures or substitute text with pretty symbols
        ;;tabs              ; an tab bar for Emacs
        treemacs          ; a project drawer, like neotree but cooler
        ;;unicode           ; extended unicode support for various languages
