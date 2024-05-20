@@ -1,4 +1,4 @@
-export PATH="./bin:$PATH"
+export PATH="./bin:$HOME/.local/bin:$PATH"
 
 export PATH="$PATH:./node_modules/.bin"
 export PATH="$PATH:$HOME/go/bin"
