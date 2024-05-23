@@ -116,3 +116,7 @@ if [[ -e $MACHINE_SPECIFIC_CONF ]]; then
     source $MACHINE_SPECIFIC_CONF
 fi
 eval "$(gh copilot alias -- zsh)"
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/madyankin/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
