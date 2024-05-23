@@ -2369,7 +2369,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Blur</key>
 			<false/>
 			<key>Blur Radius</key>
-			<real>48.595520279255318</real>
+			<real>37.288746675531918</real>
 			<key>Bold Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -2547,7 +2547,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Custom Command</key>
 			<string>No</string>
 			<key>Custom Directory</key>
-			<string>No</string>
+			<string>Recycle</string>
 			<key>Default Bookmark</key>
 			<string>No</string>
 			<key>Description</key>
@@ -2976,6 +2976,8 @@ The script should do this: \(ai.prompt)</string>
 			<true/>
 			<key>Normal Font</key>
 			<string>JetBrainsMonoNFP-Regular 14</string>
+			<key>Only The Default BG Color Uses Transparency</key>
+			<false/>
 			<key>Option Key Sends</key>
 			<integer>0</integer>
 			<key>Prompt Before Closing 2</key>
