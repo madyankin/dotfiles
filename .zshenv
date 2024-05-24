@@ -33,3 +33,4 @@ if [[ -e $CARGO_ENV ]]; then
     source $CARGO_ENV
 fi
 
+DOCKER_HOST="unix://$HOME/.colima/docker.sock"
