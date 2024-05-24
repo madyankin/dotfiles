@@ -7,6 +7,7 @@ export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.bin:$PATH"
 export PATH="$PATH:$HOME/.emacs.d/bin"
+export PATH="$HOME/.rd/bin:$PATH"
 
 export LC_ALL=en_US.UTF-8
 

@@ -9,7 +9,7 @@ The script should do this: \(ai.prompt)</string>
 	<key>AiMaxTokens</key>
 	<integer>128000</integer>
 	<key>AiModel</key>
-	<string>gpt-4o</string>
+	<string>gpt-4-turbo</string>
 	<key>AllowClipboardAccess</key>
 	<true/>
 	<key>Custom Color Presets</key>
