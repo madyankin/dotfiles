@@ -7,4 +7,20 @@ return {
       },
     },
   },
+
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      ensure_installed = {
+        "solargraph",
+      },
+    },
+  },
+
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = { "ruby" },
+    },
+  },
 }
