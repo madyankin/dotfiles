@@ -3,15 +3,6 @@ bashcompinit
 
 source ~/.zplug/init.zsh
 
-#zplug "themes/robbyrussell", from:oh-my-zsh, as:theme
-#zplug "themes/kphoen", from:oh-my-zsh, as:theme
-
-export SPACESHIP_GIT_SYMBOL=''
-export SPACESHIP_KUBECTL_CONTEXT_SHOW=false
-export SPACESHIP_GCLOUD_SHOW=false
-export SPACESHIP_CONDA_SHOW=false
-zplug denysdovhan/spaceship-prompt, use:spaceship.zsh, from:github, as:theme
-
 zplug "lib/completion", from:oh-my-zsh
 zplug "lib/history", from:oh-my-zsh
 zplug "lib/directories", from:oh-my-zsh
@@ -29,6 +20,9 @@ zplug "plugins/npm", from:oh-my-zsh
 zplug "plugins/yarn", from:oh-my-zsh
 
 zplug "zsh-users/zsh-syntax-highlighting"
+
+zplug mafredri/zsh-async, from:github
+zplug sindresorhus/pure, use:pure.zsh, from:github, as:theme
   
 # Install plugins if there are plugins that have not been installed
 if ! zplug check --verbose; then
