@@ -2369,7 +2369,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Blur</key>
 			<true/>
 			<key>Blur Radius</key>
-			<real>48.94426529255319</real>
+			<real>48.523495203267473</real>
 			<key>Bold Color</key>
 			<dict>
 				<key>Alpha Component</key>
@@ -2552,8 +2552,10 @@ The script should do this: \(ai.prompt)</string>
 			<string>No</string>
 			<key>Description</key>
 			<string>Default</string>
-			<key>Disable Window Resizing</key>
+			<key>Disable Printing</key>
 			<true/>
+			<key>Disable Window Resizing</key>
+			<false/>
 			<key>Faint Text Alpha (Dark)</key>
 			<real>0.5</real>
 			<key>Faint Text Alpha (Light)</key>
@@ -2843,7 +2845,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Terminal Type</key>
 			<string>xterm-256color</string>
 			<key>Transparency</key>
-			<real>0.098847517730496451</real>
+			<real>0.11808035714285714</real>
 			<key>Unlimited Scrollback</key>
 			<false/>
 			<key>Use Bold Font</key>
