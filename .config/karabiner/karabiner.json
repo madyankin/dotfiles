@@ -93,7 +93,7 @@
                 "caps_lock_delay_milliseconds": 0,
                 "country_code": 0,
                 "keyboard_type": "ansi",
-                "keyboard_type_v2": "ansi"
+                "keyboard_type_v2": "iso"
             }
         }
     ]
