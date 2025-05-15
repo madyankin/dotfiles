@@ -11,6 +11,7 @@
 .sass-cache
 *.swp
 .vscode
+.cursor
 *.code-workspace
 jsconfig.json
 _vimrc_local.vim
