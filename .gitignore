@@ -16,6 +16,8 @@
 jsconfig.json
 _vimrc_local.vim
 .direnv
+.windsurfrules
+dip.yml
 
 # Rails
 public/uploads

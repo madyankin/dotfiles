@@ -87,7 +87,6 @@ case "$OSTYPE" in
     alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
     alias subl="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 		
-    source $HOME/.asdf/asdf.sh
     # append completions to fpath
     fpath=(${ASDF_DIR}/completions $fpath)
     # initialise completions with ZSH's compinit
@@ -122,3 +121,6 @@ fi
 export PATH="/Users/alexander/.codeium/windsurf/bin:$PATH"
 export ASDF_DATA_DIR="$HOME/.asdf"
 export PATH="$ASDF_DATA_DIR/shims:$PATH"
+
+# Added by Windsurf
+export PATH="/Users/madyankin/.codeium/windsurf/bin:$PATH"
