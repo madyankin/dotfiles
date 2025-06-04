@@ -6,6 +6,11 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(vim.env.LAZY or lazypath)
 
+if vim.g.vscode then
+  vim.g.mapleader = " "
+  vim.g.maplocalleader = " "
+end
+
 require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
