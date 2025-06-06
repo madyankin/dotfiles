@@ -17,6 +17,7 @@ jsconfig.json
 _vimrc_local.vim
 .direnv
 .windsurfrules
+.windsurf
 dip.yml
 
 # Rails
