@@ -54,7 +54,8 @@
                         "is_keyboard": true,
                         "is_pointing_device": true
                     },
-                    "ignore": false
+                    "ignore": false,
+                    "treat_as_built_in_keyboard": true
                 },
                 {
                     "identifiers": {
