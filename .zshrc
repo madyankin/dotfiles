@@ -21,9 +21,7 @@ zplug "plugins/bundler", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh
 zplug "plugins/docker-compose", from:oh-my-zsh
 zplug "plugins/git", from:oh-my-zsh
-zplug "plugins/heroku", from:oh-my-zsh
 zplug "plugins/macos", from:oh-my-zsh
-zplug "plugins/react-native", from:oh-my-zsh
 zplug "plugins/npm", from:oh-my-zsh
 zplug "plugins/yarn", from:oh-my-zsh
 
@@ -64,20 +62,6 @@ g++-run() {
     g++ -lstdc++ -std=c++14 -pipe -O2 -Wall $1 && ./a.out
 }
 
-# Codi
-# Usage: codi [filetype] [filename]
-codi() {
-  local syntax="${1:-python}"
-  shift
-  vim -c \
-    "let g:startify_disable_at_vimenter = 1 |\
-    set bt=nofile ls=0 noru nonu nornu |\
-    hi ColorColumn ctermbg=NONE |\
-    hi VertSplit ctermbg=NONE |\
-    hi NonText ctermfg=0 |\
-    ALEDisable |\
-    Codi $syntax" "$@"
-}
 
 
 case "$OSTYPE" in
@@ -85,7 +69,6 @@ case "$OSTYPE" in
 		export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 		
     alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
-    alias subl="/Applications/Sublime\ Text.app/Contents/SharedSupport/bin/subl"
 		
     # append completions to fpath
     fpath=(${ASDF_DIR}/completions $fpath)
@@ -105,7 +88,6 @@ esac
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 
-
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 MACHINE_SPECIFIC_CONF=~/.zshrc.machine-specific
@@ -117,10 +99,3 @@ fi
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Added by Windsurf
-export PATH="/Users/alexander/.codeium/windsurf/bin:$PATH"
-export ASDF_DATA_DIR="$HOME/.asdf"
-export PATH="$ASDF_DATA_DIR/shims:$PATH"
-
-# Added by Windsurf
-export PATH="/Users/madyankin/.codeium/windsurf/bin:$PATH"
