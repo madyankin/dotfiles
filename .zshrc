@@ -70,11 +70,6 @@ case "$OSTYPE" in
 		
     alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
 		
-    # append completions to fpath
-    fpath=(${ASDF_DIR}/completions $fpath)
-    # initialise completions with ZSH's compinit
-    autoload -Uz compinit && compinit
-
 		;;
 	linux*)
 		alias bat="batcat"
