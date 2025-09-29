@@ -1,20 +1,4 @@
-local function set_lsp_keymaps(bufnr)
-  local map = function(mode, lhs, rhs, desc)
-    vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
-  end
-
-  map('n', 'gd', vim.lsp.buf.definition, 'Go to definition')
-  map('n', 'gr', vim.lsp.buf.references, 'Go to references')
-  map('n', 'K', vim.lsp.buf.hover, 'Hover docs')
-  map('n', '<leader>rn', vim.lsp.buf.rename, 'Rename symbol')
-  map('n', '<leader>ca', vim.lsp.buf.code_action, 'Code action')
-  map('n', '<leader>fd', vim.diagnostic.open_float, 'Line diagnostics')
-  map('n', '[d', vim.diagnostic.goto_prev, 'Prev diagnostic')
-  map('n', ']d', vim.diagnostic.goto_next, 'Next diagnostic')
-  map('n', '<leader>fo', function()
-    vim.lsp.buf.format({ async = true })
-  end, 'Format buffer')
-end
+-- LSP keymaps are handled by LazyVim
 
 return {
   { 'folke/lazy.nvim', version = false },
@@ -58,6 +42,22 @@ return {
         'tsx',
         'typescript',
         'yaml',
+        -- Additional TypeScript/JavaScript parsers
+        'jsdoc',
+        'jsonc',
+        'vue',
+        'svelte',
+        'astro',
+        'prisma',
+        'graphql',
+        'dockerfile',
+        'gitignore',
+        'gitcommit',
+        'git_config',
+        'git_rebase',
+      },
+      indent = {
+        enable = false, -- Disable treesitter-based indentation
       },
     },
   },
@@ -70,115 +70,36 @@ return {
     end,
   },
 
-  {
-    'mason-org/mason-lspconfig.nvim',
-    dependencies = { 'mason-org/mason.nvim' },
-  },
 
+  -- LSP configuration is handled by LazyVim extras
+  -- Custom LSP servers can be configured in separate files
+
+  -- Completion is handled by LazyVim extras
+
+  -- TypeScript support is imported in lazy.lua
+
+
+  -- Yarn workspace support
   {
-    'neovim/nvim-lspconfig',
-    dependencies = {
-      'mason-org/mason-lspconfig.nvim',
-      'hrsh7th/cmp-nvim-lsp',
-    },
+    "vuki656/package-info.nvim",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    event = { "BufRead package.json" },
     config = function()
-      local capabilities = vim.tbl_deep_extend(
-        'force',
-        vim.lsp.protocol.make_client_capabilities(),
-        require('cmp_nvim_lsp').default_capabilities()
-      )
-
-      local servers = {
-        lua_ls = {
-          settings = {
-            Lua = {
-              workspace = { checkThirdParty = false },
-              diagnostics = { globals = { 'vim' } },
-            },
+      require("package-info").setup({
+        colors = {
+          up_to_date = "#3C4048", -- Text color for up to date package version
+          outdated = "#d19a66", -- Text color for outdated package version
+        },
+        icons = {
+          enable = true, -- Enable package icons
+          style = {
+            up_to_date = "|  ", -- Icon for up to date package
+            outdated = "|󰄬 ", -- Icon for outdated package
           },
         },
-        ruby_ls = {},
-        tsserver = {
-          settings = {
-            javascript = { format = { indentSize = 2 } },
-            typescript = { format = { indentSize = 2 } },
-          },
-        },
-        gopls = {},
-      }
-
-      local mason_lspconfig = require('mason-lspconfig')
-      mason_lspconfig.setup({ ensure_installed = vim.tbl_keys(servers) })
-
-      mason_lspconfig.setup_handlers({
-        function(server_name)
-          local server_opts = vim.tbl_deep_extend(
-            'force',
-            {
-              capabilities = capabilities,
-              on_attach = set_lsp_keymaps,
-            },
-            servers[server_name] or {}
-          )
-
-          require('lspconfig')[server_name].setup(server_opts)
-        end,
-      })
-    end,
-  },
-
-  {
-    'hrsh7th/nvim-cmp',
-    event = 'InsertEnter',
-    dependencies = {
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-buffer',
-      'hrsh7th/cmp-path',
-      'saadparwaiz1/cmp_luasnip',
-      'L3MON4D3/LuaSnip',
-      'rafamadriz/friendly-snippets',
-    },
-    config = function()
-      local cmp = require('cmp')
-      local luasnip = require('luasnip')
-
-      require('luasnip.loaders.from_vscode').lazy_load()
-
-      cmp.setup({
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
-        },
-        mapping = cmp.mapping.preset.insert({
-          ['<C-Space>'] = cmp.mapping.complete(),
-          ['<CR>'] = cmp.mapping.confirm({ select = true }),
-          ['<Tab>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            else
-              fallback()
-            end
-          end, { 'i', 's' }),
-          ['<S-Tab>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { 'i', 's' }),
-        }),
-        sources = cmp.config.sources({
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
-        }, {
-          { name = 'buffer' },
-          { name = 'path' },
-        }),
+        autostart = true, -- Automatically start package info
+        hide_up_to_date = false, -- Hide up to date packages
+        hide_unstable_versions = false, -- Hide unstable versions from versions list
       })
     end,
   },
