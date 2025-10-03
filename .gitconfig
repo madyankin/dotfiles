@@ -42,7 +42,7 @@
   autocrlf = input
   excludesfile = ~/.gitignore
   precomposeunicode = false
-  pager = diff-so-fancy | less --tabs=4 -RFX
+  pager = difft | less
 
 [push]
   default = simple
@@ -55,9 +55,16 @@
 
 [diff]
   compactionHeuristic = true
+  external = difft
 
 [merge]
-  tool = opendiff
+  conflictStyle = zdiff3
+
+[interactive]
+  diffFilter = difft
+
+[delta]
+  navigate = true
 
 [url "ssh://git@github.com"]
 	insteadOf = https://github.com
