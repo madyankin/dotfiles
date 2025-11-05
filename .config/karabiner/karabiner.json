@@ -62,7 +62,13 @@
                         "is_keyboard": true,
                         "is_pointing_device": true
                     },
-                    "ignore": false
+                    "ignore": false,
+                    "simple_modifications": [
+                        {
+                            "from": { "key_code": "grave_accent_and_tilde" },
+                            "to": [{ "key_code": "grave_accent_and_tilde" }]
+                        }
+                    ]
                 }
             ],
             "fn_function_keys": [
@@ -93,7 +99,7 @@
                 "caps_lock_delay_milliseconds": 0,
                 "country_code": 0,
                 "keyboard_type": "ansi",
-                "keyboard_type_v2": "iso"
+                "keyboard_type_v2": "ansi"
             }
         }
     ]
