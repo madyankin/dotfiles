@@ -69,6 +69,14 @@
                             "to": [{ "key_code": "grave_accent_and_tilde" }]
                         }
                     ]
+                },
+                {
+                    "identifiers": {
+                        "device_address": "ea-37-e4-b1-17-71",
+                        "is_keyboard": true,
+                        "is_pointing_device": true
+                    },
+                    "ignore": false
                 }
             ],
             "fn_function_keys": [

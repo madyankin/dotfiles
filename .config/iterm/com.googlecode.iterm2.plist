@@ -1661,6 +1661,8 @@ The script should do this: \(ai.prompt)</string>
 	</dict>
 	<key>Default Bookmark Guid</key>
 	<string>9A9E5CC5-4AE8-4C5B-AE5C-73018C664C0D</string>
+	<key>Default Browser Profile Guid</key>
+	<string>9A9E5CC5-4AE8-4C5B-AE5C-73018C664C0D</string>
 	<key>EnableAPIServer</key>
 	<true/>
 	<key>HapticFeedbackForEsc</key>
@@ -2577,7 +2579,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Faint Text Alpha (Dark)</key>
 			<real>0.5</real>
 			<key>Faint Text Alpha (Light)</key>
-			<real>0.5</real>
+			<real>0.50339033018867929</real>
 			<key>Flashing Bell</key>
 			<false/>
 			<key>Foreground Color</key>
@@ -2623,6 +2625,8 @@ The script should do this: \(ai.prompt)</string>
 			<string>9A9E5CC5-4AE8-4C5B-AE5C-73018C664C0D</string>
 			<key>Horizontal Spacing</key>
 			<real>1</real>
+			<key>Icon</key>
+			<integer>1</integer>
 			<key>Idle Code</key>
 			<integer>0</integer>
 			<key>Jobs to Ignore</key>
@@ -2899,7 +2903,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Use Underline Color (Light)</key>
 			<false/>
 			<key>Vertical Spacing</key>
-			<real>1.1499999999999999</real>
+			<real>1.01</real>
 			<key>Visual Bell</key>
 			<true/>
 			<key>Window Type</key>
