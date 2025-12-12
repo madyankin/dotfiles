@@ -19,140 +19,155 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 # Gaps between windows
 [gaps]
-    inner.horizontal = 10
-    inner.vertical = 10
-    outer.left = 10
-    outer.bottom = 10
-    outer.top = 10
-    outer.right = 10
+inner.horizontal = 10
+inner.vertical = 10
+outer.left = 10
+outer.bottom = 10
+outer.top = 10
+outer.right = 10
 
 [key-mapping]
-    preset = 'qwerty'
+preset = 'qwerty'
 
 # Hyper = cmd+ctrl+alt+shift
 # Meh = ctrl+alt+shift (for move operations)
 
 # Main keybindings
 [mode.main.binding]
-    # Focus (Hyper + hjkl)
-    cmd-ctrl-alt-shift-h = 'focus left'
-    cmd-ctrl-alt-shift-j = 'focus down'
-    cmd-ctrl-alt-shift-k = 'focus up'
-    cmd-ctrl-alt-shift-l = 'focus right'
+# Focus (Hyper + hjkl)
+cmd-ctrl-alt-shift-h = 'focus left'
+cmd-ctrl-alt-shift-j = 'focus down'
+cmd-ctrl-alt-shift-k = 'focus up'
+cmd-ctrl-alt-shift-l = 'focus right'
 
-    # Move windows (Meh + hjkl)
-    ctrl-alt-shift-h = 'move left'
-    ctrl-alt-shift-j = 'move down'
-    ctrl-alt-shift-k = 'move up'
-    ctrl-alt-shift-l = 'move right'
+# Move windows (Meh + hjkl)
+ctrl-alt-shift-h = 'move left'
+ctrl-alt-shift-j = 'move down'
+ctrl-alt-shift-k = 'move up'
+ctrl-alt-shift-l = 'move right'
 
-    # Workspaces (Ctrl + number)
-    ctrl-1 = 'workspace web'
-    ctrl-2 = 'workspace dev'
-    ctrl-3 = 'workspace terminals'
-    ctrl-4 = 'workspace calendar'
-    ctrl-5 = 'workspace planning'
-    ctrl-6 = 'workspace messaging'
-    ctrl-7 = 'workspace music'
-    ctrl-8 = 'workspace zoom'
-    ctrl-9 = 'workspace 9'
+# Workspaces (Ctrl + number)
+ctrl-1 = 'workspace web'
+ctrl-2 = 'workspace dev'
+ctrl-3 = 'workspace terminals'
+ctrl-4 = 'workspace calendar'
+ctrl-5 = 'workspace planning'
+ctrl-6 = 'workspace messaging'
+ctrl-7 = 'workspace music'
+ctrl-8 = 'workspace zoom'
+ctrl-9 = 'workspace vm'
 
-    # Move to workspace (Meh + number)
-    ctrl-alt-shift-1 = 'move-node-to-workspace web'
-    ctrl-alt-shift-2 = 'move-node-to-workspace dev'
-    ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
-    ctrl-alt-shift-4 = 'move-node-to-workspace calendar'
-    ctrl-alt-shift-5 = 'move-node-to-workspace planning'
-    ctrl-alt-shift-6 = 'move-node-to-workspace messaging'
-    ctrl-alt-shift-7 = 'move-node-to-workspace music'
-    ctrl-alt-shift-8 = 'move-node-to-workspace zoom'
-    ctrl-alt-shift-9 = 'move-node-to-workspace 9'
+# Move to workspace (Meh + number)
+ctrl-alt-shift-1 = 'move-node-to-workspace web'
+ctrl-alt-shift-2 = 'move-node-to-workspace dev'
+ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
+ctrl-alt-shift-4 = 'move-node-to-workspace calendar'
+ctrl-alt-shift-5 = 'move-node-to-workspace planning'
+ctrl-alt-shift-6 = 'move-node-to-workspace messaging'
+ctrl-alt-shift-7 = 'move-node-to-workspace music'
+ctrl-alt-shift-8 = 'move-node-to-workspace zoom'
+ctrl-alt-shift-9 = 'move-node-to-workspace vm'
 
-    # Layout (ctrl-alt)
-    ctrl-alt-slash = 'layout floating tiling'
-    ctrl-alt-comma = 'layout tiles horizontal vertical'
-    ctrl-alt-period = 'layout accordion horizontal vertical'
-    cmd-ctrl-alt-shift-space = 'layout tiles accordion floating'
-    ctrl-alt-f = 'layout floating tiling'
-    cmd-ctrl-alt-shift-f = 'fullscreen'
+# Layout (ctrl-alt)
+ctrl-alt-slash = 'layout floating tiling'
+ctrl-alt-comma = 'layout tiles horizontal vertical'
+ctrl-alt-period = 'layout accordion horizontal vertical'
+cmd-ctrl-alt-shift-space = 'layout tiles accordion floating'
+ctrl-alt-f = 'layout floating tiling'
+cmd-ctrl-alt-shift-f = 'fullscreen'
 
-    # Resize
-    cmd-ctrl-alt-shift-right = 'resize smart +50'
-    cmd-ctrl-alt-shift-left = 'resize smart -50'
+# Resize
+cmd-ctrl-alt-shift-up = 'resize smart +50'
+cmd-ctrl-alt-shift-down = 'resize smart -50'
 
-    # Service mode
-    cmd-ctrl-alt-shift-semicolon = 'mode service'
+# Service mode
+cmd-ctrl-alt-shift-semicolon = 'mode service'
 
 # Service mode for less common operations
 [mode.service.binding]
-    esc = 'mode main'
-    r = ['reload-config', 'mode main']
-    ctrl-alt-shift-h = ['join-with left', 'mode main']
-    ctrl-alt-shift-j = ['join-with down', 'mode main']
-    ctrl-alt-shift-k = ['join-with up', 'mode main']
-    ctrl-alt-shift-l = ['join-with right', 'mode main']
+esc = 'mode main'
+r = ['reload-config', 'mode main']
+ctrl-alt-shift-h = ['join-with left', 'mode main']
+ctrl-alt-shift-j = ['join-with down', 'mode main']
+ctrl-alt-shift-k = ['join-with up', 'mode main']
+ctrl-alt-shift-l = ['join-with right', 'mode main']
 
 # App assignments
 
 # Browsers → web
 [[on-window-detected]]
-    if.app-id = 'com.google.Chrome'
-    run = 'move-node-to-workspace web'
+if.app-id = 'com.google.Chrome'
+run = 'move-node-to-workspace web'
 
 [[on-window-detected]]
-    if.app-id = 'org.mozilla.firefox'
-    run = 'move-node-to-workspace web'
+if.app-id = 'org.mozilla.firefox'
+run = 'move-node-to-workspace web'
 
 [[on-window-detected]]
-    if.app-id = 'com.apple.Safari'
-    run = 'move-node-to-workspace web'
+if.app-id = 'com.apple.Safari'
+run = 'move-node-to-workspace web'
 
 [[on-window-detected]]
-    if.app-id = 'app.zen-browser.zen'
-    run = 'move-node-to-workspace web'
+if.app-id = 'app.zen-browser.zen'
+run = 'move-node-to-workspace web'
 
 # Cursor → dev
 [[on-window-detected]]
-    if.app-id = 'com.todesktop.230313mzl4w4u92'
-    run = 'move-node-to-workspace dev'
+if.app-id = 'com.todesktop.230313mzl4w4u92'
+run = 'move-node-to-workspace dev'
+
+# Xcode → dev
+[[on-window-detected]]
+if.app-id = 'com.apple.dt.Xcode'
+run = 'move-node-to-workspace dev'
 
 # iTerm → terminals
 [[on-window-detected]]
-    if.app-id = 'com.googlecode.iterm2'
-    run = 'move-node-to-workspace terminals'
+if.app-id = 'com.googlecode.iterm2'
+run = 'move-node-to-workspace terminals'
 
 # Calendar → calendar
 [[on-window-detected]]
-    if.app-id = 'com.apple.iCal'
-    run = 'move-node-to-workspace calendar'
+if.app-id = 'com.apple.iCal'
+run = 'move-node-to-workspace calendar'
 
 # Obsidian → planning
 [[on-window-detected]]
-    if.app-id = 'md.obsidian'
-    run = 'move-node-to-workspace planning'
+if.app-id = 'md.obsidian'
+run = 'move-node-to-workspace planning'
 
 # Things → planning
 [[on-window-detected]]
-    if.app-id = 'com.culturedcode.ThingsMac'
-    run = 'move-node-to-workspace planning'
+if.app-id = 'com.culturedcode.ThingsMac'
+run = 'move-node-to-workspace planning'
 
 # Slack → messaging
 [[on-window-detected]]
-    if.app-id = 'com.tinyspeck.slackmacgap'
-    run = 'move-node-to-workspace messaging'
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace messaging'
 
 # Apple Mail → messaging
 [[on-window-detected]]
-    if.app-id = 'com.apple.mail'
-    run = 'move-node-to-workspace messaging'
+if.app-id = 'com.apple.mail'
+run = 'move-node-to-workspace messaging'
 
 # Zoom → zoom
 [[on-window-detected]]
-    if.app-id = 'us.zoom.xos'
-    run = 'move-node-to-workspace zoom'
+if.app-id = 'us.zoom.xos'
+run = 'move-node-to-workspace zoom'
 
 # Music → music
 [[on-window-detected]]
-    if.app-id = 'com.apple.Music'
-    run = 'move-node-to-workspace music'
+if.app-id = 'com.apple.Music'
+run = 'move-node-to-workspace music'
 
+# Parallels → vm
+[[on-window-detected]]
+if.app-id = 'com.parallels.desktop.console'
+if.window-title-regex-substring = 'Control Center'
+run = ['move-node-to-workspace vm', 'layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.parallels.desktop.console'
+if.window-title-regex-substring = '^(?!.*Control Center).*$'
+run = 'move-node-to-workspace vm'
