@@ -2574,6 +2574,8 @@ The script should do this: \(ai.prompt)</string>
 			<true/>
 			<key>Disable Window Resizing</key>
 			<false/>
+			<key>Draw Powerline Glyphs</key>
+			<false/>
 			<key>Faint Text Alpha (Dark)</key>
 			<real>0.5</real>
 			<key>Faint Text Alpha (Light)</key>
@@ -2714,7 +2716,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>JetBrainsMono-Regular 14</string>
+			<string>JetBrainsMono-Regular 15</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<false/>
 			<key>Option Key Sends</key>

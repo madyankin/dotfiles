@@ -1,160 +1,193 @@
 #!/usr/bin/env bash
 
-# See more at https://github.com/kevinSuttle/macOS-Defaults/blob/master/.macos
+# macOS defaults configuration
+# See: https://github.com/kevinSuttle/macOS-Defaults
+
+set -e
 
 SCREENSHOTS_DIR="${HOME}/Screenshots"
 
-echo 'Enter hostname:'
-read HOST_NAME
-
-# Ask for the administrator password upfront
+# --- Sudo keepalive ---
 sudo -v
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
-# Keep-alive: update existing `sudo` time stamp until `.osx` has finished
-while true; do
-	sudo -n true
-	sleep 60
-	kill -0 "$$" || exit
-done 2>/dev/null &
+# --- Hostname ---
+setup_hostname() {
+  echo ""
+  read -rp "Enter hostname: " HOST_NAME
+  [[ -z "$HOST_NAME" ]] && return
+  
+  sudo scutil --set ComputerName "$HOST_NAME"
+  sudo scutil --set HostName "$HOST_NAME"
+  sudo scutil --set LocalHostName "$HOST_NAME"
+  sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "$HOST_NAME"
+  echo "✓ Hostname set to $HOST_NAME"
+}
 
-###############################################################################
-# General UI/UX                                                               #
-###############################################################################
+# --- Finder ---
+configure_finder() {
+  echo "→ Configuring Finder..."
+  
+  # Desktop icons
+  defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+  defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
+  defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
+  defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+  
+  # UI
+  defaults write com.apple.finder ShowStatusBar -bool true
+  defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"  # Search current folder
+  defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+  defaults write com.apple.finder _FXSortFoldersFirst -bool true
+  defaults write com.apple.finder _FXSortFoldersFirstOnDesktop -bool true
+  defaults write com.apple.finder FXPreferredViewStyle -string "clmv"  # Column view
+  defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+  
+  # Default location: Home
+  defaults write com.apple.finder NewWindowTarget -string "PfLo"
+  defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
+  
+  # Performance
+  defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+}
 
-# Set computer name (as done via System Preferences → Sharing)
-sudo scutil --set ComputerName $HOST_NAME
-sudo scutil --set HostName $HOST_NAME
-sudo scutil --set LocalHostName $HOST_NAME
-sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string $HOST_NAME
+# --- System UI ---
+configure_system_ui() {
+  echo "→ Configuring System UI..."
+  
+  # Animations
+  defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
+  
+  # Dialogs
+  defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+  
+  # Dock
+  defaults write com.apple.dock mineffect -string "scale"
+  defaults write com.apple.dock minimize-to-application -bool true
+  defaults write com.apple.dock autohide -bool true
+  defaults write com.apple.dock show-recents -bool false
+  defaults write com.apple.dock persistent-apps -array
+  defaults write com.apple.dock persistent-others -array
+  defaults write com.apple.dock expose-group-apps -bool true
+  killall Dock
+  
+  # Window dragging with Cmd+Ctrl
+  defaults write -g NSWindowShouldDragOnGesture YES
+}
 
-# Disable opening and closing window animations
-defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
+# --- Screenshots ---
+configure_screenshots() {
+  echo "→ Configuring Screenshots..."
+  
+  mkdir -p "$SCREENSHOTS_DIR"
+  defaults write com.apple.screencapture location -string "$SCREENSHOTS_DIR"
+  defaults write com.apple.screencapture disable-shadow -bool true
+}
 
-# Expand save panel by default
-defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+# --- Disk Images ---
+configure_disk_images() {
+  echo "→ Configuring Disk Images..."
+  
+  defaults write com.apple.frameworks.diskimages skip-verify -bool true
+  defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
+  defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
+}
 
-# Disable local Time Machine snapshots
-sudo tmutil disablelocal
+# --- Safari ---
+configure_safari() {
+  echo "→ Configuring Safari..."
+  
+  defaults write com.apple.Safari HomePage -string "about:blank"
+  defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
+  defaults write com.apple.Safari ShowFavoritesBar -bool false
+  defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
+  
+  # Developer tools
+  defaults write com.apple.Safari IncludeDevelopMenu -bool true
+  defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
+  defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+  defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
+  
+  # Security & spelling
+  defaults write com.apple.Safari WebContinuousSpellCheckingEnabled -bool true
+  defaults write com.apple.Safari WebAutomaticSpellingCorrectionEnabled -bool false
+  defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
+  defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
+}
 
-# Show icons for hard drives, servers, and removable media on the desktop
-defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
-defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
-defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
-defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+# --- Input & Text ---
+configure_input() {
+  echo "→ Configuring Input..."
+  
+  # Trackpad: tap to click
+  defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+  defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+  defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+  
+  # Mouse: right click as secondary click
+  defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseButtonMode -string "TwoButton"
+  defaults write com.apple.AppleMultitouchMouse MouseButtonMode -string "TwoButton"
+  
+  # Mouse: swipe between pages with one finger
+  defaults write NSGlobalDomain AppleEnableMouseSwipeNavigateWithScrolls -bool true
+  defaults write com.apple.driver.AppleBluetoothMultitouch.mouse MouseOneFingerDoubleTapGesture -int 1
+  
+  # Accessibility: zoom with Ctrl + scroll
+  defaults write com.apple.universalaccess closeViewScrollWheelToggle -bool true
+  defaults write com.apple.universalaccess HIDScrollZoomModifierMask -int 262144  # Ctrl key
+  
+  # Disable auto-correct globally
+  defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+  
+  # Messages: disable emoji substitution and smart quotes
+  defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
+  defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
+}
 
-# Finder: show status bar
-defaults write com.apple.finder ShowStatusBar -bool true
+# --- Mail ---
+configure_mail() {
+  echo "→ Configuring Mail..."
+  
+  # Plain email addresses on copy
+  defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
+}
 
-# When performing a search, search the current folder by default
-defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+# --- Terminal & Fonts ---
+configure_terminal() {
+  echo "→ Configuring Terminal & Fonts..."
+  
+  defaults write com.apple.terminal StringEncodings -array 4  # UTF-8
+  
+  
+  # Crispy fonts (no smoothing)
+  defaults -currentHost write -g AppleFontSmoothing -int 0
+}
 
-# Disable the warning when changing a file extension
-defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+# --- Performance ---
+configure_performance() {
+  echo "→ Configuring Performance..."
+  
+  # Disable noatime for SSD
+  sudo cp ~/.config/yadm/scripts/assets/com.hdd.noatime.plist /Library/LaunchDaemons/
+  sudo chown root:wheel /Library/LaunchDaemons/com.hdd.noatime.plist
+}
 
-# Avoid creating .DS_Store files on network volumes
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+# --- Run All ---
+echo ""
+echo "╭─────────────────────────────────────╮"
+echo "│       macOS Defaults Setup          │"
+echo "╰─────────────────────────────────────╯"
 
-# Disable disk image verification
-defaults write com.apple.frameworks.diskimages skip-verify -bool true
-defaults write com.apple.frameworks.diskimages skip-verify-locked -bool true
-defaults write com.apple.frameworks.diskimages skip-verify-remote -bool true
+setup_hostname
+configure_finder
+configure_system_ui
+configure_screenshots
+configure_disk_images
+configure_safari
+configure_input
+configure_mail
+configure_terminal
+configure_performance
 
-# Set Default Finder Location to Home Folder
-defaults write com.apple.finder NewWindowTarget -string "PfLo"
-defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
-
-###############################################################################
-# Screenshots                                                                 #
-###############################################################################
-
-# Change  location
-mkdir $SCREENSHOTS_DIR >/dev/null 2>&1
-defaults write com.apple.screencapture location -string $SCREENSHOTS_DIR
-
-# Disable shadows
-defaults write com.apple.screencapture disable-shadow -bool true
-
-###############################################################################
-# Safari & WebKit                                                             #
-###############################################################################
-
-# Set Safari’s home page to `about:blank` for faster loading
-defaults write com.apple.Safari HomePage -string "about:blank"
-
-# Prevent Safari from opening ‘safe’ files automatically after downloading
-defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
-
-# Hide Safari’s bookmarks bar by default
-defaults write com.apple.Safari ShowFavoritesBar -bool false
-
-# Make Safari’s search banners default to Contains instead of Starts With
-defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
-
-# Enable the Develop menu and the Web Inspector in Safari
-defaults write com.apple.Safari IncludeDevelopMenu -bool true
-defaults write com.apple.Safari WebKitDeveloperExtrasEnabledPreferenceKey -bool true
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
-
-# Add a context menu item for showing the Web Inspector in web views
-defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
-
-# Enable continuous spellchecking
-defaults write com.apple.Safari WebContinuousSpellCheckingEnabled -bool true
-# Disable auto-correct
-defaults write com.apple.Safari WebAutomaticSpellingCorrectionEnabled -bool false
-
-# Warn about fraudulent websites
-defaults write com.apple.Safari WarnAboutFraudulentWebsites -bool true
-
-# Enable “Do Not Track”
-defaults write com.apple.Safari SendDoNotTrackHTTPHeader -bool true
-
-###############################################################################
-# Mail                                                                        #
-###############################################################################
-
-# Copy email addresses as `foo@example.com` instead of `Foo Bar <foo@example.com>` in Mail.app
-defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
-
-###############################################################################
-# Terminal
-###############################################################################
-
-# Only use UTF-8 in Terminal.app
-defaults write com.apple.terminal StringEncodings -array 4
-
-###############################################################################
-# Messages                                                                    #
-###############################################################################
-
-# Disable automatic emoji substitution (i.e. use plain text smileys)
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticEmojiSubstitutionEnablediMessage" -bool false
-
-# Disable smart quotes as it’s annoying for messages that contain code
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
-
-# Install SF Mono font
-cp -v /Applications/Utilities/Terminal.app/Contents/Resources/Fonts/SFMono-* ~/Library/Fonts
-
-# Make fonts crispy
-defaults -currentHost write -g AppleFontSmoothing -int 0
-
-# Disable auto-correct
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-
-# Dock, Dashboard, and hot corners
-
-# Change minimize/maximize window effect
-defaults write com.apple.dock mineffect -string "scale"
-
-# Minimize windows into their application’s icon
-defaults write com.apple.dock minimize-to-application -bool true
-
-# Drag windows using any part of the window with cmd+ctrl
-defaults write -g NSWindowShouldDragOnGesture YES
-
-# Disable noatime
-sudo cp ~/.config/yadm/scripts/assets/com.hdd.noatime.plist /Library/LaunchDaemons/
-sudo chown root:wheel /Library/LaunchDaemons/com.hdd.noatime.plist
-
-echo "Done. Note that some of these changes require a logout/restart to take effect."
+echo ""
+echo "✓ Done. Restart required for some changes."
