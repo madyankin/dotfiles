@@ -1,41 +1,38 @@
 #!/bin/bash
 
-export SYSTEM_TYPE=$(uname -s)
+set -e
 
-export BOOTSTRAP_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $BOOTSTRAP_DIR
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
+log() { echo ""; echo "━━━ $1 ━━━"; }
 
 case "$OSTYPE" in
-	darwin*)
-  		echo "Bootstraping macOS"
-  		./scripts/macos.sh
+  darwin*)
+    log "macOS Defaults"
+    ./scripts/macos.sh
 
-  		echo "Bootstraping Homebrew"
-  		./scripts/homebrew.sh
+    log "Homebrew"
+    ./scripts/homebrew.sh
 
-  		sudo xcodebuild -license
+    log "Xcode License"
+    sudo xcodebuild -license accept
 
-		  echo "Bootstrapping iTerm2"
-		  ./scripts/iterm.sh
-		;;
-	
-	linux*)
-  		echo "Bootstraping Linux"
-  		./scripts/linux.sh
-		;;
-	*) ;;
+    log "iTerm2"
+    ./scripts/iterm.sh
+    ;;
+
+  linux*)
+    log "Linux Setup"
+    ./scripts/linux.sh
+    ;;
 esac
 
-
-echo "Boostrapping ZSH"
+log "ZSH"
 ./scripts/zsh.sh
 
-echo "Bootstraping Cron"
+log "Cron"
 ./scripts/cron.sh
 
-if [ "$SYSTEM_TYPE" = "Darwin" ]; then
-  for app in "Dock" "Finder" "Mail" "Messages" "Safari" "SystemUIServer" "Terminal"; do
-   killall "${app}" > /dev/null 2>&1
-  done
-fi
+echo ""
+echo "✓ Bootstrap complete"
