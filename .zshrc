@@ -1,13 +1,14 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
+# Enable Powerlevel10k instant prompt (keep at top)
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-autoload bashcompinit
+# --- Completions ---
+autoload -Uz compinit bashcompinit
+compinit
 bashcompinit
 
+# --- Zplug ---
 source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
 source ~/.zplug/init.zsh
 
@@ -25,76 +26,61 @@ zplug "plugins/macos", from:oh-my-zsh
 zplug "plugins/npm", from:oh-my-zsh
 zplug "plugins/yarn", from:oh-my-zsh
 
-zplug "zsh-users/zsh-syntax-highlighting"
+zplug "zsh-users/zsh-syntax-highlighting", defer:2
 
-# Install plugins if there are plugins that have not been installed
-if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
-    if read -q; then
-        echo; zplug install
-    fi
-fi
+# Auto-install missing plugins
+zplug check || zplug install
+zplug load
 
-# Then, source plugins and add commands to $PATH
-zplug load #--verbose
+# --- Options ---
+setopt auto_cd
+bindkey -e
 
-# Enable colored output for ls
+# --- Colors ---
 unset LSCOLORS
 export CLICOLOR=1
 export CLICOLOR_FORCE=1
 
-setopt auto_cd
-bindkey -e
-
+# --- Aliases ---
 alias rld='source ~/.zshrc'
-alias de='docker exec -i -t'
+alias de='docker exec -it'
 alias dstats='docker stats --format "table {{.Name}}:\t{{.MemUsage}}\t{{.CPUPerc}}"'
 alias sync-dotfiles='~/.config/yadm/scripts/commit-and-push.sh'
-alias nvim-config='~/.config/nvim && nvim .'
+alias nvim-config='cd ~/.config/nvim && nvim .'
 
+# --- Functions ---
 git-clean-branches() {
-    git fetch
-    git remote prune origin
-    git branch -vv | grep gone | awk '{print $1}' | xargs git branch -D
+  git fetch -p
+  git branch -vv | grep gone | awk '{print $1}' | xargs git branch -D
 }
 
 g++-run() {
-    g++ -lstdc++ -std=c++14 -pipe -O2 -Wall $1 && ./a.out
+  g++ -lstdc++ -std=c++14 -pipe -O2 -Wall "$1" && ./a.out
 }
 
-
-
+# --- OS-specific ---
 case "$OSTYPE" in
-	darwin*)
-		export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-		
+  darwin*)
+  
+    export MANPAGER="sh -c 'col -bx | bat -l man -p'"
     alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
-		
-		;;
-	linux*)
-		alias bat="batcat"
-		export MANPAGER="sh -c 'col -bx | batcat -l man -p'"
-		;;
-	*) ;;
+  
+    ;;
+  
+  linux*)
+  
+    alias bat="batcat"
+    export MANPAGER="sh -c 'col -bx | batcat -l man -p'"
+  
+    ;;
 esac
 
+# --- External sources ---
+[[ -f ~/.zshenv ]] && source ~/.zshenv
+[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+[[ -f ~/.iterm2_shell_integration.zsh ]] && source ~/.iterm2_shell_integration.zsh
+[[ -f ~/.zshrc.machine-specific ]] && source ~/.zshrc.machine-specific
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-[ -s "$HOME/.zshenv" ] && source $HOME/.zshenv
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
-MACHINE_SPECIFIC_CONF=~/.zshrc.machine-specific
-
-if [[ -e $MACHINE_SPECIFIC_CONF ]]; then
-    source $MACHINE_SPECIFIC_CONF
-fi
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# append completions to fpath
+# --- ASDF ---
 fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
-# initialise completions with ZSH's compinit
-autoload -Uz compinit && compinit
