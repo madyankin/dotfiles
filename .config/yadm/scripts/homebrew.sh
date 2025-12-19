@@ -31,6 +31,7 @@ brew install --cask \
   bias-fx \
   firefox \
   fliqlo \
+  flux \
   guitar-pro \
   iina \
   iterm2 \
@@ -62,6 +63,9 @@ mas install 425424353   # The Unarchiver
 mas install 992076693   # MindNode
 mas install 904280696   # Things 3
 mas install 497799835     # Xcode
-
-
+mas install 1452453066 # hidden bar
+mas install 1438243180 # dark reader
+mas install 1637438059 # untrap
+mas install 1481853033 # Strongbox
+mas install 1511185140 # Moneywiz
 
