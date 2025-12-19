@@ -150,6 +150,10 @@ configure_mail() {
   
   # Plain email addresses on copy
   defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
+  
+  # Font sizes
+  defaults write com.apple.mail NSFontSize -int 16
+  defaults write com.apple.mail NSFixedPitchFontSize -int 14
 }
 
 # --- Terminal & Fonts ---
@@ -157,10 +161,23 @@ configure_terminal() {
   echo "→ Configuring Terminal & Fonts..."
   
   defaults write com.apple.terminal StringEncodings -array 4  # UTF-8
-  
+  defaults write com.apple.Terminal "Default Window Settings" -string "Basic"
+  defaults write com.apple.Terminal "Startup Window Settings" -string "Basic"
   
   # Crispy fonts (no smoothing)
   defaults -currentHost write -g AppleFontSmoothing -int 0
+}
+
+# --- TextEdit ---
+configure_textedit() {
+  echo "→ Configuring TextEdit..."
+  
+  # Plain text by default
+  defaults write com.apple.TextEdit RichText -int 0
+  
+  # Font size 14 for both plain and rich text
+  defaults write com.apple.TextEdit NSFixedPitchFontSize -int 14
+  defaults write com.apple.TextEdit NSFontSize -int 14
 }
 
 # --- Performance ---
@@ -187,6 +204,7 @@ configure_safari
 configure_input
 configure_mail
 configure_terminal
+configure_textedit
 configure_performance
 
 echo ""

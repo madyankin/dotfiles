@@ -15,8 +15,12 @@ case "$OSTYPE" in
     log "Homebrew"
     ./scripts/homebrew.sh
 
-    log "Xcode License"
-    sudo xcodebuild -license accept
+    # Accept Xcode license (if Xcode is installed)
+    if [[ -d "/Applications/Xcode.app" ]]; then
+      log "Xcode License"
+      sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+      sudo xcodebuild -license accept
+    fi
 
     log "iTerm2"
     ./scripts/iterm.sh
