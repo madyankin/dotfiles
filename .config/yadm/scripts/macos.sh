@@ -123,12 +123,6 @@ defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
 # Only use UTF-8 in Terminal.app
 defaults write com.apple.terminal StringEncodings -array 4
 
-# Use a modified version of the Pro theme by default in Terminal.app
-open "$HOME/.config/yadm/scripts/assets/ayu.terminal"
-sleep 1 # Wait a bit to make sure the theme is loaded
-defaults write com.apple.terminal "Default Window Settings" -string "ayu"
-defaults write com.apple.terminal "Startup Window Settings" -string "ayu"
-
 ###############################################################################
 # Messages                                                                    #
 ###############################################################################

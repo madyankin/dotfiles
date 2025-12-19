@@ -8,25 +8,16 @@ cd $BOOTSTRAP_DIR
 
 case "$OSTYPE" in
 	darwin*)
-  		echo "Bootstraping Xcode"
-  		./scripts/xcode.sh
-
   		echo "Bootstraping macOS"
   		./scripts/macos.sh
 
   		echo "Bootstraping Homebrew"
   		./scripts/homebrew.sh
 
-    		echo "Bootstraping whalebrew"
-  		./scripts/whalebrew.sh
-
   		sudo xcodebuild -license
 
-  		echo "Bootstraping dnsmasq"
-  		#./scripts/dnsmasq.sh
-		
-		echo "Bootstrapping iTerm2"
-		./scripts/iterm.sh
+		  echo "Bootstrapping iTerm2"
+		  ./scripts/iterm.sh
 		;;
 	
 	linux*)
@@ -40,21 +31,8 @@ esac
 echo "Boostrapping ZSH"
 ./scripts/zsh.sh
 
-echo "Bootstraping asdf"
-./scripts/asdf.sh
-
-# echo "Bootstraping Rust"
-# ./scripts/rust.sh
-
 echo "Bootstraping Cron"
 ./scripts/cron.sh
-
-echo "Bootstraping Emacs"
-./scripts/emacs.sh
-
-echo "Bootstraping tmux"
-./scripts/tmux.sh
-
 
 if [ "$SYSTEM_TYPE" = "Darwin" ]; then
   for app in "Dock" "Finder" "Mail" "Messages" "Safari" "SystemUIServer" "Terminal"; do
