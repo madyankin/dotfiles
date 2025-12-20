@@ -69,7 +69,6 @@ install_personal() {
   echo "→ Installing personal apps..."
   brew install --cask \
     anki \
-    battle-net \
     bias-fx \
     guitar-pro
 
