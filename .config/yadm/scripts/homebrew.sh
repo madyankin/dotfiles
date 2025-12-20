@@ -61,15 +61,17 @@ install_essentials() {
 
 install_personal() {
   echo ""
-  echo "→ Installing music apps..."
-  brew install --cask \
-    bias-fx \
-    guitar-pro
-
-  echo ""
   echo "→ Installing backup & security..."
   brew install --cask \
     arq
+
+  echo ""
+  echo "→ Installing personal apps..."
+  brew install --cask \
+    anki \
+    battle-net \
+    bias-fx \
+    guitar-pro
 
   echo ""
   echo "→ Installing personal MAS apps..."
