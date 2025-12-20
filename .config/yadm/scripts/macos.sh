@@ -98,6 +98,7 @@ configure_safari() {
   echo "→ Configuring Safari..."
   
   defaults write com.apple.Safari HomePage -string "about:blank"
+  defaults write com.apple.Safari AlwaysRestoreSessionAtLaunch -bool true
   defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
   defaults write com.apple.Safari ShowFavoritesBar -bool false
   defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
