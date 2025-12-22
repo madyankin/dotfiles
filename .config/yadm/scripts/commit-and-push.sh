@@ -4,6 +4,9 @@ set -euo pipefail
 source $HOME/.zshenv
 cd $HOME
 
+# Save editor extensions before commit
+$HOME/.config/yadm/scripts/editors.sh save > /dev/null 2>&1 || true
+
 yadm add -u
 
 yadm commit -m "Commited via cron $(date -u)" > /dev/null 2>&1

@@ -29,5 +29,7 @@
     "workbench.statusBar.visible": false,
     "workbench.editor.showTabs": "single",
     "workbench.activityBar.location": "hidden",
-    "workbench.navigationControl.enabled": false
+    "workbench.navigationControl.enabled": false,
+    "window.commandCenter": false,
+    "chat.commandCenter.enabled": false
 }

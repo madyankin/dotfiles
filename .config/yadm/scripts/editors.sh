@@ -14,7 +14,7 @@ link_settings() {
   local target="$1"
   local user_dir="$2"
   local name=$(basename "$2")
-  
+  3
   mkdir -p "$user_dir"
   
   for file in settings.json keybindings.json; do
