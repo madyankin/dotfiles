@@ -1,2 +1,5 @@
+akamud.vscode-theme-onedark
+akamud.vscode-theme-onelight
+anysphere.remote-containers
 ms-vscode-remote.remote-containers
 zhuangtongfa.material-theme

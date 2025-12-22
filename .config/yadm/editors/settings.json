@@ -22,7 +22,7 @@
     "terminal.integrated.fontSize": 14,
     "files.autoSave": "onFocusChange",
     "window.systemColorTheme": "auto",
-    "workbench.preferredLightColorTheme": "Cursor Light",
+    "workbench.preferredLightColorTheme": "Atom One Light",
     "cursor.composer.textSizeScale": 1.15,
     "workbench.tips.enabled": false,
     "workbench.startupEditor": "none",
@@ -31,5 +31,8 @@
     "workbench.activityBar.location": "hidden",
     "workbench.navigationControl.enabled": false,
     "window.commandCenter": false,
-    "chat.commandCenter.enabled": false
+    "chat.commandCenter.enabled": false,
+    "window.autoDetectColorScheme": true,
+    "workbench.preferredDarkColorTheme": "Atom One Dark",
+    "workbench.preferredHighContrastLightColorTheme": "Solarized Light"
 }
