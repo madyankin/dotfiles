@@ -9,12 +9,14 @@ EDITORS_DIR="$HOME/.config/yadm/editors"
 CURSOR_USER="$HOME/Library/Application Support/Cursor/User"
 CODE_USER="$HOME/Library/Application Support/Code/User"
 
-# --- Symlink settings ---
+# Symlink settings.json, keybindings.json, and snippets/ to an editor's User directory.
+# Arguments:
+#   $1 - source directory (EDITORS_DIR)
+#   $2 - target User directory (e.g., ~/Library/Application Support/Cursor/User)
 link_settings() {
   local target="$1"
   local user_dir="$2"
-  local name=$(basename "$2")
-  3
+  
   mkdir -p "$user_dir"
   
   for file in settings.json keybindings.json; do
@@ -33,6 +35,7 @@ link_settings() {
   fi
 }
 
+# Create symlinks for both Cursor and VS Code to share settings from EDITORS_DIR.
 setup_symlinks() {
   echo "→ Linking Cursor settings..."
   link_settings "$EDITORS_DIR" "$CURSOR_USER"
@@ -41,11 +44,12 @@ setup_symlinks() {
   link_settings "$EDITORS_DIR" "$CODE_USER"
 }
 
-# --- Extensions ---
-# extensions.txt          - shared (installed to both editors)
-# extensions-cursor-only.txt - Cursor-specific
-# extensions-code-only.txt   - VS Code-specific
-
+# Collect extensions from both editors, merge and dedupe into extensions.txt.
+# Files:
+#   extensions.txt             - shared (installed to both editors)
+#   extensions-cursor-only.txt - Cursor-specific (manual)
+#   extensions-code-only.txt   - VS Code-specific (manual)
+# Create editor-specific extensions files manually when needed.
 save_extensions() {
   echo "→ Saving extensions..."
   
@@ -64,6 +68,8 @@ save_extensions() {
   echo "  ✓ Shared: $(wc -l < "$EDITORS_DIR/extensions.txt" | tr -d ' ') extensions"
 }
 
+# Install extensions from tracked files.
+# Shared extensions go to both editors; editor-specific extensions to their respective editor.
 install_extensions() {
   echo "→ Installing extensions..."
   
