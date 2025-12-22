@@ -2,6 +2,12 @@
 
 set -e
 
+# Exclude root README from worktree
+if ! yadm sparse-checkout list &>/dev/null; then
+  yadm sparse-checkout init --no-cone
+  yadm sparse-checkout set '*' '!/README.md'
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
