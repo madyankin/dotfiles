@@ -30,6 +30,9 @@ case "$OSTYPE" in
 
     log "iTerm2"
     ./scripts/iterm.sh
+
+    log "Editors"
+    ./scripts/editors.sh
     ;;
 
   linux*)
