@@ -42,35 +42,55 @@ setup_symlinks() {
 }
 
 # --- Extensions ---
+# extensions.txt          - shared (installed to both editors)
+# extensions-cursor-only.txt - Cursor-specific
+# extensions-code-only.txt   - VS Code-specific
+
 save_extensions() {
   echo "→ Saving extensions..."
   
+  local cursor_exts="" code_exts=""
+  
   if command -v cursor &>/dev/null; then
-    cursor --list-extensions > "$EDITORS_DIR/extensions-cursor.txt" 2>/dev/null || true
-    echo "  ✓ Cursor: $(wc -l < "$EDITORS_DIR/extensions-cursor.txt" | tr -d ' ') extensions"
+    cursor_exts=$(cursor --list-extensions 2>/dev/null || true)
   fi
   
   if command -v code &>/dev/null; then
-    code --list-extensions > "$EDITORS_DIR/extensions-code.txt" 2>/dev/null || true
-    echo "  ✓ VS Code: $(wc -l < "$EDITORS_DIR/extensions-code.txt" | tr -d ' ') extensions"
+    code_exts=$(code --list-extensions 2>/dev/null || true)
   fi
+  
+  # Merge and dedupe into shared extensions
+  { echo "$cursor_exts"; echo "$code_exts"; } | grep -v '^$' | sort -u > "$EDITORS_DIR/extensions.txt"
+  echo "  ✓ Shared: $(wc -l < "$EDITORS_DIR/extensions.txt" | tr -d ' ') extensions"
 }
 
 install_extensions() {
   echo "→ Installing extensions..."
   
-  if command -v cursor &>/dev/null && [[ -f "$EDITORS_DIR/extensions-cursor.txt" ]]; then
+  # Shared extensions → both editors
+  if [[ -f "$EDITORS_DIR/extensions.txt" ]]; then
     while IFS= read -r ext; do
-      [[ -n "$ext" ]] && cursor --install-extension "$ext" --force 2>/dev/null || true
-    done < "$EDITORS_DIR/extensions-cursor.txt"
-    echo "  ✓ Cursor extensions installed"
+      [[ -z "$ext" ]] && continue
+      command -v cursor &>/dev/null && cursor --install-extension "$ext" --force 2>/dev/null || true
+      command -v code &>/dev/null && code --install-extension "$ext" --force 2>/dev/null || true
+    done < "$EDITORS_DIR/extensions.txt"
+    echo "  ✓ Shared extensions installed"
   fi
   
-  if command -v code &>/dev/null && [[ -f "$EDITORS_DIR/extensions-code.txt" ]]; then
+  # Cursor-only extensions
+  if command -v cursor &>/dev/null && [[ -f "$EDITORS_DIR/extensions-cursor-only.txt" ]]; then
+    while IFS= read -r ext; do
+      [[ -n "$ext" ]] && cursor --install-extension "$ext" --force 2>/dev/null || true
+    done < "$EDITORS_DIR/extensions-cursor-only.txt"
+    echo "  ✓ Cursor-only extensions installed"
+  fi
+  
+  # VS Code-only extensions
+  if command -v code &>/dev/null && [[ -f "$EDITORS_DIR/extensions-code-only.txt" ]]; then
     while IFS= read -r ext; do
       [[ -n "$ext" ]] && code --install-extension "$ext" --force 2>/dev/null || true
-    done < "$EDITORS_DIR/extensions-code.txt"
-    echo "  ✓ VS Code extensions installed"
+    done < "$EDITORS_DIR/extensions-code-only.txt"
+    echo "  ✓ VS Code-only extensions installed"
   fi
 }
 
