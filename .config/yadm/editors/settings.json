@@ -33,6 +33,6 @@
     "window.commandCenter": false,
     "chat.commandCenter.enabled": false,
     "window.autoDetectColorScheme": true,
-    "workbench.preferredDarkColorTheme": "Atom One Dark",
+    "workbench.preferredDarkColorTheme": "One Dark Pro Night Flat",
     "workbench.preferredHighContrastLightColorTheme": "Solarized Light"
 }
