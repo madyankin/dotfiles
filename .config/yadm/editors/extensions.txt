@@ -1,1 +1,2 @@
+ms-vscode-remote.remote-containers
 zhuangtongfa.material-theme
