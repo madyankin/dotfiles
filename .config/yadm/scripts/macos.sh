@@ -181,6 +181,17 @@ configure_textedit() {
   defaults write com.apple.TextEdit NSFontSize -int 14
 }
 
+# --- Calendar ---
+configure_calendar() {
+  echo "→ Configuring Calendar..."
+  
+  # Timezone support
+  defaults write com.apple.iCal "TimeZone support enabled" -bool true
+  
+  # Show week numbers
+  defaults write com.apple.iCal "Show Week Numbers" -bool true
+}
+
 # --- Performance ---
 configure_performance() {
   echo "→ Configuring Performance..."
@@ -206,6 +217,7 @@ configure_input
 configure_mail
 configure_terminal
 configure_textedit
+configure_calendar
 configure_performance
 
 echo ""

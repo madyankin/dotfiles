@@ -171,3 +171,8 @@ run = ['move-node-to-workspace vm', 'layout floating']
 if.app-id = 'com.parallels.desktop.console'
 if.window-title-regex-substring = '^(?!.*Control Center).*$'
 run = 'move-node-to-workspace vm'
+
+# DaisyDisk → floating
+[[on-window-detected]]
+if.app-id = 'com.daisydiskapp.DaisyDisk'
+run = 'layout floating'
