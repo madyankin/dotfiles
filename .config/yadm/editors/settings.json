@@ -22,7 +22,7 @@
     "terminal.integrated.fontSize": 14,
     "files.autoSave": "onFocusChange",
     "window.systemColorTheme": "auto",
-    "workbench.preferredLightColorTheme": "Atom One Light",
+    "workbench.preferredLightColorTheme": "GitHub Light",
     "cursor.composer.textSizeScale": 1.15,
     "workbench.tips.enabled": false,
     "workbench.startupEditor": "none",
@@ -34,5 +34,7 @@
     "chat.commandCenter.enabled": false,
     "window.autoDetectColorScheme": true,
     "workbench.preferredDarkColorTheme": "One Dark Pro Night Flat",
-    "workbench.preferredHighContrastLightColorTheme": "Solarized Light"
+    "workbench.preferredHighContrastLightColorTheme": "GitHub Light Default",
+    "git.autofetch": true,
+    "extensions.ignoreRecommendations": true
 }
