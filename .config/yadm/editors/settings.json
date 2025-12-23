@@ -10,7 +10,6 @@
     "editor.padding.top": 14,
     "editor.scrollbar.horizontal": "auto",
     "editor.codeLens": false,
-    "editor.glyphMargin": false,
     "editor.foldingHighlight": false,
     "editor.guides.indentation": false,
     "editor.guides.highlightActiveIndentation": false,
