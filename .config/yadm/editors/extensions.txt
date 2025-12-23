@@ -8,17 +8,12 @@ dbaeumer.vscode-eslint
 eamodio.gitlens
 editorconfig.editorconfig
 esbenp.prettier-vscode
-firefox-devtools.vscode-firefox-debug
-github.copilot
-github.copilot-chat
 github.github-vscode-theme
 github.vscode-pull-request-github
 golang.go
-hashicorp.hcl
 hashicorp.terraform
 jeronimoekerdt.color-picker-universal
 mechatroner.rainbow-csv
-misogi.ruby-rubocop
 mkhl.shfmt
 ms-azuretools.vscode-containers
 ms-azuretools.vscode-docker
@@ -35,5 +30,4 @@ tamasfe.even-better-toml
 timonwong.shellcheck
 vscjava.vscode-java-debug
 vscjava.vscode-java-pack
-yzhang.markdown-all-in-one
 zhuangtongfa.material-theme
