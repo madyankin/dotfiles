@@ -35,17 +35,23 @@ install_essentials() {
     htop \
     mas \
     mc \
-    neovim \
     pinentry-mac \
     powerlevel10k \
     speedtest-cli \
-    yadm
+    yadm 
 
   echo ""
   echo "→ Installing fonts..."
   brew install --cask \
     font-jetbrains-mono \
-    font-jetbrains-mono-nerd-font \
+    font-jetbrains-mono-nerd-font
+
+  echo ""
+  echo "→ Installing editors..."
+  brew install neovim
+  brew install --cask \
+    cursor \
+    visual-studio-code 
 
   echo ""
   echo "→ Installing essential MAS apps..."
