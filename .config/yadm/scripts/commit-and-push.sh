@@ -11,5 +11,4 @@ yadm pull --rebase > /dev/null 2>&1
 
 yadm push > /dev/null 2>&1
 
-# Install any new extensions after sync
-$HOME/.config/yadm/scripts/editors.sh install > /dev/null 2>&1 || true
+"$HOME"/.config/yadm/scripts/editors.sh sync > /dev/null 2>&1 || true

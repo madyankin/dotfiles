@@ -38,5 +38,6 @@
     "git.autofetch": true,
     "extensions.ignoreRecommendations": true,
     "explorer.confirmDragAndDrop": false,
-    "explorer.confirmDelete": false
+    "explorer.confirmDelete": false,
+    "chat.mcp.gallery.enabled": true
 }

@@ -68,6 +68,32 @@ save_extensions() {
   echo "  ✓ Shared: $(wc -l < "$EDITORS_DIR/extensions.txt" | tr -d ' ') extensions"
 }
 
+# Save extensions from Cursor only.
+save_cursor_extensions() {
+  echo "→ Saving Cursor extensions..."
+  
+  if ! command -v cursor &>/dev/null; then
+    echo "  ✗ Cursor not found"
+    exit 1
+  fi
+  
+  cursor --list-extensions 2>/dev/null | sort -u > "$EDITORS_DIR/extensions.txt"
+  echo "  ✓ Saved: $(wc -l < "$EDITORS_DIR/extensions.txt" | tr -d ' ') extensions"
+}
+
+# Save extensions from VS Code only.
+save_code_extensions() {
+  echo "→ Saving VS Code extensions..."
+  
+  if ! command -v code &>/dev/null; then
+    echo "  ✗ VS Code not found"
+    exit 1
+  fi
+  
+  code --list-extensions 2>/dev/null | sort -u > "$EDITORS_DIR/extensions.txt"
+  echo "  ✓ Saved: $(wc -l < "$EDITORS_DIR/extensions.txt" | tr -d ' ') extensions"
+}
+
 # Install extensions from tracked files.
 # Shared extensions go to both editors; editor-specific extensions to their respective editor.
 install_extensions() {
@@ -100,6 +126,60 @@ install_extensions() {
   fi
 }
 
+# Sync extensions: install missing, remove unlisted.
+# Arguments:
+#   $1 - editor command (cursor or code)
+#   $2 - editor name for display
+sync_editor_extensions() {
+  local cmd="$1"
+  local name="$2"
+  
+  if ! command -v "$cmd" &>/dev/null; then
+    echo "  ✗ $name not found"
+    return
+  fi
+  
+  # Build list of desired extensions (shared + editor-specific)
+  local desired=""
+  [[ -f "$EDITORS_DIR/extensions.txt" ]] && desired=$(cat "$EDITORS_DIR/extensions.txt")
+  if [[ -f "$EDITORS_DIR/extensions-${cmd}-only.txt" ]]; then
+    desired=$(printf "%s\n%s" "$desired" "$(cat "$EDITORS_DIR/extensions-${cmd}-only.txt")")
+  fi
+  desired=$(echo "$desired" | grep -v '^$' | tr '[:upper:]' '[:lower:]' | sort -u)
+  
+  # Get currently installed
+  local installed
+  installed=$("$cmd" --list-extensions 2>/dev/null | tr '[:upper:]' '[:lower:]' | sort -u)
+  
+  # Install missing
+  local to_install
+  to_install=$(comm -23 <(echo "$desired") <(echo "$installed"))
+  if [[ -n "$to_install" ]]; then
+    echo "$to_install" | while IFS= read -r ext; do
+      [[ -n "$ext" ]] && "$cmd" --install-extension "$ext" --force 2>/dev/null || true
+    done
+    echo "  ✓ $name: installed $(echo "$to_install" | wc -l | tr -d ' ') extensions"
+  fi
+  
+  # Remove unlisted
+  local to_remove
+  to_remove=$(comm -13 <(echo "$desired") <(echo "$installed"))
+  if [[ -n "$to_remove" ]]; then
+    echo "$to_remove" | while IFS= read -r ext; do
+      [[ -n "$ext" ]] && "$cmd" --uninstall-extension "$ext" 2>/dev/null || true
+    done
+    echo "  ✓ $name: removed $(echo "$to_remove" | wc -l | tr -d ' ') extensions"
+  fi
+  
+  [[ -z "$to_install" && -z "$to_remove" ]] && echo "  ✓ $name: already in sync"
+}
+
+sync_extensions() {
+  echo "→ Syncing extensions..."
+  sync_editor_extensions cursor Cursor
+  sync_editor_extensions code "VS Code"
+}
+
 # --- Main ---
 case "${1:-setup}" in
   setup)
@@ -115,14 +195,23 @@ case "${1:-setup}" in
   save)
     save_extensions
     ;;
+  save:cursor)
+    save_cursor_extensions
+    ;;
+  save:code)
+    save_code_extensions
+    ;;
   install)
     install_extensions
+    ;;
+  sync)
+    sync_extensions
     ;;
   link)
     setup_symlinks
     ;;
   *)
-    echo "Usage: $0 {setup|save|install|link}"
+    echo "Usage: $0 {setup|save|save:cursor|save:code|install|sync|link}"
     exit 1
     ;;
 esac
