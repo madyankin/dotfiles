@@ -56,6 +56,7 @@ ctrl-6 = 'workspace messaging'
 ctrl-7 = 'workspace music'
 ctrl-8 = 'workspace zoom'
 ctrl-9 = 'workspace vm'
+ctrl-0 = 'workspace guitar'
 
 # Move to workspace (Meh + number)
 ctrl-alt-shift-1 = 'move-node-to-workspace web'
@@ -67,6 +68,10 @@ ctrl-alt-shift-6 = 'move-node-to-workspace messaging'
 ctrl-alt-shift-7 = 'move-node-to-workspace music'
 ctrl-alt-shift-8 = 'move-node-to-workspace zoom'
 ctrl-alt-shift-9 = 'move-node-to-workspace vm'
+ctrl-alt-shift-0 = 'move-node-to-workspace guitar'
+
+# Launch guitar workspace (Hyper + g)
+cmd-ctrl-alt-shift-g = ['workspace guitar', 'exec-and-forget open -a "Bias FX 2"', 'exec-and-forget open -a "Guitar Pro 8"', 'exec-and-forget open "/Users/alexander/Documents/02 Areas/Guitar"', 'exec-and-forget open -a Skim "/Users/alexander/Documents/02 Areas/Guitar/Peter Fisher School/Rock Guitar Secrets.pdf"']
 
 # Layout (ctrl-alt)
 ctrl-alt-slash = 'layout floating tiling'
@@ -160,6 +165,16 @@ run = 'move-node-to-workspace zoom'
 [[on-window-detected]]
 if.app-id = 'com.apple.Music'
 run = 'move-node-to-workspace music'
+
+# Bias FX → guitar
+[[on-window-detected]]
+if.app-id = 'com.PositiveGrid.BIASFX2'
+run = 'move-node-to-workspace guitar'
+
+# Guitar Pro → guitar
+[[on-window-detected]]
+if.app-id = 'com.arobas-music.Guitar-Pro-8'
+run = 'move-node-to-workspace guitar'
 
 # Parallels → vm
 [[on-window-detected]]

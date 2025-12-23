@@ -18,7 +18,7 @@
     "workbench.colorTheme": "One Dark Pro Night Flat",
     "editor.fontSize": 14,
     "editor.fontFamily": "JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
-    "editor.lineHeight": 22,
+    "editor.lineHeight": 23,
     "terminal.integrated.fontSize": 14,
     "files.autoSave": "onFocusChange",
     "window.systemColorTheme": "auto",
@@ -36,5 +36,7 @@
     "workbench.preferredDarkColorTheme": "One Dark Pro Night Flat",
     "workbench.preferredHighContrastLightColorTheme": "GitHub Light Default",
     "git.autofetch": true,
-    "extensions.ignoreRecommendations": true
+    "extensions.ignoreRecommendations": true,
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false
 }

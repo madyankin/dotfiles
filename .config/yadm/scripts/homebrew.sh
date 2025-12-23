@@ -51,7 +51,7 @@ install_essentials() {
   brew install neovim
   brew install --cask \
     cursor \
-    visual-studio-code 
+    visual-studio-code
 
   echo ""
   echo "→ Installing essential MAS apps..."
@@ -77,7 +77,9 @@ install_personal() {
     anki \
     battle-net \
     bias-fx \
-    guitar-pro
+    guitar-pro \
+    skim \
+    zotero
 
   echo ""
   echo "→ Installing personal MAS apps..."
