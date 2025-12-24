@@ -63,6 +63,8 @@ install_essentials() {
   mas install 1637438059  # Untrap
   mas install 411643860   # DaisyDisk
   mas install 904280696   # Things 3
+  mas install 1573461917  # SponsorBlock für YouTube
+  mas install 6451469297  # DeArrow for YouTube
 }
 
 install_personal() {
