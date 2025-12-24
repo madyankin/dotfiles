@@ -156,6 +156,11 @@ run = 'move-node-to-workspace messaging'
 if.app-id = 'com.apple.mail'
 run = 'move-node-to-workspace messaging'
 
+# Telegram → messaging
+[[on-window-detected]]
+if.app-id = 'ru.keepcoder.Telegram'
+run = 'move-node-to-workspace messaging'
+
 # Zoom → zoom
 [[on-window-detected]]
 if.app-id = 'us.zoom.xos'
