@@ -101,6 +101,7 @@ configure_safari() {
   defaults write com.apple.Safari AlwaysRestoreSessionAtLaunch -bool true
   defaults write com.apple.Safari AutoOpenSafeDownloads -bool false
   defaults write com.apple.Safari ShowFavoritesBar -bool false
+  defaults write com.apple.Safari ShowOverlayStatusBar -bool true
   defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
   
   # Developer tools
