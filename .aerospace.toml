@@ -34,11 +34,6 @@ preset = 'qwerty'
 
 # Main keybindings
 [mode.main.binding]
-# Focus (Hyper + hjkl)
-cmd-ctrl-alt-shift-h = 'focus left'
-cmd-ctrl-alt-shift-j = 'focus down'
-cmd-ctrl-alt-shift-k = 'focus up'
-cmd-ctrl-alt-shift-l = 'focus right'
 
 # Move windows (Meh + hjkl)
 ctrl-alt-shift-h = 'move left'
@@ -68,17 +63,24 @@ ctrl-alt-shift-7 = 'move-node-to-workspace guitar'
 ctrl-alt-shift-8 = 'move-node-to-workspace music'
 ctrl-alt-shift-9 = 'move-node-to-workspace misc'
 
-# Layout (ctrl-alt)
-ctrl-alt-slash = 'layout floating tiling'
-ctrl-alt-comma = 'layout tiles horizontal vertical'
-ctrl-alt-period = 'layout accordion horizontal vertical'
+# Layout (Hyper)
+cmd-ctrl-alt-shift-v = 'layout tiles vertical'
+cmd-ctrl-alt-shift-h = 'layout tiles horizontal'
 cmd-ctrl-alt-shift-space = 'layout tiles accordion floating'
-ctrl-alt-f = 'layout floating tiling'
 cmd-ctrl-alt-shift-f = 'fullscreen'
+ctrl-alt-slash = 'layout floating tiling'
+ctrl-alt-f = 'layout floating tiling'
 
-# Resize
-cmd-ctrl-alt-shift-up = 'resize smart +50'
-cmd-ctrl-alt-shift-down = 'resize smart -50'
+# Focus (Hyper + arrows)
+cmd-ctrl-alt-shift-left = 'focus left'
+cmd-ctrl-alt-shift-right = 'focus right'
+cmd-ctrl-alt-shift-up = 'focus up'
+cmd-ctrl-alt-shift-down = 'focus down'
+
+# Resize (Hyper + =/-)
+cmd-ctrl-alt-shift-equal = 'resize smart +50'
+cmd-ctrl-alt-shift-minus = 'resize smart -50'
+
 
 # Service mode
 cmd-ctrl-alt-shift-semicolon = 'mode service'
@@ -87,10 +89,10 @@ cmd-ctrl-alt-shift-semicolon = 'mode service'
 [mode.service.binding]
 esc = 'mode main'
 r = ['reload-config', 'mode main']
-ctrl-alt-shift-h = ['join-with left', 'mode main']
-ctrl-alt-shift-j = ['join-with down', 'mode main']
-ctrl-alt-shift-k = ['join-with up', 'mode main']
-ctrl-alt-shift-l = ['join-with right', 'mode main']
+cmd-ctrl-alt-shift-left = ['join-with left', 'mode main']
+cmd-ctrl-alt-shift-down = ['join-with down', 'mode main']
+cmd-ctrl-alt-shift-up = ['join-with up', 'mode main']
+cmd-ctrl-alt-shift-right = ['join-with right', 'mode main']
 
 # App assignments
 
