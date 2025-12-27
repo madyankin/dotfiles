@@ -26,7 +26,6 @@ outer.bottom = 10
 outer.top = 10
 outer.right = 10
 
-
 [key-mapping]
 preset = 'qwerty'
 
@@ -51,28 +50,23 @@ ctrl-alt-shift-l = 'move right'
 ctrl-1 = 'workspace web'
 ctrl-2 = 'workspace dev'
 ctrl-3 = 'workspace terminals'
-ctrl-4 = 'workspace calendar'
+ctrl-4 = 'workspace notes'
 ctrl-5 = 'workspace planning'
-ctrl-6 = 'workspace messaging'
-ctrl-7 = 'workspace music'
-ctrl-8 = 'workspace zoom'
-ctrl-9 = 'workspace vm'
-ctrl-0 = 'workspace guitar'
+ctrl-6 = 'workspace chats/mail'
+ctrl-7 = 'workspace guitar'
+ctrl-8 = 'workspace music'
+ctrl-9 = 'workspace misc'
 
 # Move to workspace (Meh + number)
 ctrl-alt-shift-1 = 'move-node-to-workspace web'
 ctrl-alt-shift-2 = 'move-node-to-workspace dev'
 ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
-ctrl-alt-shift-4 = 'move-node-to-workspace calendar'
+ctrl-alt-shift-4 = 'move-node-to-workspace notes'
 ctrl-alt-shift-5 = 'move-node-to-workspace planning'
-ctrl-alt-shift-6 = 'move-node-to-workspace messaging'
-ctrl-alt-shift-7 = 'move-node-to-workspace music'
-ctrl-alt-shift-8 = 'move-node-to-workspace zoom'
-ctrl-alt-shift-9 = 'move-node-to-workspace vm'
-ctrl-alt-shift-0 = 'move-node-to-workspace guitar'
-
-# Launch guitar workspace (Hyper + g)
-cmd-ctrl-alt-shift-g = ['workspace guitar', 'exec-and-forget open -a "Bias FX 2"', 'exec-and-forget open -a "Guitar Pro 8"', 'exec-and-forget open "/Users/alexander/Documents/02 Areas/Guitar"', 'exec-and-forget open -a Skim "/Users/alexander/Documents/02 Areas/Guitar/Peter Fisher School/Rock Guitar Secrets.pdf"']
+ctrl-alt-shift-6 = 'move-node-to-workspace chats/mail'
+ctrl-alt-shift-7 = 'move-node-to-workspace guitar'
+ctrl-alt-shift-8 = 'move-node-to-workspace music'
+ctrl-alt-shift-9 = 'move-node-to-workspace misc'
 
 # Layout (ctrl-alt)
 ctrl-alt-slash = 'layout floating tiling'
@@ -132,40 +126,45 @@ run = 'move-node-to-workspace dev'
 if.app-id = 'com.googlecode.iterm2'
 run = 'move-node-to-workspace terminals'
 
-# Calendar → calendar
+# Calendar → planning
 [[on-window-detected]]
 if.app-id = 'com.apple.iCal'
-run = 'move-node-to-workspace calendar'
+run = 'move-node-to-workspace planning'
 
-# Obsidian → planning
+# Obsidian → notes
 [[on-window-detected]]
 if.app-id = 'md.obsidian'
-run = 'move-node-to-workspace planning'
+run = 'move-node-to-workspace notes'
 
 # Things → planning
 [[on-window-detected]]
 if.app-id = 'com.culturedcode.ThingsMac'
 run = 'move-node-to-workspace planning'
 
-# Slack → messaging
+# Slack → chats/mail
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
-run = 'move-node-to-workspace messaging'
+run = 'move-node-to-workspace chats/mail'
 
-# Apple Mail → messaging
+# Apple Mail → chats/mail
 [[on-window-detected]]
 if.app-id = 'com.apple.mail'
-run = 'move-node-to-workspace messaging'
+run = 'move-node-to-workspace chats/mail'
 
-# Telegram → messaging
+# Telegram → chats/mail
 [[on-window-detected]]
 if.app-id = 'ru.keepcoder.Telegram'
-run = 'move-node-to-workspace messaging'
+run = 'move-node-to-workspace chats/mail'
 
-# Zoom → zoom
+# Messages → chats/mail
+[[on-window-detected]]
+if.app-id = 'com.apple.MobileSMS'
+run = 'move-node-to-workspace chats/mail'
+
+# Zoom → misc
 [[on-window-detected]]
 if.app-id = 'us.zoom.xos'
-run = 'move-node-to-workspace zoom'
+run = 'move-node-to-workspace misc'
 
 # Music → music
 [[on-window-detected]]
@@ -187,16 +186,16 @@ run = ['move-node-to-workspace guitar', 'layout floating']
 if.app-id = 'net.sourceforge.skim-app.skim'
 run = ['move-node-to-workspace guitar', 'layout floating']
 
-# Parallels → vm
+# Parallels → misc
 [[on-window-detected]]
 if.app-id = 'com.parallels.desktop.console'
 if.window-title-regex-substring = 'Control Center'
-run = ['move-node-to-workspace vm', 'layout floating']
+run = ['move-node-to-workspace misc', 'layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.parallels.desktop.console'
 if.window-title-regex-substring = '^(?!.*Control Center).*$'
-run = 'move-node-to-workspace vm'
+run = 'move-node-to-workspace misc'
 
 # DaisyDisk → floating
 [[on-window-detected]]
