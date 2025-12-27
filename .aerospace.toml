@@ -26,6 +26,7 @@ outer.bottom = 10
 outer.top = 10
 outer.right = 10
 
+
 [key-mapping]
 preset = 'qwerty'
 
@@ -171,15 +172,20 @@ run = 'move-node-to-workspace zoom'
 if.app-id = 'com.apple.Music'
 run = 'move-node-to-workspace music'
 
-# Bias FX → guitar
+# Bias FX → guitar (floating)
 [[on-window-detected]]
 if.app-id = 'com.PositiveGrid.BIASFX2'
-run = 'move-node-to-workspace guitar'
+run = ['move-node-to-workspace guitar', 'layout floating']
 
-# Guitar Pro → guitar
+# Guitar Pro → guitar (floating)
 [[on-window-detected]]
 if.app-id = 'com.arobas-music.Guitar-Pro-8'
-run = 'move-node-to-workspace guitar'
+run = ['move-node-to-workspace guitar', 'layout floating']
+
+# Skim → guitar (floating)
+[[on-window-detected]]
+if.app-id = 'net.sourceforge.skim-app.skim'
+run = ['move-node-to-workspace guitar', 'layout floating']
 
 # Parallels → vm
 [[on-window-detected]]
