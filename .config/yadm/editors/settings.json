@@ -38,5 +38,6 @@
     "extensions.ignoreRecommendations": true,
     "explorer.confirmDragAndDrop": false,
     "explorer.confirmDelete": false,
-    "chat.mcp.gallery.enabled": true
+    "chat.mcp.gallery.enabled": true,
+    "workbench.editor.empty.hint": "hidden"
 }

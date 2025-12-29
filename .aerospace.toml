@@ -118,6 +118,11 @@ run = 'move-node-to-workspace web'
 if.app-id = 'com.todesktop.230313mzl4w4u92'
 run = 'move-node-to-workspace dev'
 
+# VS Code → dev
+[[on-window-detected]]
+if.app-id = 'com.microsoft.VSCode'
+run = 'move-node-to-workspace dev'
+
 # Xcode → dev
 [[on-window-detected]]
 if.app-id = 'com.apple.dt.Xcode'
@@ -183,10 +188,6 @@ run = ['move-node-to-workspace guitar', 'layout floating']
 if.app-id = 'com.arobas-music.Guitar-Pro-8'
 run = ['move-node-to-workspace guitar', 'layout floating']
 
-# Skim → guitar (floating)
-[[on-window-detected]]
-if.app-id = 'net.sourceforge.skim-app.skim'
-run = ['move-node-to-workspace guitar', 'layout floating']
 
 # Parallels → misc
 [[on-window-detected]]
