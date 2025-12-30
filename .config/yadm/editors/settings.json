@@ -39,5 +39,6 @@
     "explorer.confirmDragAndDrop": false,
     "explorer.confirmDelete": false,
     "chat.mcp.gallery.enabled": true,
-    "workbench.editor.empty.hint": "hidden"
+    "workbench.editor.empty.hint": "hidden",
+    "chat.disableAIFeatures": true
 }
