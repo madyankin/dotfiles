@@ -48,7 +48,6 @@ ctrl-3 = 'workspace terminals'
 ctrl-4 = 'workspace notes'
 ctrl-5 = 'workspace planning'
 ctrl-6 = 'workspace chats/mail'
-ctrl-7 = 'workspace guitar'
 ctrl-8 = 'workspace music'
 ctrl-9 = 'workspace misc'
 
@@ -59,7 +58,6 @@ ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
 ctrl-alt-shift-4 = 'move-node-to-workspace notes'
 ctrl-alt-shift-5 = 'move-node-to-workspace planning'
 ctrl-alt-shift-6 = 'move-node-to-workspace chats/mail'
-ctrl-alt-shift-7 = 'move-node-to-workspace guitar'
 ctrl-alt-shift-8 = 'move-node-to-workspace music'
 ctrl-alt-shift-9 = 'move-node-to-workspace misc'
 
@@ -177,17 +175,6 @@ run = 'move-node-to-workspace misc'
 [[on-window-detected]]
 if.app-id = 'com.apple.Music'
 run = 'move-node-to-workspace music'
-
-# Bias FX → guitar (floating)
-[[on-window-detected]]
-if.app-id = 'com.PositiveGrid.BIASFX2'
-run = ['move-node-to-workspace guitar', 'layout floating']
-
-# Guitar Pro → guitar (floating)
-[[on-window-detected]]
-if.app-id = 'com.arobas-music.Guitar-Pro-8'
-run = ['move-node-to-workspace guitar', 'layout floating']
-
 
 # Parallels → misc
 [[on-window-detected]]
