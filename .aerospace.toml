@@ -48,8 +48,8 @@ ctrl-3 = 'workspace terminals'
 ctrl-4 = 'workspace notes'
 ctrl-5 = 'workspace planning'
 ctrl-6 = 'workspace chats/mail'
-ctrl-8 = 'workspace music'
-ctrl-9 = 'workspace misc'
+ctrl-7 = 'workspace music'
+ctrl-8 = 'workspace misc'
 
 # Move to workspace (Meh + number)
 ctrl-alt-shift-1 = 'move-node-to-workspace web'
@@ -58,8 +58,8 @@ ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
 ctrl-alt-shift-4 = 'move-node-to-workspace notes'
 ctrl-alt-shift-5 = 'move-node-to-workspace planning'
 ctrl-alt-shift-6 = 'move-node-to-workspace chats/mail'
-ctrl-alt-shift-8 = 'move-node-to-workspace music'
-ctrl-alt-shift-9 = 'move-node-to-workspace misc'
+ctrl-alt-shift-7 = 'move-node-to-workspace music'
+ctrl-alt-shift-8 = 'move-node-to-workspace misc'
 
 # Layout (Hyper)
 cmd-ctrl-alt-shift-v = 'layout tiles vertical'
