@@ -40,5 +40,13 @@
     "explorer.confirmDelete": false,
     "chat.mcp.gallery.enabled": true,
     "workbench.editor.empty.hint": "hidden",
-    "chat.disableAIFeatures": true
+    "chat.disableAIFeatures": true,
+    "update.releaseTrack": "dev",
+    "update.mode": "silentlyApplyOnQuit",
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

@@ -53,3 +53,5 @@ Vagrantfile
 # Xcode
 outpunk.xcuserdatad
 .env
+
+.devcontainer
