@@ -4,7 +4,6 @@
     "explorer.autoReveal": false,
     "editor.minimap.enabled": false,
     "workbench.tree.indent": 14,
-    "breadcrumbs.enabled": false,
     "editor.overviewRulerBorder": false,
     "editor.padding.bottom": 14,
     "editor.padding.top": 14,
