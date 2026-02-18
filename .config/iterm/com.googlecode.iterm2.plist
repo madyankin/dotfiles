@@ -4509,7 +4509,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Non-ASCII Ligatures</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>JetBrainsMono-Regular 15</string>
+			<string>JetBrainsMonoNFM-Regular 15</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<false/>
 			<key>Option Key Sends</key>

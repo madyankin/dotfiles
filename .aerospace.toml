@@ -126,11 +126,6 @@ run = 'move-node-to-workspace dev'
 if.app-id = 'com.apple.dt.Xcode'
 run = 'move-node-to-workspace dev'
 
-# iTerm → terminals
-[[on-window-detected]]
-if.app-id = 'com.googlecode.iterm2'
-run = 'move-node-to-workspace terminals'
-
 # Calendar → planning
 [[on-window-detected]]
 if.app-id = 'com.apple.iCal'
