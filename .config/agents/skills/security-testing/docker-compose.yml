@@ -1,0 +1,27 @@
+services:
+  kali:
+    image: kalilinux/kali-rolling
+    container_name: pentest-kali
+    stdin_open: true
+    tty: true
+    volumes:
+      # Mount the pentest project directory
+      - ./:/pentest
+      # Persist home directory for tool configs
+      - kali-home:/root
+    networks:
+      - pentest-net
+    # Keep container running
+    command: /bin/bash
+    # Security: run with limited capabilities in most cases
+    # Uncomment cap_add for network scanning tools that need raw sockets
+    # cap_add:
+    #   - NET_RAW
+    #   - NET_ADMIN
+
+volumes:
+  kali-home:
+
+networks:
+  pentest-net:
+    driver: bridge

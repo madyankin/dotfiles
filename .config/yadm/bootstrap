@@ -47,5 +47,8 @@ log "ZSH"
 log "Cron"
 ./scripts/cron.sh
 
+log "Agents"
+./scripts/agents.sh
+
 echo ""
 echo "✓ Bootstrap complete"
