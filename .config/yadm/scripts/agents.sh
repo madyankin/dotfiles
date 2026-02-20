@@ -88,13 +88,21 @@ remove_unselected() {
 
 link_configs() {
   echo "→ Linking agent configs..."
+  if is_selected opencode; then
+    if [[ ! -e ~/.agents || -L ~/.agents ]]; then
+      ln -sfn .config/agents ~/.agents
+      echo "  ✓ ~/.agents linked"
+    else
+      echo "  ✓ ~/.agents exists (skipped)"
+    fi
+  fi
   for agent in "${selected_agents[@]}"; do
     if [[ "$agent" == "opencode" ]]; then
       continue
     fi
     mkdir -p ~/."$agent"
-    ln -sf ~/.config/agents/skills ~/."$agent/skills"
-    ln -sf ~/.config/agents/agents ~/."$agent/agents"
+    ln -sfn ../.config/agents/skills ~/."$agent/skills"
+    ln -sfn ../.config/agents/agents ~/."$agent/agents"
     echo "  ✓ ~/.$agent linked"
   done
 }
