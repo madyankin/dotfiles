@@ -1,6 +1,6 @@
 ---
 name: rpi-implement
-description: Implement an approved technical plan phase by phase with verification. Use when the user has an existing plan file in thoughts/plans/ and wants to execute it.
+description: Implement an approved technical plan phase by phase with verification. Use when the user has an existing plan file in _scratchpad/plans/ and wants to execute it.
 tools: Bash, Read, Glob, Grep, Edit, Write, Task
 ---
 

@@ -95,4 +95,4 @@ Ask if they have follow-up questions.
 - Use parallel agents for research, not sequential tool calls
 - Document what IS, not what SHOULD BE
 - Include specific file:line references
-- Write the research doc to `thoughts/research/`
+- Write the research doc to `_scratchpad/research/`

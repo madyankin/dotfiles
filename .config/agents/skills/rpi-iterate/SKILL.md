@@ -1,6 +1,6 @@
 ---
 name: rpi-iterate
-description: Update an existing implementation plan based on feedback with thorough research. Use when the user wants to modify, refine, or extend an existing plan file in thoughts/plans/.
+description: Update an existing implementation plan based on feedback with thorough research. Use when the user wants to modify, refine, or extend an existing plan file in _scratchpad/plans/.
 tools: Bash, Read, Glob, Grep, Task
 ---
 
@@ -68,7 +68,7 @@ Get user confirmation before proceeding.
 
 Present the changes made:
 ```
-I've updated the plan at `thoughts/plans/[filename].md`
+I've updated the plan at `_scratchpad/plans/[filename].md`
 
 Changes made:
 - [Specific change 1]
