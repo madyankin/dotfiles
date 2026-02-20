@@ -44,6 +44,16 @@ install_goose() {
   fi
 }
 
+install_opencode() {
+  if ! brew list --formula opencode &>/dev/null 2>&1; then
+    brew install opencode
+    echo "  ✓ opencode installed"
+  else
+    echo "  ✓ opencode already installed"
+  fi
+  selected_agents+=(opencode)
+}
+
 is_selected() {
   local agent="$1"
   for s in "${selected_agents[@]}"; do
@@ -66,6 +76,11 @@ remove_unselected() {
     brew uninstall --cask --force cursor
     rm -f ~/.cursor/skills ~/.cursor/agents
     echo "  ✓ cursor removed"
+  fi
+  # opencode: uninstall formula (skills are loaded from ~/.agents)
+  if ! is_selected opencode && brew list --formula opencode &>/dev/null 2>&1; then
+    brew uninstall opencode
+    echo "  ✓ opencode removed"
   fi
   # goose uses ~/.config/goose/ (not symlinked), so nothing to unlink
 }
@@ -90,6 +105,7 @@ echo "  [1] Claude  (Anthropic)"
 echo "  [2] Codex   (OpenAI)"
 echo "  [3] Cursor  (Cursor)"
 echo "  [4] Goose   (Block)"
+echo "  [5] OpenCode (SST)"
 echo "  [a] All"
 echo "  [q] Skip"
 echo ""
@@ -101,11 +117,13 @@ for choice in "${choices[@]}"; do
     2) install_codex ;;
     3) install_cursor ;;
     4) install_goose ;;
+    5) install_opencode ;;
     a|A)
       install_claude
       install_codex
       install_cursor
       install_goose
+      install_opencode
       break
       ;;
     q|Q)
@@ -121,4 +139,3 @@ done
 
 remove_unselected
 link_configs
-
