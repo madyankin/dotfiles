@@ -55,3 +55,6 @@ outpunk.xcuserdatad
 .env
 
 .devcontainer
+.claude/settings.local.json
+.claude/worktrees
+_scratchpad
