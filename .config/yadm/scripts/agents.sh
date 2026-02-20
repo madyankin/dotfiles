@@ -80,6 +80,7 @@ remove_unselected() {
   # opencode: uninstall formula (skills are loaded from ~/.agents)
   if ! is_selected opencode && brew list --formula opencode &>/dev/null 2>&1; then
     brew uninstall opencode
+    rm -f ~/.opencode/skills ~/.opencode/agents
     echo "  ✓ opencode removed"
   fi
   # goose uses ~/.config/goose/ (not symlinked), so nothing to unlink
@@ -88,6 +89,9 @@ remove_unselected() {
 link_configs() {
   echo "→ Linking agent configs..."
   for agent in "${selected_agents[@]}"; do
+    if [[ "$agent" == "opencode" ]]; then
+      continue
+    fi
     mkdir -p ~/."$agent"
     ln -sf ~/.config/agents/skills ~/."$agent/skills"
     ln -sf ~/.config/agents/agents ~/."$agent/agents"
