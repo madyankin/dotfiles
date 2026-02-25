@@ -93,6 +93,22 @@ Use this response format:
 - [human validation step]
 ```
 
+### Step 6: Compounding Handoff (When Requested)
+
+If the user is running a compounding loop (plan -> implement -> review -> iterate),
+append a handoff block:
+
+```markdown
+## Compounding Handoff
+- Next best action: [implement_next_phase|iterate_plan|run_targeted_research]
+- Why: [short rationale tied to findings]
+- Blocking issues:
+  - [issue or "None"]
+- Suggested owner skill: [rpi-implement|rpi-iterate|rpi-research]
+```
+
+Only include this section when it helps decide the immediate next loop step.
+
 ## Review Principles
 
 1. Be skeptical: verify claims, do not trust wording alone

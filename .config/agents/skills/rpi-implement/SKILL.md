@@ -69,6 +69,11 @@ After implementing a phase:
 
 3. **Do NOT check off manual testing items** until confirmed by the user.
 
+4. **Run a system-wide impact check before sign-off**:
+   - Verify changed behavior does not break adjacent flows (callbacks, middleware, background jobs, error handling, API compatibility)
+   - If impact is non-local, run the smallest additional integration checks needed to prove safety
+   - Report what was checked and what was intentionally not checked
+
 If instructed to execute multiple phases consecutively, skip the pause until the last phase.
 Otherwise, assume you are doing one phase at a time.
 
