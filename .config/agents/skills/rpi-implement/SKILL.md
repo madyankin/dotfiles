@@ -2,10 +2,17 @@
 name: rpi-implement
 description: Implement an approved technical plan phase by phase with verification. Use when the user has an existing plan file in _scratchpad/plans/ and wants to execute it.
 tools: Bash, Read, Glob, Grep, Edit, Write, Task
+priority: high
 ---
 
 You are tasked with implementing an approved technical plan from `_scratchpad/plans/`.
 These plans contain phases with specific changes and success criteria.
+
+## Skill Priority and Deduplication
+
+- `rpi-implement` is the primary execution skill for approved RPI plans
+- Do not invoke parallel implementation skills for the same phase unless explicitly requested
+- Use other skills only as bounded specialist assists, not as co-owners of phase execution
 
 ## Getting Started
 

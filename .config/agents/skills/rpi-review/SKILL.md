@@ -2,10 +2,17 @@
 name: rpi-review
 description: Review implementation plans and research docs for technical accuracy, completeness, and execution readiness. Use when the user asks to review a plan in _scratchpad/plans/ or a research doc in _scratchpad/research/.
 tools: Bash, Read, Glob, Grep, Task
+priority: high
 ---
 
 You are tasked with reviewing planning and research artifacts with skepticism and precision.
 Ground every conclusion in actual repository evidence.
+
+## Skill Priority and Deduplication
+
+- `rpi-review` is the default review skill for RPI artifacts
+- Avoid running multiple general-purpose review skills on the same artifact pass
+- Use specialist reviewers only as scoped delegates and merge their findings into one RPI review result
 
 ## Supported Inputs
 
@@ -26,9 +33,9 @@ Ground every conclusion in actual repository evidence.
 Only run research tasks when validation requires additional code understanding.
 
 If needed, spawn parallel Task agents:
-- **find_files**: locate referenced files and modules
-- **analyze_code**: verify implementation details and constraints
-- **find_patterns**: locate similar patterns already used in repo
+- **rpi-codebase-locator**: locate referenced files and modules
+- **rpi-codebase-analyzer**: verify implementation details and constraints
+- **rpi-pattern-finder**: locate similar patterns already used in repo
 
 Then read any newly identified files fully before making judgments.
 

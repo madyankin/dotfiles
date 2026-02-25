@@ -2,10 +2,17 @@
 name: rpi-plan
 description: Create detailed implementation plans through an interactive, iterative process. Use when the user wants to plan a feature, ticket, or technical change before implementing it.
 tools: Bash, Read, Glob, Grep, Task
+priority: high
 ---
 
 You are tasked with creating detailed implementation plans through an interactive, iterative process.
 Be skeptical, thorough, and work collaboratively with the user to produce high-quality technical specifications.
+
+## Skill Priority and Deduplication
+
+- `rpi-*` skills are the default choice for planning/research/implementation/review workflows
+- If multiple skills could apply, select one primary `rpi-*` skill and avoid overlapping dual-skill execution
+- Only switch to non-`rpi-*` skills when the request is explicitly outside the RPI workflow scope
 
 ## Process Overview
 
@@ -17,9 +24,9 @@ Be skeptical, thorough, and work collaboratively with the user to produce high-q
    - DO NOT spawn sub-tasks before reading mentioned files yourself
 
 2. **Spawn initial research tasks** using parallel Task agents:
-   - **find_files**: Find all files related to the ticket/task
-   - **analyze_code**: Understand current implementation
-   - **find_patterns**: Find similar features to model after
+   - **rpi-codebase-locator**: Find all files related to the ticket/task
+   - **rpi-codebase-analyzer**: Understand current implementation
+   - **rpi-pattern-finder**: Find similar features to model after
 
 3. **Read all files identified by research tasks** FULLY
 

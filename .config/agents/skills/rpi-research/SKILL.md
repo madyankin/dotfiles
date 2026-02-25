@@ -2,6 +2,7 @@
 name: rpi-research
 description: Research and document a codebase for a specific topic using parallel sub-agents. Use when the user wants to investigate, understand, or map out how something works in the codebase, or asks to "research" a topic.
 tools: Bash, Read, Glob, Grep, Task
+priority: high
 ---
 
 ## YOUR ONLY JOB: DOCUMENT THE CODEBASE AS IT EXISTS TODAY
@@ -9,6 +10,12 @@ tools: Bash, Read, Glob, Grep, Task
 - DO NOT critique the implementation
 - ONLY describe what exists, where it exists, and how it works
 - You are creating a technical map, not a code review
+
+## Skill Priority and Deduplication
+
+- `rpi-research` is the canonical research skill for RPI workflows
+- Do not layer another general research skill on top of the same query
+- Escalate to non-`rpi-*` specialist skills only for truly domain-specific depth
 
 ---
 
@@ -23,16 +30,16 @@ Break down the query into 3-5 specific research areas.
 ### STEP 3: SPAWN PARALLEL SUB-AGENTS (REQUIRED)
 Launch multiple Task agents in parallel to do the research:
 
-- **find_files agent**: Find WHERE files and components live (use Glob/Grep)
-- **analyze_code agent**: Understand HOW specific code works (use Read)
-- **find_patterns agent**: Find examples of existing patterns (use Grep)
+- **rpi-codebase-locator agent**: Find WHERE files and components live (use Glob/Grep)
+- **rpi-codebase-analyzer agent**: Understand HOW specific code works (use Read)
+- **rpi-pattern-finder agent**: Find examples of existing patterns (use Grep)
 
 Call multiple agents in parallel. Example:
 ```
 I'll spawn 3 parallel research tasks:
-1. find_files: "MCP extension loading"
-2. analyze_code: "extension configuration files"
-3. find_patterns: "how other extensions are structured"
+1. rpi-codebase-locator: "MCP extension loading"
+2. rpi-codebase-analyzer: "extension configuration files"
+3. rpi-pattern-finder: "how other extensions are structured"
 ```
 
 **DO NOT skip this step. DO NOT do all the research yourself. USE PARALLEL AGENTS.**

@@ -16,6 +16,7 @@ Analyze the directory to determine the language and dependency management system
 - `go.mod` → Go
 - `pom.xml` → Java/Maven
 - `build.gradle` → Java/Gradle
+- `Gemfile`, `Gemfile.lock` → Ruby or Ruby/Rails 
 
 ### 2. Check for Outdated Dependencies
 
@@ -26,6 +27,7 @@ Run the appropriate command:
 - **Go**: `go list -u -m all`
 - **Maven**: `mvn versions:display-dependency-updates`
 - **Gradle**: `gradle dependencyUpdates`
+- **Ruby**: `bundle update`
 
 ### 3. Report Findings
 For each outdated dependency, list:

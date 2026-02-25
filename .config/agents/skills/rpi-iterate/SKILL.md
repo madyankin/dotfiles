@@ -2,10 +2,17 @@
 name: rpi-iterate
 description: Update an existing implementation plan based on feedback with thorough research. Use when the user wants to modify, refine, or extend an existing plan file in _scratchpad/plans/.
 tools: Bash, Read, Glob, Grep, Task
+priority: high
 ---
 
 You are tasked with updating existing implementation plans based on user feedback.
 Be skeptical, thorough, and ensure changes are grounded in actual codebase reality.
+
+## Skill Priority and Deduplication
+
+- `rpi-*` skills take priority for iterative plan workflows
+- If another generic planning skill also matches, keep this skill as the canonical executor
+- Avoid duplicating work already covered by sibling `rpi-*` skills in the same step
 
 ## Process Steps
 
@@ -21,9 +28,9 @@ Be skeptical, thorough, and ensure changes are grounded in actual codebase reali
 If the feedback requires understanding new code patterns or validating assumptions:
 
 1. **Spawn parallel Task agents**:
-   - **find_files**: Find relevant files
-   - **analyze_code**: Understand implementation details
-   - **find_patterns**: Find similar patterns
+   - **rpi-codebase-locator**: Find relevant files
+   - **rpi-codebase-analyzer**: Understand implementation details
+   - **rpi-pattern-finder**: Find similar patterns
 
 2. **Read any new files identified by research** FULLY
 

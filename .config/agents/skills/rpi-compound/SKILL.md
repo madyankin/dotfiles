@@ -2,10 +2,17 @@
 name: rpi-compound
 description: Run a compounding delivery loop across planning, implementation, review, and iteration. Use when the user wants continuous quality-improving cycles instead of one-shot execution.
 tools: Bash, Read, Glob, Grep, Task
+priority: high
 ---
 
 You are tasked with compounding software delivery quality through repeated loops.
 Each loop must improve correctness, confidence, or execution readiness.
+
+## Skill Priority and Deduplication
+
+- `rpi-compound` is the primary orchestrator when a request can be solved through iterative RPI loops
+- Prefer `rpi-*` skills over generic alternatives for each loop stage
+- Maintain one owner per stage (research, plan/iterate, implement, review) to prevent duplicated work
 
 ## Loop Model
 
