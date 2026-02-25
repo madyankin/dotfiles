@@ -48,11 +48,16 @@ After getting initial clarifications:
 
 1. **If user corrects any misunderstanding**: Spawn new research tasks to verify — don't just accept the correction.
 
-2. **Spawn parallel sub-tasks for comprehensive research**
+2. **Apply a risk-triggered external research gate**:
+   - Always perform external research when the plan touches security/auth, billing/payments, data migrations, privacy/compliance, or public API contracts
+   - For localized refactors or low-risk internal changes, external research is optional
+   - Document why external research is or is not required
 
-3. **Wait for ALL sub-tasks to complete** before proceeding
+3. **Spawn parallel sub-tasks for comprehensive research**
 
-4. **Present findings and design options**:
+4. **Wait for ALL sub-tasks to complete** before proceeding
+
+5. **Present findings and design options**:
    ```
    Based on my research:
 
@@ -140,6 +145,22 @@ pause for manual confirmation before proceeding to next phase.
 - [End-to-end scenarios]
 ```
 
+Include a frontmatter metadata block at the top of every plan:
+
+```yaml
+---
+origin:
+  ticket: [ticket-path-or-id]
+  research:
+    - [research-doc-path]
+  related_plans:
+    - [plan-path]
+last_updated: [YYYY-MM-DD]
+---
+```
+
+If any origin source does not exist, set it to `none` rather than leaving it ambiguous.
+
 ## Success Criteria Guidelines
 
 Always separate into:
@@ -152,3 +173,10 @@ Always separate into:
 - **Database changes**: schema/migration → store methods → business logic → API → clients
 - **New features**: data model → backend logic → API endpoints → UI last
 - **Refactoring**: document current behavior → incremental changes → maintain backwards compatibility
+
+## Cross-Provider Compatibility
+
+- Write instructions as behavior contracts, not provider-specific syntax
+- Prefer capability language like "spawn parallel research agents" over slash-command-only guidance
+- If a named tool is unavailable, use the closest equivalent behavior and continue
+- Avoid assumptions that only hold for one runtime (OpenCode, Codex, Claude, Cursor)

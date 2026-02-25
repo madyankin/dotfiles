@@ -48,5 +48,6 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "workbench.statusBar.visible": false,
-    "git.confirmSync": false
+    "git.confirmSync": false,
+    "makefile.configureOnOpen": true
 }

@@ -44,11 +44,16 @@ Compile and connect findings across components.
 ### STEP 5: Gather Git Metadata
 Run these commands:
 ```bash
-date -Iseconds
+date +"%Y-%m-%dT%H:%M:%S%z"
 git rev-parse HEAD
 git branch --show-current
-basename $(git rev-parse --show-toplevel)
+basename "$(git rev-parse --show-toplevel)"
 ```
+
+If git metadata commands fail (for example, not a git repo), continue and set:
+- `git_commit: unknown`
+- `branch: unknown`
+- `repository: [basename of current working directory]`
 
 ### STEP 6: Write Research Document
 Create `_scratchpad/research/YYYY-MM-DD-HHmm-topic.md` (e.g., `2025-01-15-1430-auth-flow.md`) with this structure:
@@ -56,9 +61,9 @@ Create `_scratchpad/research/YYYY-MM-DD-HHmm-topic.md` (e.g., `2025-01-15-1430-a
 ```markdown
 ---
 date: [ISO date from step 5]
-git_commit: [commit hash]
-branch: [branch name]
-repository: [repo name]
+git_commit: [commit hash or unknown]
+branch: [branch name or unknown]
+repository: [repo name or cwd basename]
 topic: "[Research Topic]"
 tags: [research, codebase, relevant-tags]
 status: complete
@@ -96,3 +101,4 @@ Ask if they have follow-up questions.
 - Document what IS, not what SHOULD BE
 - Include specific file:line references
 - Write the research doc to `_scratchpad/research/`
+- Do not fail the workflow solely because git metadata is unavailable
