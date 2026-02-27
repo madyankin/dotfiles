@@ -49,5 +49,6 @@
     },
     "workbench.statusBar.visible": false,
     "git.confirmSync": false,
-    "makefile.configureOnOpen": true
+    "makefile.configureOnOpen": true,
+    "diffEditor.ignoreTrimWhitespace": false
 }

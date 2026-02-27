@@ -2,7 +2,6 @@ aaron-bond.better-comments
 akamud.vscode-theme-onedark
 akamud.vscode-theme-onelight
 alefragnani.bookmarks
-anysphere.remote-containers
 arcanis.vscode-zipfs
 dbaeumer.vscode-eslint
 eamodio.gitlens
