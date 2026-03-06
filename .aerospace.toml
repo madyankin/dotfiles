@@ -180,7 +180,19 @@ run = ['move-node-to-workspace misc', 'layout floating']
 [[on-window-detected]]
 if.app-id = 'com.parallels.desktop.console'
 if.window-title-regex-substring = '^(?!.*Control Center).*$'
-run = 'move-node-to-workspace misc'# DaisyDisk → floating
+run = 'move-node-to-workspace misc'
+
+# DaisyDisk → floating
 [[on-window-detected]]
 if.app-id = 'com.daisydiskapp.DaisyDisk'
+run = 'layout floating'
+
+# Skim → floating
+[[on-window-detected]]
+if.app-id = 'net.sourceforge.skim-app.skim'
+run = 'layout floating'
+
+# Bias FX → floating
+[[on-window-detected]]
+if.app-id = 'com.positivegrid.BiasFx2Standalone'
 run = 'layout floating'
