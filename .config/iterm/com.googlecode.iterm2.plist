@@ -4417,7 +4417,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Guid</key>
 			<string>21DB65C4-72C9-429B-9A1C-DF7C09DDCF47</string>
 			<key>Horizontal Spacing</key>
-			<real>1</real>
+			<real>0.90000000000000002</real>
 			<key>Idle Code</key>
 			<integer>0</integer>
 			<key>Jobs to Ignore</key>
@@ -4681,7 +4681,7 @@ The script should do this: \(ai.prompt)</string>
 			<key>Use Underline Color (Light)</key>
 			<false/>
 			<key>Vertical Spacing</key>
-			<real>1.1000000000000001</real>
+			<real>0.94999999999999996</real>
 			<key>Visual Bell</key>
 			<true/>
 			<key>Window Type</key>
