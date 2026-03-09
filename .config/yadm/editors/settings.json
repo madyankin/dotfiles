@@ -50,5 +50,6 @@
     "workbench.statusBar.visible": false,
     "git.confirmSync": false,
     "makefile.configureOnOpen": true,
-    "diffEditor.ignoreTrimWhitespace": false
+    "diffEditor.ignoreTrimWhitespace": false,
+    "go.toolsManagement.autoUpdate": true
 }
