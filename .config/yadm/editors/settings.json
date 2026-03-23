@@ -51,5 +51,6 @@
     "git.confirmSync": false,
     "makefile.configureOnOpen": true,
     "diffEditor.ignoreTrimWhitespace": false,
-    "go.toolsManagement.autoUpdate": true
+    "go.toolsManagement.autoUpdate": true,
+    "claudeCode.preferredLocation": "panel"
 }

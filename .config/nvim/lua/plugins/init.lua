@@ -3,6 +3,9 @@
 return {
   { 'folke/lazy.nvim', version = false },
 
+  -- Disable bufferline (tab bar)
+  { "akinsho/bufferline.nvim", enabled = false },
+
   {
     'numToStr/Comment.nvim',
     event = { 'BufReadPre', 'BufNewFile' },
