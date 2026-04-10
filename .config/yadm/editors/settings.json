@@ -14,7 +14,7 @@
     "editor.guides.highlightActiveIndentation": false,
     "workbench.tree.renderIndentGuides": "none",
     "workbench.colorTheme": "One Dark Pro Night Flat",
-    "editor.fontSize": 14,
+    "editor.fontSize": 15,
     "editor.fontFamily": "JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
     "editor.lineHeight": 23,
     "terminal.integrated.fontSize": 14,
