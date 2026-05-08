@@ -58,3 +58,5 @@ outpunk.xcuserdatad
 .claude/settings.local.json
 .claude/worktrees
 _scratchpad
+.vercel
+.env*.local
