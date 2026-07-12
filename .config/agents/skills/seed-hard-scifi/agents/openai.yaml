@@ -1,0 +1,4 @@
+interface:
+  display_name: "Seed Hard Sci-Fi"
+  short_description: "Turn any topic into grounded sci-fi premises"
+  default_prompt: "Use $seed-hard-scifi to turn this conversation into a hard sci-fi story seed."

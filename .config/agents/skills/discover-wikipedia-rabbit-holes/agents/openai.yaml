@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wikipedia Rabbit Holes"
+  short_description: "Discover surprising Wikipedia reading paths"
+  default_prompt: "Use $discover-wikipedia-rabbit-holes to make today’s Wikipedia reading list."

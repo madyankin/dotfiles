@@ -1,0 +1,4 @@
+interface:
+  display_name: "Explain with a Metaphor"
+  short_description: "Make difficult ideas memorable through analogy"
+  default_prompt: "Use $explain-with-metaphor to explain this concept through a concrete everyday analogy."
