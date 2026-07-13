@@ -17,7 +17,7 @@
     "editor.fontSize": 15,
     "editor.fontFamily": "JetBrains Mono, Menlo, Monaco, 'Courier New', monospace",
     "editor.lineHeight": 23,
-    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontSize": 15,
     "files.autoSave": "onFocusChange",
     "window.systemColorTheme": "auto",
     "workbench.preferredLightColorTheme": "GitHub Light",
@@ -52,5 +52,5 @@
     "makefile.configureOnOpen": true,
     "diffEditor.ignoreTrimWhitespace": false,
     "go.toolsManagement.autoUpdate": true,
-    "claudeCode.preferredLocation": "panel"
+    "claudeCode.preferredLocation": "sidebar"
 }
