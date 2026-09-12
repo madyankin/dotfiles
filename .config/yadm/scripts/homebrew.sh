@@ -25,7 +25,6 @@ install_essentials() {
   echo ""
   echo "→ Installing CLI tools..."
   brew install \
-    asdf \
     bat \
     delta \
     git \
@@ -35,6 +34,7 @@ install_essentials() {
     htop \
     mas \
     mc \
+    mise \
     pinentry-mac \
     powerlevel10k \
     speedtest-cli \

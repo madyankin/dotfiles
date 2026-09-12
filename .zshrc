@@ -7,6 +7,7 @@ fi
 
 
 # --- Completions ---
+fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
 autoload -Uz compinit bashcompinit
 compinit
 bashcompinit
@@ -88,11 +89,8 @@ esac
 [[ -f ~/.zshrc.machine-specific ]] && source ~/.zshrc.machine-specific
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-# --- ASDF ---
-fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
-
-export DIRENV_LOG_FORMAT=""
-eval "$(direnv hook zsh)"
+# --- mise ---
+eval "$(mise activate zsh)"
 
 
 # Unity CLI
