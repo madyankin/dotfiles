@@ -94,3 +94,6 @@ fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
 export DIRENV_LOG_FORMAT=""
 eval "$(direnv hook zsh)"
 
+
+# Unity CLI
+. "/Users/alexander/.unity/env"
