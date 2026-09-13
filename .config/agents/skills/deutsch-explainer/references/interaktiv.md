@@ -270,7 +270,7 @@ quiz: [
 { art: "valenz",
   titel: "Что требует helfen",
   hinweis: "Кликай по аргументам.",
-  beobachtung: "В русском «помогать кому» — дательный, и в немецком тоже. Совпало, редкий случай.",
+  beobachtung: "У helfen дополнение в Dativ: это видно по dem Freund. Здесь русское и немецкое управление совпадают.",
   verb: "helfen", satz: "Ich helfe dem Freund.",
   argumente: [
     { rolle: "wer?", kasus: "nom", beispiel: "ich" },
@@ -328,3 +328,39 @@ quiz: [
     { name: "Wortstellung im Nebensatz", n: 2, beispiel: "weil ich habe angerufen → weil ich angerufen habe" },
     { name: "Artikelgenus",              n: 1, beispiel: "das Termin → der Termin" } ] }
 ```
+
+## Дополнения к DATA для сборщика
+
+```json
+{
+  "meta": {
+    "pages": ["19", "21"],
+    "requested_pages": ["19", "21"],
+    "page_map": [{"pdf_page": 4, "printed_pages": ["18", "19"]}]
+  },
+  "reference": [{"titel": "Формы глаголов", "text": "Примечание к таблице",
+    "kopf": ["Infinitiv", "Perfekt"], "zeilen": [["gehen", "ist gegangen"]]}],
+  "solutions": [{"titel": "Упражнение 3", "text": "Ответы с объяснениями"}]
+}
+```
+
+Это дополнительные поля, а не полная DATA. Страницы — печатные; pdf_page — с единицы.
+`requested_pages` — заявленный пользователем состав, `pages` — фактически разобранный.
+Сборщик проверяет соответствие, но смысловую полноту проверяет автор по самим страницам.
+У `analyse`: необязательные `titel`, `herkunft` (`zitat`/`loesung`/`beispiel`) и `quelle`.
+У `ordnen` сохраняется основное `loesung`; добавь `loesungen` как массив всех принимаемых
+последовательностей, включая основную. Например:
+`[["Ich", "komme", "morgen"], ["Morgen", "komme", "ich"]]`.
+
+## Смысл визуализаций
+
+На каждый HTML выбирай хотя бы одну объясняющую схему, если материал содержит подходящую
+связь: управление → `valenz`; времена → `zeitstrahl`; порядок слов → `feldermodell`;
+словообразование → `wortbau`; смысловые связи → `wortnetz`. Цвет — не единственный носитель
+смысла: добавляй подписи и пояснение словами для заметки и печати. Не выдумывай численные
+частоты ошибок ради `fehlerprofil`. Две согласованные формы одной конструкции полезнее
+нескольких несвязанных иллюстраций.
+
+На оси времени Perfekt и Präteritum не разводи как «давно / недавно»; Plusquamperfekt привязывай
+к другому прошлому событию. Для Wechselpräpositionen различай направление/изменение
+пространственного отношения и местоположение: движение внутри места тоже допускает Dativ.

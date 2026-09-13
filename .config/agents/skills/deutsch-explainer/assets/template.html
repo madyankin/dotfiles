@@ -36,7 +36,7 @@ a{color:var(--accent)}
 .muted{color:var(--muted)}
 .small{font-size:.86rem}
 header .meta{color:var(--muted);font-size:.86rem;display:flex;flex-wrap:wrap;gap:.35rem .7rem;margin-bottom:1.2rem}
-header .meta span{white-space:nowrap}
+header .meta span{white-space:normal;overflow-wrap:anywhere}
 .badge{display:inline-block;background:var(--accent-soft);color:var(--accent);
   border-radius:999px;padding:.05rem .55rem;font-size:.8rem;font-weight:600}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
@@ -345,7 +345,10 @@ const DATA = {
   if (DATA.analyse && DATA.analyse.length){
     sec('Разбор');
     DATA.analyse.forEach(a => {
+      if (a.titel) add(root, h('h3', null, a.titel));
       const c = add(root, h('div','card'));
+      const origins = {zitat:'Цитата',loesung:'Восстановленный ответ',beispiel:'Учебный пример'};
+      if (a.herkunft || a.quelle) add(c, h('div','small muted', [origins[a.herkunft], a.quelle].filter(Boolean).join(' · ')));
       add(c, h('div','de', a.de));
       if (a.wort) add(c, h('div','small muted', 'дословно: ' + a.wort));
       if (a.frei) add(c, h('div','small', a.frei));
@@ -506,7 +509,8 @@ const DATA = {
     },
 
     feldermodell(f, box){
-      const t = add(box, h('table','felder'));
+      const wrap = add(box,h('div')); wrap.style.overflowX='auto';
+      const t = add(wrap, h('table','felder'));
       const hr = add(add(t, h('thead')), h('tr'));
       ['', 'Vorfeld', 'linke Klammer', 'Mittelfeld', 'rechte Klammer', 'Nachfeld']
         .forEach(c => add(hr, h('th', null, c)));
@@ -559,6 +563,9 @@ const DATA = {
       };
       box.querySelectorAll('.pt').forEach(c =>
         c.addEventListener('click', () => show(+c.dataset.i)));
+      const controls = add(box,h('div','chips'));
+      f.punkte.forEach((pt,i) => { const b=add(controls,h('button','chip',pt.label));
+        b.type='button'; b.onclick=()=>show(i); });
       show(0, true);
     },
 
@@ -609,6 +616,10 @@ const DATA = {
       box.insertAdjacentHTML('beforeend', s);
       const out = add(box, h('div','card'));
       if (f.satz) out.innerHTML = '<div class="de">' + f.satz + '</div>';
+      const controls = add(box,h('div','chips'));
+      f.argumente.forEach(a => { const b=add(controls,h('button','chip',a.rolle+' — '+a.beispiel));
+        b.type='button'; b.onclick=()=>{ out.innerHTML=(f.satz?'<div class="de">'+f.satz+'</div>':'')+
+          '<div>'+a.rolle+' → '+(KASUS_NAME[a.kasus]||'')+'</div>'+(a.notiz?'<p>'+a.notiz+'</p>':''); reveal(box); }; });
       box.querySelectorAll('.node[data-i]').forEach(nd =>
         nd.addEventListener('click', () => {
           const a = f.argumente[+nd.dataset.i];
@@ -731,6 +742,27 @@ const DATA = {
     });
   }
 
+  // Optional appendices stay outside the learning pitfalls.
+  [['reference','Справочник'],['solutions','Ответы к упражнениям']].forEach(([key,title]) => {
+    if (!DATA[key] || !DATA[key].length) return;
+    sec(title);
+    DATA[key].forEach(item => {
+      const d = add(root, h('details','wf'));
+      add(d, h('summary',null,item.titel));
+      const body = add(d,h('div','body'));
+      if (item.text) add(body,h('p',null,item.text));
+      if (item.kopf) {
+        const wrap = add(body,h('div')); wrap.style.overflowX = 'auto';
+        const table = add(wrap,h('table'));
+        const row = add(add(table,h('thead')),h('tr'));
+        item.kopf.forEach(cell => add(row,h('th',null,cell)));
+        const tb = add(table,h('tbody'));
+        (item.zeilen || []).forEach(cells => { const r = add(tb,h('tr'));
+          cells.forEach(cell => add(r,h('td',null,cell))); });
+      }
+    });
+  });
+
   /* --- 7. Квиз --- */
   const norm = s => (s||'').toLowerCase().trim()
     .replace(/ß/g,'ss').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue')
@@ -748,13 +780,13 @@ const DATA = {
     const resetBtn = h('button','btn ghost','Сбросить');
     resetBtn.type = 'button';
 
-    function paint(){
+    function paint(persist = true){
       const answered = done.filter(x => x !== null).length;
       const right = done.filter(x => x === true).length;
       scoreTxt.innerHTML = '<b>' + right + ' / ' + DATA.quiz.length + '</b> верно' +
         (answered < DATA.quiz.length ? ' · отвечено ' + answered : (right === DATA.quiz.length
           ? ' · можно считать тему пройденной' : ' · перечитай разбор и пройди заново'));
-      try { localStorage.setItem(KEY, JSON.stringify(done)); } catch(e){}
+      if (persist) { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch(e){} }
     }
 
     DATA.quiz.forEach((q, i) => {
@@ -815,12 +847,13 @@ const DATA = {
           b.onclick = () => {
             if (done[i] !== null) return;
             b.disabled = true; b.style.opacity = .35;
-            picked.push(t);
+            const token = { text: t };
+            picked.push(token);
             const s = add(slots, h('button','tok', t));
             s.type = 'button';
             s.onclick = () => {
               if (done[i] !== null) return;
-              picked.splice(picked.indexOf(t), 1);
+              picked.splice(picked.indexOf(token), 1);
               s.remove(); b.disabled = false; b.style.opacity = 1;
             };
           };
@@ -830,8 +863,9 @@ const DATA = {
         btn.type = 'button';
         btn.onclick = () => {
           if (done[i] !== null) return;
-          const ok = picked.length === q.loesung.length &&
-            picked.every((t,j) => norm(t) === norm(q.loesung[j]));
+          const accepted = q.loesungen || [q.loesung];
+          const ok = accepted.some(solution => picked.length === solution.length &&
+            picked.every((token,j) => norm(token.text) === norm(solution[j])));
           done[i] = ok; paint();
           btn.disabled = true;
           fb.className = 'feedback on ' + (ok ? 'ok' : 'bad');
@@ -846,7 +880,7 @@ const DATA = {
     add(scoreBox, scoreTxt); add(scoreBox, resetBtn);
     add(root, scoreBox);
     resetBtn.onclick = () => { try { localStorage.removeItem(KEY); } catch(e){} location.reload(); };
-    paint();
+    paint(false);
 
     add(root, h('div','gate',
       'Не считай тему пройденной и не заливай карточки в Anki, пока не соберёшь ' +
@@ -854,7 +888,7 @@ const DATA = {
 
     try {
       const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
-      if (Array.isArray(saved) && saved.length === done.length){
+      if (Array.isArray(saved) && saved.length === done.length && saved.every(x => x === null || typeof x === "boolean")){
         add(root, h('div','small muted',
           'Прошлый результат: ' + saved.filter(x => x === true).length + '/' + saved.length +
           '. Кнопка «Сбросить» стирает его.'));
@@ -865,7 +899,7 @@ const DATA = {
   /* --- 8. Карточки --- */
   if (DATA.karten && DATA.karten.length){
     sec('Карточки');
-    add(root, h('p','muted small','Те же карточки — в заметке Obsidian. В Anki (колода Deutsch) заливаются отдельным шагом.'));
+    add(root, h('p','muted small','Карточки для повторения. Отправка в Anki — отдельный шаг по твоему запросу.'));
     DATA.karten.forEach(k => {
       const d = add(root, h('div','karte'));
       add(d, h('div', null, k.v));
