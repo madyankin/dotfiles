@@ -116,6 +116,40 @@ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);color:v
 .reveal .hidden-until{display:block}
 .beobachtung{margin-top:.8rem;font-size:.88rem;color:var(--accent);background:var(--accent-soft);
   border-radius:8px;padding:.45rem .7rem}
+/* --- диаграммы --- */
+.felder{width:100%;font-size:.92rem}
+.felder th{font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+.felder td{vertical-align:top}
+.felder td.vf{background:var(--vorfeld)} .felder td.mf{background:var(--mittelfeld)}
+.felder td.lk,.felder td.rk{background:var(--finit);font-weight:700}
+.felder tbody tr{cursor:pointer}
+.felder tbody tr.on td{outline:2px solid var(--accent);outline-offset:-2px}
+svg.plot{width:100%;height:auto;display:block;margin:.5rem 0;overflow:visible;color:var(--fg)}
+.ax{stroke:var(--line);stroke-width:1.5;fill:none}
+.tick{stroke:var(--line);stroke-width:1}
+.lbl{fill:var(--muted);font-size:13px;font-family:inherit}
+.lbl.big{fill:var(--fg);font-size:15px;font-weight:600}
+.pt{fill:var(--card);stroke:var(--accent);stroke-width:2;cursor:pointer}
+.pt.on{fill:var(--accent)}
+.now{stroke:var(--accent);stroke-dasharray:4 3;stroke-width:1.2}
+.kiste{fill:none;stroke:var(--fg);stroke-width:2}
+.obj{fill:var(--accent);transition:cx .45s ease,cy .45s ease}
+.edge{stroke:var(--line);stroke-width:1.4}
+.node{fill:var(--card);stroke:var(--accent);stroke-width:1.4;cursor:pointer}
+.node.on{fill:var(--accent-soft)}
+.node.zentrum{cursor:default;fill:var(--accent-soft)}
+.wb{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;margin:.4rem 0}
+.wbteil{border:1px solid var(--line);background:var(--card);border-radius:8px;
+  padding:.35rem .6rem;font-weight:600}
+.wbteil.fuge{font-weight:400;color:var(--muted);font-size:.82rem;padding:.3rem .4rem}
+.wbteil.kopf{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.bars{display:flex;flex-direction:column;gap:.35rem}
+.barrow{display:grid;grid-template-columns:minmax(6rem,13rem) 1fr 2rem;gap:.5rem;align-items:center;
+  background:transparent;border:none;padding:.2rem 0;text-align:left;width:100%}
+.barlbl{font-size:.88rem}
+.bartrack{background:var(--line);border-radius:999px;height:.7rem;overflow:hidden}
+.barfill{display:block;height:100%;background:var(--accent);border-radius:999px}
+.barn{font-size:.85rem;color:var(--muted);text-align:right}
 @media print{
   body{background:#fff;color:#000}
   .chip,.btn,.score{display:none}
@@ -468,6 +502,202 @@ const DATA = {
           if (w.beispiel) b.innerHTML += '<div>' + w.beispiel + '</div>';
           d.addEventListener('toggle', () => { if (d.open) reveal(box); });
         });
+      });
+    },
+
+    feldermodell(f, box){
+      const t = add(box, h('table','felder'));
+      const hr = add(add(t, h('thead')), h('tr'));
+      ['', 'Vorfeld', 'linke Klammer', 'Mittelfeld', 'rechte Klammer', 'Nachfeld']
+        .forEach(c => add(hr, h('th', null, c)));
+      const tb = add(t, h('tbody'));
+      f.saetze.forEach(z => {
+        const r = add(tb, h('tr'));
+        add(r, h('th', null, z.label || ''));
+        add(r, h('td','vf', z.vorfeld || '—'));
+        add(r, h('td','lk', z.lk || '—'));
+        add(r, h('td','mf', z.mittelfeld || '—'));
+        add(r, h('td','rk', z.rk || '—'));
+        add(r, h('td','nf', z.nachfeld || '—'));
+        r.onclick = () => {
+          [...tb.children].forEach(x => x.classList.remove('on'));
+          r.classList.add('on'); reveal(box);
+        };
+      });
+    },
+
+    zeitstrahl(f, box){
+      const W = 700, H = 150, Y = 85, X0 = 45, X1 = 650;
+      const px = v => X0 + (Math.max(0, Math.min(100, v)) / 100) * (X1 - X0);
+      let s = '<svg class="plot" viewBox="0 0 ' + W + ' ' + H + '" role="img">';
+      s += '<line class="ax" x1="' + X0 + '" y1="' + Y + '" x2="' + X1 + '" y2="' + Y + '"/>';
+      s += '<polygon class="ax" fill="currentColor" points="' + X1 + ',' + (Y-6) + ' ' +
+           (X1+12) + ',' + Y + ' ' + X1 + ',' + (Y+6) + '"/>';
+      if (f.jetzt != null){
+        const x = px(f.jetzt);
+        s += '<line class="now" x1="' + x + '" y1="16" x2="' + x + '" y2="' + (H-16) + '"/>';
+        s += '<text class="lbl" x="' + (x+6) + '" y="26">jetzt</text>';
+      }
+      f.punkte.forEach((pt,i) => {
+        const x = px(pt.pos), oben = i % 2 === 0;
+        s += '<line class="tick" x1="' + x + '" y1="' + (Y-7) + '" x2="' + x + '" y2="' + (Y+7) + '"/>';
+        s += '<circle class="pt" data-i="' + i + '" cx="' + x + '" cy="' + Y + '" r="8"/>';
+        s += '<text class="lbl big" text-anchor="middle" x="' + x + '" y="' +
+             (oben ? Y-18 : Y+30) + '">' + pt.label + '</text>';
+      });
+      s += '</svg>';
+      box.insertAdjacentHTML('beforeend', s);
+      const out = add(box, h('div','card'));
+      const show = (i, still) => {
+        const pt = f.punkte[i];
+        out.innerHTML = '<div class="de">' + pt.satz + '</div>' +
+          (pt.notiz ? '<div class="small muted">' + pt.notiz + '</div>' : '');
+        box.querySelectorAll('.pt').forEach(c => c.classList.remove('on'));
+        const n = box.querySelector('.pt[data-i="' + i + '"]');
+        if (n) n.classList.add('on');
+        if (!still) reveal(box);
+      };
+      box.querySelectorAll('.pt').forEach(c =>
+        c.addEventListener('click', () => show(+c.dataset.i)));
+      show(0, true);
+    },
+
+    raum(f, box){
+      const W = 700, H = 260;
+      const chips = add(box, h('div','chips'));
+      box.insertAdjacentHTML('beforeend',
+        '<svg class="plot" viewBox="0 0 ' + W + ' ' + H + '" role="img">' +
+        '<rect class="kiste" x="235" y="95" width="230" height="105" rx="6"/>' +
+        '<text class="lbl" text-anchor="middle" x="350" y="225">' + (f.bezug || '') + '</text>' +
+        '<circle class="obj" cx="350" cy="148" r="17"/></svg>');
+      const obj = box.querySelector('.obj');
+      const out = add(box, h('div','card'));
+      const apply = (i, still) => {
+        const pr = f.praepositionen[i];
+        obj.setAttribute('cx', pr.x / 100 * W);
+        obj.setAttribute('cy', pr.y / 100 * H);
+        [...chips.children].forEach((c,j) => c.setAttribute('aria-pressed', j === i));
+        out.innerHTML = '<div class="de">' + pr.satz + '</div>' +
+          '<div class="small muted">' + pr.p + ' + ' + (KASUS_NAME[pr.kasus] || '') + '</div>';
+        if (!still) reveal(box);
+      };
+      f.praepositionen.forEach((pr,i) => {
+        const b = add(chips, h('button','chip', pr.p));
+        b.type = 'button';
+        b.onclick = () => apply(i);
+      });
+      if (f.objekt) add(box, h('div','small muted',
+        'Объект: <span class="de">' + f.objekt + '</span>'));
+      apply(0, true);
+    },
+
+    valenz(f, box){
+      const n = f.argumente.length, W = 700, H = 50 + n * 64, vy = H / 2;
+      let s = '<svg class="plot" viewBox="0 0 ' + W + ' ' + H + '" role="img">';
+      f.argumente.forEach((a,i) => {
+        const y = 25 + i * 64;
+        s += '<line class="edge" x1="195" y1="' + vy + '" x2="325" y2="' + (y+21) + '"/>';
+        s += '<text class="lbl" text-anchor="middle" x="260" y="' + ((vy + y + 21)/2 - 7) + '">' +
+             (KASUS_NAME[a.kasus] || '') + '</text>';
+        s += '<rect class="node" data-i="' + i + '" x="325" y="' + y +
+             '" width="330" height="42" rx="9"/>';
+        s += '<text class="lbl big" x="342" y="' + (y+27) + '">' + a.rolle + ' — ' + a.beispiel + '</text>';
+      });
+      s += '<ellipse class="node zentrum" cx="108" cy="' + vy + '" rx="88" ry="27"/>';
+      s += '<text class="lbl big" text-anchor="middle" x="108" y="' + (vy+6) + '">' + f.verb + '</text>';
+      s += '</svg>';
+      box.insertAdjacentHTML('beforeend', s);
+      const out = add(box, h('div','card'));
+      if (f.satz) out.innerHTML = '<div class="de">' + f.satz + '</div>';
+      box.querySelectorAll('.node[data-i]').forEach(nd =>
+        nd.addEventListener('click', () => {
+          const a = f.argumente[+nd.dataset.i];
+          box.querySelectorAll('.node[data-i]').forEach(x => x.classList.remove('on'));
+          nd.classList.add('on');
+          out.innerHTML = (f.satz ? '<div class="de">' + f.satz + '</div>' : '') +
+            '<div class="small"><b>' + a.rolle + '</b> → ' + (KASUS_NAME[a.kasus] || '') + '</div>' +
+            (a.notiz ? '<div class="small muted">' + a.notiz + '</div>' : '');
+          reveal(box);
+        }));
+    },
+
+    wortnetz(f, box){
+      const W = 700, H = 380, cx = 350, cy = 190, rx = 245, ry = 135;
+      const n = f.knoten.length;
+      const pos = f.knoten.map((k,i) => {
+        const a = -Math.PI/2 + i * 2 * Math.PI / n;
+        return { x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) };
+      });
+      let s = '<svg class="plot" viewBox="0 0 ' + W + ' ' + H + '" role="img">';
+      pos.forEach((pt,i) => {
+        s += '<line class="edge" x1="' + cx + '" y1="' + cy + '" x2="' + pt.x + '" y2="' + pt.y + '"/>';
+        const mx = cx + (pt.x - cx) * 0.55, my = cy + (pt.y - cy) * 0.55;
+        s += '<text class="lbl" text-anchor="middle" x="' + mx + '" y="' + (my - 5) + '">' +
+             (f.knoten[i].rel || '') + '</text>';
+      });
+      pos.forEach((pt,i) => {
+        const w = Math.max(90, f.knoten[i].w.length * 9 + 26);
+        s += '<rect class="node" data-i="' + i + '" x="' + (pt.x - w/2) + '" y="' + (pt.y - 17) +
+             '" width="' + w + '" height="34" rx="9"/>';
+        s += '<text class="lbl big" text-anchor="middle" x="' + pt.x + '" y="' + (pt.y + 6) + '">' +
+             f.knoten[i].w + '</text>';
+      });
+      const zw = Math.max(120, (f.zentrum || '').length * 10 + 30);
+      s += '<rect class="node zentrum" x="' + (cx - zw/2) + '" y="' + (cy - 22) +
+           '" width="' + zw + '" height="44" rx="11"/>';
+      s += '<text class="lbl big" text-anchor="middle" x="' + cx + '" y="' + (cy + 6) + '">' +
+           (f.zentrum || '') + '</text>';
+      s += '</svg>';
+      box.insertAdjacentHTML('beforeend', s);
+      const out = add(box, h('div','card'));
+      box.querySelectorAll('.node[data-i]').forEach(nd =>
+        nd.addEventListener('click', () => {
+          const k = f.knoten[+nd.dataset.i];
+          box.querySelectorAll('.node[data-i]').forEach(x => x.classList.remove('on'));
+          nd.classList.add('on');
+          out.innerHTML = '<div class="de">' + k.w + '</div>' +
+            '<div class="small muted">' + (k.rel || '') + (k.notiz ? ' · ' + k.notiz : '') + '</div>' +
+            (k.beispiel ? '<div class="small">' + k.beispiel + '</div>' : '');
+          reveal(box);
+        }));
+    },
+
+    wortbau(f, box){
+      const row = add(box, h('div','wb'));
+      const out = add(box, h('div','card'));
+      f.teile.forEach(t => {
+        const cls = 'wbteil' + (t.fuge ? ' fuge' : '') +
+          (f.kopf && t.t === f.kopf ? ' kopf' : '');
+        const b = add(row, h('button', cls, t.t));
+        b.type = 'button';
+        b.onclick = () => {
+          out.innerHTML = '<div class="de">' + (t.artikel ? t.artikel + ' ' : '') + t.t + '</div>' +
+            (t.ru ? '<div class="small muted">' + t.ru + '</div>' : '') +
+            (t.fuge ? '<div class="small muted">соединительный элемент, значения не несёт</div>' : '');
+          reveal(box);
+        };
+      });
+      add(box, h('div','small muted', 'Целиком: <span class="de">' + f.wort + '</span>' +
+        (f.notiz ? ' · ' + f.notiz : '')));
+    },
+
+    fehlerprofil(f, box){
+      const max = Math.max.apply(null, f.kategorien.map(k => k.n || 0).concat([1]));
+      const wrap = add(box, h('div','bars'));
+      const out = add(box, h('div','card'));
+      f.kategorien.forEach(k => {
+        const b = add(wrap, h('button','barrow'));
+        b.type = 'button';
+        b.innerHTML = '<span class="barlbl">' + k.name + '</span>' +
+          '<span class="bartrack"><span class="barfill" style="width:' +
+          Math.round((k.n || 0) / max * 100) + '%"></span></span>' +
+          '<span class="barn">' + (k.n || 0) + '</span>';
+        b.onclick = () => {
+          out.innerHTML = '<div class="small muted">' + k.name + '</div>' +
+            (k.beispiel ? '<div class="de">' + k.beispiel + '</div>' : '') +
+            (k.notiz ? '<div class="small">' + k.notiz + '</div>' : '');
+          reveal(box);
+        };
       });
     }
   };
