@@ -62,11 +62,26 @@ anki-deck: Explanations::«Subject»
   section is a human-readable record of what was pushed, not a sync source. Use `→`, never
   `:::` — the `flashcards-obsidian` plugin is installed and would pick up `:::` lines and
   create a second copy of every card.
+- **Nothing pushed yet?** Then the section says so, rather than silently vanishing or
+  claiming cards that do not exist:
+
+  ```markdown
+  ## Карточки
+
+  > [!todo] Не отправлено
+  > Колода `Explanations::«Subject»`, тег `«slug»` — предложено «N» карточек, ждут подтверждения.
+  ```
+
+  Replace that block with the `front → back` list the moment `anki-cards` actually pushes.
+  A stub that lists cards nobody created is worse than a stub with no card section.
 - **`anki-deck` and `sources`** in frontmatter make a later run able to extend rather than
   duplicate.
 - **Prerequisite gaps go in the stub, not only in the HTML.** A gap the reader can see is a
   reading list; a gap hidden in an HTML file is a surprise.
 - **Wikilink only to notes that exist.** Search first.
+- **One Mermaid diagram** carrying the single structural idea, so the note teaches something
+  on mobile without opening the page. Obsidian renders Mermaid natively. Keep it under ~10
+  nodes; it is a summary, not a second copy of the page's figures.
 - **Title and headings match the folder's language.** `3 Resources/Algorithms/` is
   Russian-titled; a lone English note there is a wart.
 

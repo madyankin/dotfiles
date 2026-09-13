@@ -308,18 +308,8 @@ page has neither.
   .viz-control output { font-family:ui-monospace, Menlo, monospace; color:var(--muted);
                         min-width:4rem; }
 
-  /* Proof / derivation stepper */
-  .proof { list-style:none; counter-reset:pf; padding:0; margin:1rem 0; }
-  .proof li { counter-increment:pf; display:grid; grid-template-columns:auto 1fr;
-              gap:.2rem 1rem; padding:.5rem .8rem; border-left:3px solid transparent;
-              border-radius:0 6px 6px 0; }
-  .proof li::before { content:"(" counter(pf) ")"; color:var(--muted); font-size:.8rem;
-                      font-family:ui-monospace, Menlo, monospace; grid-row:1; }
-  .proof .expr { font-family:ui-serif, Georgia, serif; font-size:1.02rem; }
-  .proof .why { grid-column:2; color:var(--muted); font-size:.84rem; }
-  .proof li.at { border-left-color:var(--accent); background:var(--accent-soft); }
-  .proof li.next { opacity:.28; }
-  .proof li.done { opacity:.85; }
+  /* `.proof` styling lives in HTML_TEMPLATE.md — it is already in the skeleton, do not
+     paste a second copy here. */
 ```
 
 ### JS
@@ -341,8 +331,9 @@ var Viz = (function () {
     if (lo === hi) { lo -= 1; hi += 1; }
     return [lo, hi];
   }
-  function fmt(v) {
-    if (Math.abs(v) >= 1000) return (v / 1000) + "k";
+  function fmt(v) {                                  // axis labels, always rounded
+    if (Math.abs(v) >= 1e6) return Math.round(v / 1e5) / 10 + "M";
+    if (Math.abs(v) >= 1000) return Math.round(v / 100) / 10 + "k";
     return Math.round(v * 100) / 100 + "";
   }
 
@@ -356,11 +347,23 @@ var Viz = (function () {
       s.points.forEach(function (p) { xs.push(p[0]); ys.push(p[1]); });
     });
     if (!xs.length) return;
-    var xe = extent(xs), ye = extent(ys);
-    if (spec.yZero !== false) ye[0] = Math.min(0, ye[0]);
+    // yScale:"log" plots log10(y) — use it when competing bounds differ by orders of
+    // magnitude and a linear axis would flatten the small ones onto the x-axis.
+    var logY = spec.yScale === "log";
+    var yfloor = 1;
+    if (logY) {
+      var pos = ys.filter(function (v) { return v > 0; });
+      yfloor = pos.length ? Math.min.apply(null, pos) : 1;
+    }
+    var ty = function (v) { return logY ? Math.log(Math.max(v, yfloor)) / Math.LN10 : v; };
+    var iy = function (t) { return logY ? Math.pow(10, t) : t; };
+
+    var xe = extent(xs), ye = extent(ys.map(ty));
+    if (!logY && spec.yZero !== false) ye[0] = Math.min(0, ye[0]);
 
     var sx = function (v) { return P.l + (v - xe[0]) / (xe[1] - xe[0]) * (W - P.l - P.r); };
-    var sy = function (v) { return H - P.b - (v - ye[0]) / (ye[1] - ye[0]) * (H - P.t - P.b); };
+    var sy = function (t) { return H - P.b - (t - ye[0]) / (ye[1] - ye[0]) * (H - P.t - P.b); };
+    var syv = function (v) { return sy(ty(v)); };            // raw data value -> pixels
 
     var svg = svgEl("svg", {
       viewBox: "0 0 " + W + " " + H, class: "viz",
@@ -371,7 +374,7 @@ var Viz = (function () {
       var v = ye[0] + f * (ye[1] - ye[0]), y = sy(v);
       svg.appendChild(svgEl("line", { x1: P.l, x2: W - P.r, y1: y, y2: y, class: "grid" }));
       var t = svgEl("text", { x: P.l - 8, y: y + 4, class: "tick", "text-anchor": "end" });
-      t.textContent = fmt(v);
+      t.textContent = fmt(iy(v));
       svg.appendChild(t);
     });
 
@@ -402,17 +405,17 @@ var Viz = (function () {
         s.points.forEach(function (p, pi) {
           var x = sx(p[0]) - (series.length * bw) / 2 + si * bw;
           svg.appendChild(svgEl("rect", {
-            x: x, y: sy(p[1]), width: bw, height: Math.max(1, sy(ye[0]) - sy(p[1])),
+            x: x, y: syv(p[1]), width: bw, height: Math.max(1, sy(ye[0]) - syv(p[1])),
             class: "bar " + cls
           }));
         });
       } else if (spec.type === "scatter") {
         s.points.forEach(function (p) {
-          svg.appendChild(svgEl("circle", { cx: sx(p[0]), cy: sy(p[1]), r: 3.5, class: "dot " + cls }));
+          svg.appendChild(svgEl("circle", { cx: sx(p[0]), cy: syv(p[1]), r: 3.5, class: "dot " + cls }));
         });
       } else {
         var d = s.points.map(function (p, pi) {
-          return (pi ? "L" : "M") + sx(p[0]) + " " + sy(p[1]);
+          return (pi ? "L" : "M") + sx(p[0]) + " " + syv(p[1]);
         }).join(" ");
         svg.appendChild(svgEl("path", {
           d: d, class: "line " + cls, fill: "none", "stroke-dasharray": DASH[si % DASH.length]
@@ -458,6 +461,7 @@ var Viz = (function () {
   /* spec: {nodes:[{id,label,x,y,tag}], edges:[{from,to,label,dashed}], height} — x/y in any units */
   function graph(mount, spec) {
     var nodes = spec.nodes, edges = spec.edges || [];
+    if (!nodes || !nodes.length) return null;
     var byId = {}; nodes.forEach(function (n) { byId[n.id] = n; });
     var W = 640, H = spec.height || 300, M = 40, R = spec.radius || 18;
     var xe = extent(nodes.map(function (n) { return n.x; }));
@@ -532,7 +536,56 @@ var Viz = (function () {
     return ol;
   }
 
-  return { chart: chart, graph: graph, proof: proof };
+  /* spec: {parent:[…], only:[i,…], labels:{i:"…"}, gap, radius, height, aria}
+     Forest of parent-pointer trees straight from the array the algorithm actually uses.
+     A root is `parent[i] === i`. Leaves get consecutive x, a parent sits at the midpoint of
+     its children, y is depth, and separate trees are spaced by `gap`. Returns
+     {svg, depth, roots, nodes, edges} — `depth` is worth showing in the caption, since
+     "the tree got shallower" is the whole point of half the union-find page.
+
+     This is the default figure for trees, heaps, forests, and parent-pointer structures:
+     do not hand-roll a layout per page. */
+  function tree(mount, spec) {
+    var parent = spec.parent, keep = null, i;
+    if (spec.only) { keep = {}; spec.only.forEach(function (x) { keep[x] = true; }); }
+    var kids = {}, roots = [];
+    for (i = 0; i < parent.length; i++) {
+      if (keep && !keep[i]) continue;
+      if (parent[i] === i) roots.push(i);
+      else (kids[parent[i]] = kids[parent[i]] || []).push(i);
+    }
+    var nodes = [], edges = [], cursor = 0, depth = 0;
+    var gap = spec.gap == null ? 1.3 : spec.gap;
+
+    function place(n, d) {
+      if (d > depth) depth = d;
+      var ch = kids[n], x, xs;
+      if (!ch || !ch.length) { x = cursor; cursor += 1; }
+      else {
+        xs = ch.map(function (c) { return place(c, d + 1); });
+        x = (Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2;
+      }
+      nodes.push({
+        id: String(n),
+        label: spec.labels && spec.labels[n] != null ? String(spec.labels[n]) : String(n),
+        x: x, y: d, tag: parent[n] === n ? "root" : null
+      });
+      if (parent[n] !== n) edges.push({ from: String(n), to: String(parent[n]) });
+      return x;
+    }
+    roots.forEach(function (r) { place(r, 0); cursor += gap; });
+    if (!nodes.length) return null;
+
+    var svg = graph(mount, {
+      nodes: nodes, edges: edges,
+      radius: spec.radius || 15,
+      height: spec.height || (70 + depth * 62),
+      aria: spec.aria
+    });
+    return { svg: svg, depth: depth, roots: roots, nodes: nodes, edges: edges };
+  }
+
+  return { chart: chart, graph: graph, tree: tree, proof: proof };
 })();
 ```
 
@@ -545,6 +598,10 @@ Viz.chart(mountEl, {
   xLabel: "n", yLabel: "ops",
   xTickLabels: ["p50", "p95", "p99"],   // optional; categorical x
   yZero: true,                          // default true — force the y-axis to include 0
+  yScale: "log",                        // log10 y-axis; use when bounds differ by orders of
+                                        // magnitude. Line/scatter only — bars from a log
+                                        // baseline lie. Non-positive values clamp to the
+                                        // smallest positive one, so say so in the caption.
   height: 300,
   aria: "one sentence describing the figure",
   table: true,                          // default true — collapsible data table
@@ -558,6 +615,15 @@ Viz.graph(mountEl, {
   radius: 18,
   aria: "one sentence describing the structure"
 });
+
+Viz.tree(mountEl, {                     // parent-pointer forest — layout computed for you
+  parent: [0, 8, 2, 3, 4, 8, 6, 7, 8, 9],   // parent[i] === i marks a root
+  only: [3, 4, 5],                      // optional: draw just these nodes
+  labels: { 0: "root" },                // optional: override node labels
+  gap: 1.3, radius: 15, height: 200,    // optional
+  aria: "one sentence describing the structure"
+});
+// → { svg, depth, roots, nodes, edges }; `depth` is the number worth putting in the caption
 
 Viz.proof(mountEl, {
   steps: [{ expr: "HTML for the line", why: "justification" }, …],

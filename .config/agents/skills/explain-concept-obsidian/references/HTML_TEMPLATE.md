@@ -61,6 +61,16 @@ questions and leave the engine alone.
   p code, li code, td code { background:var(--code-bg); padding:.1rem .3rem; border-radius:4px; font-size:.9em; }
   .fileref { color:var(--muted); font-size:.8rem; display:block; margin:-.4rem 0 .5rem; }
 
+  /* Literate listing — prose, chunk, consequence. Chunks stay small; the assembled
+     listing lives in a <details> at the end of the walkthrough. */
+  .lit { border-left:2px solid var(--line); padding-left:1rem; margin:1.4rem 0; }
+  .lit > pre { margin:.5rem 0; }
+  .lit .lit-why { margin:.9rem 0 .1rem; }
+  .lit .lit-why::before { content:"→ "; color:var(--accent); font-weight:700; }
+  .lit .lit-then { margin:.15rem 0 .9rem; color:var(--muted); font-size:.9rem; }
+  .lit > :first-child { margin-top:0; }
+  .lit > :last-child { margin-bottom:0; }
+
   /* Callouts */
   .callout { border-left:3px solid var(--accent); background:var(--accent-soft);
              padding:.75rem 1rem; border-radius:0 8px 8px 0; margin:1.2rem 0; }
@@ -319,6 +329,14 @@ questions and leave the engine alone.
       }, 1200);
     });
     render();
+    // Returned so a figure can swap its STEPS — e.g. a selector comparing algorithm
+    // variants over the same input. Mutate the array in place, then call reset().
+    return {
+      render: render,
+      reset: function () { stop(); at = 0; render(); },
+      goto: function (i) { stop(); at = Math.min(STEPS.length - 1, Math.max(0, i)); render(); },
+      at: function () { return at; }
+    };
   };
 })();
 
@@ -337,12 +355,37 @@ questions and leave the engine alone.
     };
   }));
 
-  // «worked example» — one entry per step.
-  mountStepper("walk", [
-    { render: function (stage) { Viz.graph(stage, { nodes: «…», edges: «…», aria: "«state after step 1»" }); },
-      note: "«What just happened and why it matters»" }
-    // … one entry per step
-  ]);
+  // «worked example» — ALWAYS a stepper for an algorithm, one entry per operation, and
+  // it steps through the same input the prose narrates. Build the steps by running the
+  // real algorithm, not by hand-writing states: hand-written states drift from the code.
+  function buildSteps(«variant») {
+    var state = «fresh state»;
+    return [«initial step»].concat(«INPUT».map(function (op) {
+      «apply op to state»;
+      var snapshot = «copy of state»;
+      return {
+        render: function (stage) {
+          var t = Viz.tree(stage, { parent: snapshot, aria: "«state after » " + op });
+          stage.insertAdjacentHTML("beforeend",
+            '<p class="cost">«counters worth showing, e.g. depth »' + t.depth + "</p>");
+        },
+        note: "«what this operation did and why it matters»"
+      };
+    }));
+  }
+
+  var STEPS = buildSteps(«default variant»);
+  var walk = mountStepper("walk", STEPS);
+
+  // Optional but cheap: let the reader re-run the SAME input under a different variant.
+  // Comparing variants on one input is what makes the improvement visible.
+  var sel = document.getElementById("«variantSelect»");
+  if (sel) sel.addEventListener("change", function () {
+    var next = buildSteps(sel.value);
+    STEPS.length = 0;
+    Array.prototype.push.apply(STEPS, next);
+    walk.reset();
+  });
 })();
 
 (function () {
@@ -386,12 +429,23 @@ questions and leave the engine alone.
   var scoreEl = document.getElementById("score");
   var answered = 0, right = 0;
 
-  QUIZ.forEach(function (q, qi) {
-    var order = q.options.map(function (_, i) { return i; });
-    for (var i = order.length - 1; i > 0; i--) {          // Fisher–Yates, seeded
+  function shuffle(a) {                                   // Fisher–Yates, seeded
+    for (var i = a.length - 1; i > 0; i--) {
       var j = Math.floor(rand() * (i + 1));
-      var t = order[i]; order[i] = order[j]; order[j] = t;
+      var t = a[i]; a[i] = a[j]; a[j] = t;
     }
+    return a;
+  }
+
+  // Correct-answer slots are a seeded permutation of 0..3, so the first four questions
+  // between them use every position exactly once. QUIZ_RULES' balance requirement is
+  // satisfied by construction — you no longer hunt for a lucky SEED.
+  var SLOTS = shuffle([0, 1, 2, 3]);
+
+  QUIZ.forEach(function (q, qi) {
+    var order = shuffle(q.options.map(function (_, i) { return i; })
+                         .filter(function (i) { return i !== q.answer; }));
+    order.splice(SLOTS[qi % 4], 0, q.answer);             // answer lands in its assigned slot
 
     var card = document.createElement("div");
     card.className = "q";
@@ -468,3 +522,7 @@ questions and leave the engine alone.
   `<output>`, no invented numbers.
 - One toy instance carried through Intuition, Formal treatment, and Worked example — not
   three different examples.
+- **Run it**: `node references/verify.js "<file>.html"` must print PASS. It parses the page,
+  executes every script, clicks every button, drags every slider, cycles every select, and
+  fails on any thrown error, an empty figure mount, a stepper that does not start at `1 / n`,
+  or quiz feedback that is visible before a click. Greps cannot tell you that `Viz.tree` threw.
