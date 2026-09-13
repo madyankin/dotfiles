@@ -113,6 +113,8 @@ Title, one-paragraph summary, table of contents, one continuous page.
 5. **Common misconceptions** — the wrong models people carry, and what each one predicts
    incorrectly. Distractors in the quiz should come from here.
 6. **Further reading** — the specific chapter, lecture, or paper, not a bare book title.
+   **Anything with a stable web address is a hyperlink**, never a bare identifier the reader
+   has to retype — see "Sources are clickable" below.
 7. **Quiz** — exactly five interactive multiple-choice questions. See
    `references/QUIZ_RULES.md`; those rules are binding.
 
@@ -215,6 +217,33 @@ Rules for chunks:
 - `verify.js` fails on a `<pre>` over 25 lines outside a `<details>` — that is the mechanical
   floor, not the goal.
 
+**The code on the page is exposition, not production.** It is read once, slowly, by someone
+meeting the idea for the first time, and it is never profiled. Optimise it for that reader:
+
+- **Name the intermediate instead of nesting the call.** `Math.min(1, Math.max(0, rate *
+  (target / Math.max(prev.sp, 1e-9)) * (prev.r / r)))` is one expression doing four things.
+  Give the clamp a name, give each correction factor a name, and let the last line read like
+  the sentence above it:
+
+  ```js
+  var moneyMiss = target / Math.max(prev.sp, EPS);   // недобрали или перебрали в прошлом часе
+  var trafficShift = prev.r / r;                     // трафика стало больше или меньше
+  var winShift = prev.w / win(b);                    // выигрывать стало легче или труднее
+  rate = clamp(rate * moneyMiss * trafficShift * winShift, 0, 1);
+  ```
+
+- **Two levels of nesting is the ceiling** in any one expression. A third means a name is
+  missing.
+- **Every magic number gets a name.** `1e-9` is `EPS`; `0.7` is `LOAD_FACTOR`. The reader
+  cannot look them up.
+- **One idea per line.** A line that needs horizontal scrolling has already failed, and the
+  page is 46rem wide — roughly 90 monospace columns at this size. Wrap before that.
+- **Guard and return early** rather than nesting `if`s; the happy path should read straight
+  down the left margin.
+- If the real implementation genuinely is dense, **show the unpacked version and say so** in
+  one sentence: "здесь то же самое, разложенное на шаги". Never paste production density into
+  a teaching page and hope the reader untangles it.
+
 ### What this does not license
 
 Not condescension: the reader is inexperienced in this subject, not slow. Not padding — a
@@ -242,6 +271,12 @@ The contract:
   `Viz.graph` for general topology — alongside the raw array or table the code indexes. Seeing
   both, and seeing them agree, is most of what the figure teaches.
 - **Back, forward, and ▶** on every stepper. Play is opt-in, never autoplaying.
+- **A step shows something, or it is not a step.** Moving a highlight bar down a list is not
+  stepping — the reader who was stuck on line 6 is still stuck on line 6, now with buttons.
+  Every step either draws its own figure or marks the change inside the expression; proof and
+  derivation steppers use `Viz.proof`'s `show` and its `mk-sub` / `mk-gone` / `mk-new`
+  markers. `VISUALIZATIONS.md` has the table of step kinds and what each one draws;
+  `verify.js` fails a stepper whose steps render neither.
 - **Counters that carry the argument**: depth, comparisons, pointer hops, components, whatever
   the complexity claim is about. The number the reader watches move should be the number the
   analysis section bounds.
@@ -318,6 +353,31 @@ Reuse a small set of families. **Never ASCII art.** Label axes with units, give 
 call a real `aria` sentence, and carry one toy instance through Intuition, Formal treatment,
 and Worked example rather than switching examples per section.
 
+## Sources are clickable
+
+A citation the reader has to copy into a search box is a citation they will not follow.
+Anything with a stable address becomes an `<a href>` at the moment you write it:
+
+| Written as text | Becomes |
+|---|---|
+| `arXiv:1610.03013` | `<a href="https://arxiv.org/abs/1610.03013">` |
+| a DOI | `<a href="https://doi.org/«doi»">` |
+| `RFC 9110` | `<a href="https://www.rfc-editor.org/rfc/rfc9110">` |
+| a paper with no DOI but a canonical page | that page |
+| a lecture, course, or spec | its page |
+
+Rules:
+
+- **Link text is the title**, or the identifier — never a naked URL, and never "here".
+- **A book the user owns is not a link.** It is a file on their disk; cite chapter, section,
+  and page instead, and say the book is in `~/Documents/03 Resources/Books/`.
+- **Do not invent a URL.** An arXiv ID or DOI maps to its address mechanically and that is
+  safe; anything else you have not actually seen stays unlinked, and you say so.
+- The page's no-external-resources rule is about **loading** — scripts, styles, fonts, images,
+  `fetch`. Prose links load nothing until the reader clicks. They are not merely allowed, they
+  are required. `verify.js` distinguishes the two and fails on a bare `arXiv:` / `doi:` /
+  `RFC N` left unlinked.
+
 ## Rendering reality (state this to the user on every run)
 
 - **Browser = full fidelity.** Quiz clicks and interactive figures work only here. Hand over
@@ -366,6 +426,27 @@ card-quality rules.
 > The `flashcards-obsidian` plugin is installed and syncs any `:::` line it finds to Anki.
 > With the MCP as the single source of cards, a `:::` line means every card exists twice.
 > Use `→` in the record section.
+
+## Словарь: terms in Russian output
+
+Russian pages and stubs use Russian words. A transliterated English term is not a technical
+term, it is an untranslated one, and it reads as sloppy in a note the user will keep for years.
+
+| Never write | Write instead |
+|---|---|
+| волт, вольт | **хранилище**, **заметки**, or **Obsidian** — pick by what the sentence is about: the storage, its contents, or the app |
+
+The rule behind the table, for terms it does not list yet: **if a normal Russian word exists,
+use it.** Transliterate only when there is genuinely nothing — and a word that merely feels
+shorter in English does not count.
+
+What stays as conventionally written, and must not be translated: notation, identifiers, code,
+file names, product names (Obsidian, Anki, Swift), and established technical terms that the
+field itself writes in English or in transliteration (`union-find`, `find`, `хеш-таблица`,
+`кеш`). Translating those is the opposite mistake and just as bad.
+
+`verify.js` fails on the entries in the table. When the user corrects a word, add a row —
+that is the whole maintenance story for this section.
 
 ## Language
 
@@ -440,3 +521,11 @@ What the harness cannot judge, and you still must:
   now lints prose for words that wave a step away and for listings over 25 lines outside
   `<details>`. The blanket ban on «просто» was wrong — it is normally the adverb "merely"; only
   the shrug («это просто», "simply add") is flagged.
+- 2026-09-13 — a stepper must show the step, not highlight it: `Viz.proof` gained `show(fig, i)`
+  and the `mk-sub` / `mk-gone` / `mk-new` rewrite markers, plus a table of step kinds and what
+  each draws. Shipped `Hl`, a dependency-free syntax highlighter for every listing. Added the
+  «Словарь» section (волт → хранилище/заметки/Obsidian), the rule that page code is exposition
+  and gets named intermediates instead of nested calls, and the rule that any source with a
+  stable address is a hyperlink. `verify.js` now separates network *loading* (banned) from
+  prose links (required), and fails on unhighlighted listings, bare `arXiv:`/`doi:`/`RFC N`,
+  banned words, and proof steppers that only move a highlight.

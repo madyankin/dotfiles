@@ -155,6 +155,39 @@ Every proof, derivation, or complexity argument is stepped. The reader advances 
 time and sees the justification for that line; future lines are dimmed and `aria-hidden` so
 the argument is not spoiled.
 
+**Stepping must show the step, not highlight it.** A stepper whose only effect is moving a
+blue bar down a list of formulas is a list of formulas with extra clicks: the reader who was
+stuck on line 6 is still stuck on line 6. Every step carries `show`, or rewrite markers, or
+both.
+
+What to draw is decided by **what kind of step it is**, and the kinds are few. This table is
+the general answer — it does not depend on the subject:
+
+| Step does this | The figure shows |
+|---|---|
+| Defines or sets up an object | The object drawn: the curve, the tree, the interval, the box |
+| Substitutes one expression into another | The incoming sub-expression marked `mk-sub` in its new place |
+| Cancels or simplifies | The cancelling factors struck with `mk-gone`, on both sides at once |
+| Differentiates, or takes a limit | The curve with the tangent, the secant collapsing, or the point approached |
+| Establishes an inequality or bound | Both sides as bars, curves, or lengths, with the gap shaded |
+| Splits into cases | One panel per branch, the current branch emphasised |
+| Applies the induction hypothesis | The smaller instance drawn beside the bigger one it feeds |
+| Concludes | The claim beside the picture that makes it obvious in hindsight |
+
+Two practical shapes:
+
+- **One figure that persists and changes.** A derivation about one function keeps the same
+  plot for all steps and moves what is marked on it — the point, the area, the tangent. The
+  reader builds one mental picture instead of nine.
+- **A figure per step.** An induction or a case analysis draws a different object each time.
+
+Both are `show(figureEl, i)`; the difference is only whether the drawing code varies with `i`.
+
+When the step is pure algebra and there is genuinely nothing to plot, the rewrite markers
+*are* the visualization: seeing <span class="mk-gone">N</span> struck in the numerator and the
+denominator at the same moment is the explanation. That is the minimum bar, not an excuse to
+skip `show`.
+
 ```html
 <div class="stepper" id="proofWalk">
   <div class="controls">
@@ -170,8 +203,19 @@ the argument is not spoiled.
 
 ```js
 var LINES = [
-  { expr: '«<span class=\"math\">T(n)</span> = 2T(n/2) + n»', why: '«recurrence from the split»' },
-  { expr: '«= <span class=\"math\">n</span> log <span class=\"math\">n</span>»', why: '«master theorem, case 2»' }
+  {
+    expr: '«<span class=\"math\">S</span> = <span class=\"math\">N</span> · ' +
+          '<span class=\"mk-sub\">«w(b) · c(b)»</span>»',
+    why: '«substituted the definition of c(b)»',
+    show: function (fig) { «draw the curve with the region this line is about shaded» }
+  },
+  {
+    expr: '«d<span class=\"math\">S</span>/d<span class=\"math\">V</span> = ' +
+          '(<span class=\"mk-gone\">N</span> · b · p(b)) / (<span class=\"mk-gone\">N</span> · p(b)) ' +
+          '= <span class=\"mk-new\">b</span>»',
+    why: '«N and p(b) cancel — this is the step the whole derivation exists for»',
+    show: function (fig) { «draw the tangent whose slope is exactly b» }
+  }
 ];
 var STEPS = LINES.map(function (_, i) {
   return {
@@ -180,6 +224,9 @@ var STEPS = LINES.map(function (_, i) {
   };
 });
 ```
+
+Note where the markers sit: `mk-gone` on **both** copies of the cancelling factor, so the
+cancellation happens in front of the reader, and `mk-new` on what survives.
 
 The point is that the reader can stop at the step they don't believe and stare at it. A static
 block of algebra hides exactly that step.
@@ -309,7 +356,17 @@ page has neither.
                         min-width:4rem; }
 
   /* `.proof` styling lives in HTML_TEMPLATE.md — it is already in the skeleton, do not
-     paste a second copy here. */
+     paste a second copy here. The bits below belong to Viz.proof's figure panel and its
+     rewrite markers, so they ship with the Viz block. */
+  .proof-figure { background:var(--bg); border:1px solid var(--line); border-radius:8px;
+                  padding:.7rem .8rem; margin:0 0 .9rem; }
+  .mk-new { background:var(--accent-soft); border-radius:3px; padding:0 .15em; }
+  .mk-sub { background:var(--ok-soft); border-radius:3px; padding:0 .15em; }
+  .mk-gone { text-decoration:line-through; text-decoration-thickness:2px;
+             text-decoration-color:var(--bad); opacity:.6; }
+  /* on every line except the current one the markers are inert, so stepping animates them */
+  .proof .plain .mk-new, .proof .plain .mk-sub { background:none; padding:0; }
+  .proof .plain .mk-gone { text-decoration:none; opacity:1; }
 ```
 
 ### JS
@@ -510,10 +567,31 @@ var Viz = (function () {
     return svg;
   }
 
-  /* spec: {steps:[{expr, why}], at:i} — derivation or proof revealed one step at a time.
-     `expr` is HTML (use the .math/.frac helpers); `why` is the justification. */
+  /* spec: {steps:[{expr, why, show}], at:i} — a derivation advanced one step at a time.
+     `expr` is HTML (use the .math/.frac helpers); `why` is the justification.
+
+     A step must SHOW what it does, not merely be highlighted. Two mechanisms, use at least one:
+
+     1. `show(figureEl, i)` — draw the step's figure: the curve with the point it is about, the
+        two trees being merged, the interval being split. Rendered in a panel above the lines,
+        replaced on every step.
+     2. Markers inside `expr` — `<span class="mk-sub">` for what was substituted in,
+        `<span class="mk-gone">` for what cancels, `<span class="mk-new">` for what appears.
+        They paint only while their line is the current one, so stepping animates the rewrite
+        instead of just moving a highlight bar.
+
+     A step with neither is a highlighted row of text, which teaches nothing. */
   function proof(mount, spec) {
     var at = spec.at == null ? spec.steps.length - 1 : spec.at;
+    var cur = spec.steps[at];
+
+    if (cur && cur.show) {                                     // the step's own visualization
+      var fig = document.createElement("div");
+      fig.className = "proof-figure";
+      mount.appendChild(fig);
+      cur.show(fig, at);
+    }
+
     var ol = document.createElement("ol");
     ol.className = "proof";
     spec.steps.forEach(function (st, i) {
@@ -521,7 +599,7 @@ var Viz = (function () {
       li.className = i < at ? "done" : (i === at ? "at" : "next");
       if (i > at) li.setAttribute("aria-hidden", "true");       // not yet revealed
       var e = document.createElement("div");
-      e.className = "expr";
+      e.className = "expr" + (i === at ? "" : " plain");        // markers live on the current line
       e.innerHTML = st.expr;
       li.appendChild(e);
       if (st.why) {
@@ -626,9 +704,15 @@ Viz.tree(mountEl, {                     // parent-pointer forest — layout comp
 // → { svg, depth, roots, nodes, edges }; `depth` is the number worth putting in the caption
 
 Viz.proof(mountEl, {
-  steps: [{ expr: "HTML for the line", why: "justification" }, …],
+  steps: [{
+    expr: "HTML for the line — may contain .mk-sub / .mk-gone / .mk-new markers",
+    why:  "justification",
+    show: function (figureEl, i) { /* draw this step: Viz.chart, Viz.tree, Viz.graph, HTML */ }
+  }, …],
   at: 2                                 // current line; later lines dimmed and aria-hidden
 });
+// The figure panel renders above the lines and is rebuilt per step. Markers paint only on the
+// current line. A step with neither `show` nor a marker is a highlighted row — verify.js fails it.
 ```
 
 `Viz.graph` takes explicit `x`/`y` in any units and scales them to the viewport — compute the

@@ -61,6 +61,22 @@ questions and leave the engine alone.
   p code, li code, td code { background:var(--code-bg); padding:.1rem .3rem; border-radius:4px; font-size:.9em; }
   .fileref { color:var(--muted); font-size:.8rem; display:block; margin:-.4rem 0 .5rem; }
 
+  /* Syntax highlighting — painted by the Hl block below. Hue carries the role, weight and
+     italics carry it a second time, so the listing still reads on a monochrome screen. */
+  .hl-com { color:var(--muted); font-style:italic; }
+  .hl-str { color:#1f7a45; }
+  .hl-num { color:#a1622a; }
+  .hl-kw  { color:#7a3b9b; font-weight:600; }
+  .hl-typ { color:#3b6db5; }
+  .hl-fn  { color:#1f2328; font-weight:600; }
+  @media (prefers-color-scheme: dark) {
+    .hl-str { color:#6cc38c; }
+    .hl-num { color:#d79a63; }
+    .hl-kw  { color:#b98bd6; }
+    .hl-typ { color:#7aa7e6; }
+    .hl-fn  { color:#e4e6ea; }
+  }
+
   /* Literate listing — prose, chunk, consequence. Chunks stay small; the assembled
      listing lives in a <details> at the end of the walkthrough. */
   .lit { border-left:2px solid var(--line); padding-left:1rem; margin:1.4rem 0; }
@@ -281,6 +297,90 @@ questions and leave the engine alone.
 <p class="score" id="score" hidden></p>
 
 <script>
+/* Hl — syntax highlighting for every <pre><code> on the page. Dependency-free: one
+   sticky-regex scanner, run once on load over the DOM's own text, so whatever entity escaping
+   the source used is already resolved before tokenising.
+
+   Dialect per block via a class: `lang-py` for Python/Ruby/shell, where `#` starts a comment;
+   `lang-txt` to switch highlighting off for raw output or prose pseudocode. Everything else —
+   Swift, JS, Go, Rust, Java, C — uses the default C-family profile. Triple-quoted Python
+   strings are not special-cased; put those in a `lang-txt` block if you need them. */
+var Hl = (function () {
+  "use strict";
+
+  // One union of keywords across the languages this skill writes. A keyword highlighted in a
+  // language that lacks it is a cosmetic miss; a separate lexer per language is a maintenance
+  // burden forever. The trade is deliberate.
+  var KW = ("let|var|const|func|function|def|fn|return|if|else|elif|guard|while|for|in|do|" +
+            "switch|case|default|break|continue|struct|class|enum|protocol|interface|extends|" +
+            "implements|import|from|package|public|private|internal|static|mutating|inout|" +
+            "throws|throw|try|catch|finally|defer|new|delete|this|self|super|nil|null|None|" +
+            "true|false|True|False|and|or|not|is|as|where|typealias|type|init|deinit|lazy|" +
+            "override|final|async|await|yield|lambda|pass|with|repeat|until|end|then|" +
+            "void|int|float|double|char|bool|string").split("|");
+  var KWRE = new RegExp("^(?:" + KW.join("|") + ")$");
+
+  var STR = /(?:"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`)/y;
+  var NUM = /(?:0[xXbB][0-9a-fA-F_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)\b/y;
+  var WRD = /[A-Za-z_$][A-Za-z0-9_$]*/y;
+  var WS  = /\s+/y;
+
+  function commentRe(lang) {
+    return lang === "py" ? /#[^\n]*/y : /(?:\/\/[^\n]*|\/\*[\s\S]*?\*\/)/y;
+  }
+
+  function esc(t) {
+    return t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function match(re, src, i) {
+    re.lastIndex = i;
+    var m = re.exec(src);
+    return m && m.index === i ? m[0] : null;
+  }
+
+  function paint(src, lang) {
+    var COM = commentRe(lang);
+    var out = "", i = 0;
+
+    while (i < src.length) {
+      var hit, kind = null;
+
+      if ((hit = match(COM, src, i))) { kind = "com"; }
+      else if ((hit = match(STR, src, i))) { kind = "str"; }
+      else if ((hit = match(NUM, src, i))) { kind = "num"; }
+      else if ((hit = match(WS, src, i))) { kind = null; }
+      else if ((hit = match(WRD, src, i))) {
+        // one word, three possible roles: keyword, type, called function, or nothing
+        var after = i + hit.length;
+        if (KWRE.test(hit)) kind = "kw";
+        else if (/^[A-Z]/.test(hit)) kind = "typ";
+        else if (src.charAt(after) === "(") kind = "fn";
+      } else {
+        hit = src.charAt(i);
+      }
+
+      i += hit.length;
+      out += kind ? '<span class="hl-' + kind + '">' + esc(hit) + "</span>" : esc(hit);
+    }
+    return out;
+  }
+
+  function all(root) {
+    var blocks = (root || document).querySelectorAll("pre > code");
+    Array.prototype.forEach.call(blocks, function (code) {
+      var cls = code.className || "";
+      if (/\blang-txt\b/.test(cls) || /\bhl-done\b/.test(cls)) return;
+      var lang = /\blang-py\b/.test(cls) ? "py" : "c";
+      code.innerHTML = paint(code.textContent, lang);   // textContent: escaping already resolved
+      code.className = (cls ? cls + " " : "") + "hl-done";
+    });
+  }
+
+  return { all: all, paint: paint };
+})();
+Hl.all();
+
 // Viz: paste the JS block from references/VISUALIZATIONS.md here when the page has figures.
 
 (function () {
@@ -522,6 +622,9 @@ questions and leave the engine alone.
   `<output>`, no invented numbers.
 - One toy instance carried through Intuition, Formal treatment, and Worked example — not
   three different examples.
+- Every `<pre><code>` is highlighted: `Hl.all()` is present and runs, and a block that must
+  stay plain (raw output, a data dump) says so with `class="lang-txt"` rather than being
+  left unpainted by accident.
 - **Run it**: `node references/verify.js "<file>.html"` must print PASS. It parses the page,
   executes every script, clicks every button, drags every slider, cycles every select, and
   fails on any thrown error, an empty figure mount, a stepper that does not start at `1 / n`,
