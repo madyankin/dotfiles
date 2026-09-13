@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deutsch Explainer</title>
+<style>
+:root{
+  --bg:#fbfaf7; --fg:#1c1b19; --muted:#6b675f; --line:#e2ded4; --card:#fff;
+  --accent:#8a5a2b; --accent-soft:#f3e6d6;
+  --ok:#2f6f3e; --ok-soft:#e3f1e6; --bad:#a33a2f; --bad-soft:#f7e4e1;
+  --vorfeld:#e9e2f6; --finit:#fbe3c8; --mittelfeld:#e4eef7; --klammer:#fbe3c8; --junktor:#eae7e0;
+  --nom:#e4eef7; --akk:#fbe3c8; --dat:#e3f1e6; --gen:#f3e0ef;
+  --radius:10px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#16151a; --fg:#e9e6e0; --muted:#a09a90; --line:#2f2d34; --card:#1e1d23;
+    --accent:#d8a469; --accent-soft:#33291d;
+    --ok:#7fc98e; --ok-soft:#1e2c21; --bad:#e08b7f; --bad-soft:#2e1e1c;
+    --vorfeld:#2e2840; --finit:#3d301e; --mittelfeld:#1f2c38; --klammer:#3d301e; --junktor:#2a282f;
+    --nom:#1f2c38; --akk:#3d301e; --dat:#1e2c21; --gen:#332030;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  -webkit-text-size-adjust:100%}
+main{max-width:44rem;margin:0 auto;padding:1.5rem 1.1rem 5rem}
+h1{font-size:1.65rem;line-height:1.25;margin:0 0 .4rem}
+h2{font-size:1.15rem;margin:2.4rem 0 .7rem;padding-bottom:.3rem;border-bottom:1px solid var(--line)}
+h3{font-size:1rem;margin:1.4rem 0 .4rem}
+p{margin:.6rem 0}
+a{color:var(--accent)}
+.de{font-style:normal;font-weight:600}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+header .meta{color:var(--muted);font-size:.86rem;display:flex;flex-wrap:wrap;gap:.35rem .7rem;margin-bottom:1.2rem}
+header .meta span{white-space:nowrap}
+.badge{display:inline-block;background:var(--accent-soft);color:var(--accent);
+  border-radius:999px;padding:.05rem .55rem;font-size:.8rem;font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:.9rem 1rem;margin:.8rem 0}
+.fig{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1rem;margin:1rem 0}
+.fig .hinweis{color:var(--muted);font-size:.88rem;margin:.1rem 0 .9rem}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.2rem 0 .9rem}
+button{font:inherit;color:inherit;cursor:pointer}
+.chip{background:transparent;border:1px solid var(--line);border-radius:999px;
+  padding:.3rem .8rem;font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.satz{font-size:1.08rem;display:flex;flex-wrap:wrap;gap:.35rem;align-items:baseline;margin:.5rem 0}
+.teil{border-radius:6px;padding:.15rem .4rem;border:1px solid transparent}
+.teil.vorfeld{background:var(--vorfeld)} .teil.finit{background:var(--finit);font-weight:700}
+.teil.mittelfeld{background:var(--mittelfeld)} .teil.klammer{background:var(--klammer);font-weight:700}
+.teil.junktor{background:var(--junktor)} .teil.nachfeld{background:var(--junktor)}
+.legende{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.7rem;font-size:.78rem;color:var(--muted)}
+.legende i{font-style:normal;border-radius:4px;padding:.05rem .4rem}
+.np{border-bottom:2px dotted var(--accent);cursor:pointer;padding:.05rem .1rem;border-radius:4px}
+.np[aria-expanded="true"]{background:var(--accent-soft)}
+.kasusbox{margin-top:.8rem}
+table{border-collapse:collapse;width:100%;font-size:.9rem;margin:.5rem 0}
+th,td{border:1px solid var(--line);padding:.3rem .5rem;text-align:left}
+th{color:var(--muted);font-weight:600}
+td.hit{font-weight:700;outline:2px solid var(--accent);outline-offset:-2px}
+td.nom{background:var(--nom)} td.akk{background:var(--akk)} td.dat{background:var(--dat)} td.gen{background:var(--gen)}
+.variante{display:block;width:100%;text-align:left;background:transparent;border:1px solid var(--line);
+  border-radius:var(--radius);padding:.55rem .7rem;margin:.35rem 0}
+.variante.ok{background:var(--ok-soft);border-color:var(--ok)}
+.variante.bad{background:var(--bad-soft);border-color:var(--bad)}
+.variante .warum{display:none;margin-top:.35rem;font-size:.87rem;color:var(--muted)}
+.variante.shown .warum{display:block}
+.praefix{display:inline-block;background:var(--akk);border-radius:6px;padding:.05rem .35rem;
+  font-weight:700;transition:transform .25s ease,background .25s ease}
+.pulse{transform:translateY(-3px) scale(1.08)}
+.gloss{border-bottom:1px dashed var(--muted);cursor:pointer}
+.glossoff .gloss{border-bottom:none;cursor:default}
+.glosspop{display:none;margin:.5rem 0 0;border-left:3px solid var(--accent);padding:.35rem .7rem;
+  background:var(--card);border-radius:0 var(--radius) var(--radius) 0;font-size:.92rem}
+.glosspop.on{display:block}
+.wf{border:1px solid var(--line);border-radius:var(--radius);margin:.4rem 0;overflow:hidden}
+.wf summary{cursor:pointer;padding:.5rem .7rem;list-style:none}
+.wf summary::-webkit-details-marker{display:none}
+.wf .body{padding:0 .7rem .7rem;font-size:.92rem;color:var(--muted)}
+.falle{margin:.7rem 0;padding-left:.8rem;border-left:3px solid var(--line)}
+.falsch{color:var(--bad);text-decoration:line-through}
+.richtig{color:var(--ok);font-weight:600}
+.q{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:1rem;margin:.9rem 0}
+.q .nr{color:var(--muted);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
+.q .frage{font-weight:600;margin:.25rem 0 .7rem}
+.opt{display:block;width:100%;text-align:left;background:transparent;border:1px solid var(--line);
+  border-radius:8px;padding:.5rem .7rem;margin:.3rem 0}
+.opt.ok{background:var(--ok-soft);border-color:var(--ok)}
+.opt.bad{background:var(--bad-soft);border-color:var(--bad)}
+.opt .warum{display:none;font-size:.85rem;color:var(--muted);margin-top:.3rem}
+.opt.shown .warum{display:block}
+input[type=text]{font:inherit;padding:.45rem .6rem;border:1px solid var(--line);border-radius:8px;
+  background:var(--bg);color:var(--fg);min-width:9rem}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.45rem .9rem}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.feedback{margin-top:.6rem;font-size:.9rem;display:none}
+.feedback.on{display:block}
+.feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
+.slots{display:flex;flex-wrap:wrap;gap:.35rem;min-height:2.2rem;padding:.4rem;border:1px dashed var(--line);
+  border-radius:8px;margin-bottom:.5rem}
+.tok{border:1px solid var(--line);border-radius:6px;padding:.2rem .55rem;background:var(--bg)}
+.score{position:sticky;bottom:0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:.7rem 1rem;margin-top:1rem;display:flex;justify-content:space-between;align-items:center;gap:.7rem;
+  flex-wrap:wrap}
+.gate{color:var(--muted);font-size:.88rem;margin-top:.6rem}
+.karte{border:1px solid var(--line);border-radius:8px;padding:.5rem .7rem;margin:.35rem 0;font-size:.93rem}
+.karte .r{color:var(--muted)}
+footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
+.hidden-until{display:none}
+.reveal .hidden-until{display:block}
+.beobachtung{margin-top:.8rem;font-size:.88rem;color:var(--accent);background:var(--accent-soft);
+  border-radius:8px;padding:.45rem .7rem}
+@media print{
+  body{background:#fff;color:#000}
+  .chip,.btn,.score{display:none}
+  .variante .warum,.opt .warum,.glosspop,.hidden-until,.feedback{display:block !important}
+  .fig,.q,.card{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<main id="root"></main>
+
+<script>
+/* ============================================================================
+   DATA — единственное, что меняет генератор. Всё ниже трогать нельзя.
+   Схема: references/interaktiv.md
+   ============================================================================ */
+const DATA = {
+  meta: {
+    thema:  "Wechselpräpositionen: Wohin vs. Wo",
+    niveau: "A2",
+    modus:  "grammatik",
+    quelle: "пример из шаблона",
+    datum:  "2026-09-13",
+    slug:   "demo-wechselpraepositionen"
+  },
+
+  zweck: [
+    "После разбора ты перестанешь гадать между <span class='de'>in die Stadt</span> и <span class='de'>in der Stadt</span> — и будешь выбирать падеж за полсекунды, по одному вопросу к глаголу."
+  ],
+
+  intuition: [
+    { art: "p", text: "В русском предлог «в» тоже работает на два падежа: «иду <b>в город</b>» (винительный) и «живу <b>в городе</b>» (предложный). Немецкий делает ровно то же самое, только вторым падежом берёт Dativ." },
+    { art: "p", text: "Вопрос, который решает всё: <b>Wohin?</b> (куда, есть перемещение) → Akkusativ. <b>Wo?</b> (где, ничего не движется) → Dativ. Смотри не на предлог, а на глагол." },
+    { art: "beispiel", de: "Ich gehe in die Stadt.", ru: "Иду в город. Куда? → Akkusativ." },
+    { art: "beispiel", de: "Ich wohne in der Stadt.", ru: "Живу в городе. Где? → Dativ." },
+    { art: "tabelle", kopf: ["Глагол", "Вопрос", "Падеж"],
+      zeilen: [["gehen, fahren, stellen, legen", "Wohin?", "Akkusativ"],
+               ["sein, wohnen, stehen, liegen", "Wo?", "Dativ"]] }
+  ],
+
+  stuetzen: [
+    "Wechselpräpositionen ровно девять: <span class='de'>an, auf, hinter, in, neben, über, unter, vor, zwischen</span>.",
+    "Пары глаголов: <span class='de'>stellen/stehen</span>, <span class='de'>legen/liegen</span>, <span class='de'>setzen/sitzen</span>, <span class='de'>hängen/hängen</span> — первый в паре всегда про движение.",
+    "Слитные формы: <span class='de'>ins</span> = in + das, <span class='de'>im</span> = in + dem, <span class='de'>ans</span>, <span class='de'>am</span>."
+  ],
+
+  analyse: [
+    { de: "Ich stelle die Lampe in die Ecke.",
+      wort: "я ставлю лампу в угол",
+      frei: "Я ставлю лампу в угол.",
+      warum: "<span class='de'>stellen</span> — глагол перемещения: лампа меняет место. Значит вопрос <span class='de'>Wohin?</span> и <span class='de'>in</span> тянет Akkusativ: <span class='de'>die Ecke</span> остаётся <span class='de'>die</span> (женский род, Akk = Nom), а вот в мужском было бы видно — <span class='de'>in den Schrank</span>." },
+    { de: "Die Lampe steht in der Ecke.",
+      wort: "лампа стоит в углу",
+      frei: "Лампа стоит в углу.",
+      warum: "<span class='de'>stehen</span> — состояние, ничего не движется. Вопрос <span class='de'>Wo?</span> → Dativ, и женский род наконец показывает разницу: <span class='de'>die Ecke → in der Ecke</span>." }
+  ],
+
+  figuren: [
+    { art: "kasus",
+      titel: "Один предлог, два падежа",
+      hinweis: "Кликай по подчёркнутым группам.",
+      beobachtung: "Предлог не изменился ни разу — падеж выбрал глагол.",
+      satz: [
+        { t: "Ich stelle die Lampe" },
+        { t: "in die Ecke", np: true, kasus: "akk", genus: "f", zahl: "sg",
+          warum: "<span class='de'>stellen</span> = перемещение → Wohin? → Akkusativ." },
+        { t: ", aber jetzt steht sie" },
+        { t: "in der Ecke", np: true, kasus: "dat", genus: "f", zahl: "sg",
+          warum: "<span class='de'>stehen</span> = положение → Wo? → Dativ." },
+        { t: "." }
+      ] },
+    { art: "wortstellung",
+      titel: "Проверь себя на вариантах",
+      hinweis: "Щёлкай — каждый вариант объяснит себя.",
+      beobachtung: "Ошибка почти всегда в том, что падеж взяли от предлога, а не от глагола.",
+      varianten: [
+        { satz: "Ich hänge das Bild an die Wand.", ok: true,  warum: "<span class='de'>hängen</span> (слабый, транзитивный) = вешаю → Wohin? → Akkusativ." },
+        { satz: "Das Bild hängt an die Wand.", ok: false, warum: "Тут <span class='de'>hängen</span> = висит, состояние → нужен Dativ: <span class='de'>an der Wand</span>." },
+        { satz: "Wir fahren am Wochenende ans Meer.", ok: true, warum: "<span class='de'>ans</span> = an + das, движение к морю → Akkusativ." }
+      ] }
+  ],
+
+  fallen: [
+    { falsch: "Ich gehe in der Schule.", richtig: "Ich gehe in die Schule.",
+      warum: "С Dativ получается «хожу внутри школы кругами». Движение к цели — Akkusativ." },
+    { falsch: "Ich warte auf dem Bus.", richtig: "Ich warte auf den Bus.",
+      warum: "Здесь <span class='de'>auf</span> не про место: <span class='de'>warten auf</span> — фиксированное управление, всегда Akkusativ. Логика Wohin/Wo сюда не применяется." },
+    { text: "Русское «на неделе» не переводится через <span class='de'>auf</span>: <span class='de'>in dieser Woche</span> или <span class='de'>diese Woche</span>." }
+  ],
+
+  quiz: [
+    { typ: "wahl", frage: "Почему <span class='de'>Ich gehe in die Stadt</span>, а не <span class='de'>in der Stadt</span>?",
+      optionen: [
+        { t: "Движение к цели → Akkusativ", ok: true, warum: "<span class='de'>gehen</span> задаёт направление, вопрос Wohin?" },
+        { t: "<span class='de'>Stadt</span> женского рода", ok: false, warum: "Род влияет на форму артикля, но не на выбор падежа." },
+        { t: "<span class='de'>in</span> всегда требует Akkusativ", ok: false, warum: "<span class='de'>in</span> — Wechselpräposition, с <span class='de'>wohnen</span> будет Dativ." }
+      ] },
+    { typ: "wahl", frage: "Что не так в <span class='de'>Das Buch liegt auf den Tisch</span>?",
+      optionen: [
+        { t: "<span class='de'>liegen</span> — состояние, нужен Dativ: <span class='de'>auf dem Tisch</span>", ok: true, warum: "Книга никуда не перемещается — вопрос Wo?" },
+        { t: "Ничего, предложение верное", ok: false, warum: "Akkusativ тут означал бы, что книга в процессе приземления на стол." },
+        { t: "<span class='de'>auf</span> не бывает с <span class='de'>Tisch</span>", ok: false, warum: "Бывает, и именно с ним — вопрос только в падеже." }
+      ] },
+    { typ: "eingabe", frage: "Вставь артикль: <span class='de'>Ich lege das Handy auf ___ Tisch.</span>",
+      hinweis: "<span class='de'>legen</span> — куда или где?", antworten: ["den"],
+      warum: "<span class='de'>legen</span> = кладу, движение → Akkusativ, <span class='de'>der Tisch → den Tisch</span>." },
+    { typ: "eingabe", frage: "Вставь артикль: <span class='de'>Das Handy liegt auf ___ Tisch.</span>",
+      hinweis: "Тот же стол, другой глагол.", antworten: ["dem"],
+      warum: "<span class='de'>liegen</span> = лежит, положение → Dativ, <span class='de'>der Tisch → dem Tisch</span>." },
+    { typ: "ordnen", frage: "Собери предложение: «Она вешает куртку в шкаф».",
+      teile: ["Sie", "hängt", "die Jacke", "in", "den Schrank"],
+      loesung: ["Sie", "hängt", "die Jacke", "in", "den Schrank"],
+      warum: "Глагол на второй позиции, <span class='de'>hängen</span> = вешает → Akkusativ → <span class='de'>den Schrank</span>." }
+  ],
+
+  karten: [
+    { v: "Какие девять предлогов — Wechselpräpositionen?", r: "an, auf, hinter, in, neben, über, unter, vor, zwischen" },
+    { v: "Какой вопрос выбирает Akkusativ у Wechselpräposition?", r: "Wohin? (есть перемещение)" },
+    { v: "Какой вопрос выбирает Dativ у Wechselpräposition?", r: "Wo? (положение, ничего не движется)" },
+    { v: "<span class='de'>stellen</span> или <span class='de'>stehen</span> — какой про движение?", r: "stellen (ставить). stehen = стоять." },
+    { v: "Какой падеж после <span class='de'>warten auf</span>?", r: "Akkusativ — это фиксированное управление, а не Wohin/Wo." }
+  ]
+};
+
+/* ============================================================================
+   RENDER — не редактировать при генерации.
+   ============================================================================ */
+(function(){
+  const root = document.getElementById('root');
+  const h = (tag, cls, html) => { const n = document.createElement(tag);
+    if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
+  const add = (parent, node) => { parent.appendChild(node); return node; };
+
+  const ART = {
+    nom:{m:'der',f:'die',n:'das',pl:'die'},
+    akk:{m:'den',f:'die',n:'das',pl:'die'},
+    dat:{m:'dem',f:'der',n:'dem',pl:'den'},
+    gen:{m:'des',f:'der',n:'des',pl:'der'}
+  };
+  const KASUS_NAME = {nom:'Nominativ',akk:'Akkusativ',dat:'Dativ',gen:'Genitiv'};
+  const GENUS_NAME = {m:'m',f:'f',n:'n',pl:'Pl.'};
+
+  document.title = DATA.meta.thema + ' — Deutsch Explainer';
+
+  /* --- header --- */
+  const head = add(root, h('header'));
+  add(head, h('h1', null, DATA.meta.thema));
+  const meta = add(head, h('div','meta'));
+  const m = DATA.meta;
+  meta.innerHTML = [
+    m.niveau ? '<span class="badge">' + m.niveau + '</span>' : '',
+    m.modus  ? '<span>режим: ' + m.modus + '</span>' : '',
+    m.quelle ? '<span>источник: ' + m.quelle + '</span>' : '',
+    m.datum  ? '<span>' + m.datum + '</span>' : ''
+  ].filter(Boolean).join('');
+
+  const sec = (titel) => { add(root, h('h2', null, titel)); return root; };
+
+  /* --- 1. Зачем --- */
+  if (DATA.zweck && DATA.zweck.length){
+    sec('Зачем');
+    DATA.zweck.forEach(t => add(root, h('p', null, t)));
+  }
+
+  /* --- 2. Интуиция --- */
+  if (DATA.intuition && DATA.intuition.length){
+    sec('Интуиция');
+    DATA.intuition.forEach(b => {
+      if (b.art === 'p') add(root, h('p', null, b.text));
+      else if (b.art === 'beispiel'){
+        const c = add(root, h('div','card'));
+        add(c, h('div','de', b.de));
+        add(c, h('div','small muted', b.ru));
+      } else if (b.art === 'tabelle'){
+        const t = add(root, h('table'));
+        const tr = add(add(t, h('thead')), h('tr'));
+        b.kopf.forEach(k => add(tr, h('th', null, k)));
+        const tb = add(t, h('tbody'));
+        b.zeilen.forEach(z => { const r = add(tb, h('tr'));
+          z.forEach(c => add(r, h('td', null, c))); });
+      }
+    });
+  }
+
+  /* --- 3. Что надо помнить --- */
+  if (DATA.stuetzen && DATA.stuetzen.length){
+    sec('Что надо помнить');
+    const ul = add(root, h('ul'));
+    DATA.stuetzen.forEach(s => add(ul, h('li', null, s)));
+  }
+
+  /* --- 4. Разбор --- */
+  if (DATA.analyse && DATA.analyse.length){
+    sec('Разбор');
+    DATA.analyse.forEach(a => {
+      const c = add(root, h('div','card'));
+      add(c, h('div','de', a.de));
+      if (a.wort) add(c, h('div','small muted', 'дословно: ' + a.wort));
+      if (a.frei) add(c, h('div','small', a.frei));
+      if (a.warum) add(c, h('p', null, a.warum));
+    });
+  }
+
+  /* --- 5. Интерактив --- */
+  const FIG = {
+    satzklammer(f, box){
+      const satz = add(box, h('div','satz'));
+      const chips = add(box, h('div','chips'));
+      const draw = (i) => {
+        satz.innerHTML = '';
+        f.saetze[i].teile.forEach(t => add(satz, h('span','teil ' + (t.rolle||''), t.t)));
+        [...chips.children].forEach((c,j) => c.setAttribute('aria-pressed', j===i));
+      };
+      f.saetze.forEach((s,i) => {
+        const b = add(chips, h('button','chip', s.label));
+        b.type = 'button';
+        b.onclick = () => { draw(i); reveal(box); };
+      });
+      box.insertBefore(chips, satz);
+      const leg = add(box, h('div','legende'));
+      leg.innerHTML = ['vorfeld:Vorfeld','finit:finites Verb','mittelfeld:Mittelfeld',
+        'klammer:2. Teil der Klammer','junktor:Junktor']
+        .map(x => { const p = x.split(':');
+          return '<i class="teil ' + p[0] + '">' + p[1] + '</i>'; }).join('');
+      draw(0);
+    },
+
+    kasus(f, box){
+      const satz = add(box, h('div','satz'));
+      const pop = add(box, h('div','kasusbox'));
+      f.satz.forEach(w => {
+        if (!w.np){ add(satz, h('span', null, w.t)); return; }
+        const b = add(satz, h('button','np', w.t));
+        b.type = 'button'; b.setAttribute('aria-expanded','false');
+        b.onclick = () => {
+          [...satz.querySelectorAll('.np')].forEach(x => x.setAttribute('aria-expanded','false'));
+          b.setAttribute('aria-expanded','true');
+          pop.innerHTML = '';
+          const c = add(pop, h('div','card'));
+          const sp = w.zahl === 'pl' ? 'pl' : (w.genus || 'm');
+          add(c, h('div', null, '<b>' + KASUS_NAME[w.kasus] + '</b> · ' +
+            (w.zahl === 'pl' ? 'Plural' : GENUS_NAME[sp] + ', Singular') +
+            ' · артикль <span class="de">' + ART[w.kasus][sp] + '</span>'));
+          if (w.warum) add(c, h('p','small', w.warum));
+          const t = add(c, h('table'));
+          const hr = add(add(t, h('thead')), h('tr'));
+          ['', 'm', 'f', 'n', 'Pl.'].forEach(k => add(hr, h('th', null, k)));
+          const tb = add(t, h('tbody'));
+          ['nom','akk','dat','gen'].forEach(k => {
+            const r = add(tb, h('tr'));
+            add(r, h('th', null, KASUS_NAME[k]));
+            ['m','f','n','pl'].forEach(g => {
+              const td = add(r, h('td', k, ART[k][g]));
+              if (k === w.kasus && g === sp) td.classList.add('hit');
+            });
+          });
+          reveal(box);
+        };
+      });
+    },
+
+    wortstellung(f, box){
+      f.varianten.forEach(v => {
+        const b = add(box, h('button','variante'));
+        b.type = 'button';
+        add(b, h('span','de', v.satz));
+        add(b, h('span','warum', v.warum));
+        b.onclick = () => {
+          b.classList.add('shown', v.ok ? 'ok' : 'bad');
+          const mark = b.querySelector('.mark');
+          if (!mark) b.insertBefore(h('span','mark', v.ok ? '✅ ' : '❌ '), b.firstChild);
+          reveal(box);
+        };
+      });
+    },
+
+    konjugator(f, box){
+      const chips = add(box, h('div','chips'));
+      const out = add(box, h('div'));
+      const draw = (i) => {
+        const fo = f.formen[i];
+        out.innerHTML = '<div class="satz"><span class="de">' + fo.satz + '</span></div>' +
+          (fo.notiz ? '<div class="small muted">' + fo.notiz + '</div>' : '');
+        [...chips.children].forEach((c,j) => c.setAttribute('aria-pressed', j===i));
+      };
+      f.formen.forEach((fo,i) => {
+        const b = add(chips, h('button','chip', fo.label));
+        b.type = 'button';
+        b.onclick = () => { draw(i); reveal(box); };
+      });
+      draw(0);
+    },
+
+    trennbar(f, box){
+      const chips = add(box, h('div','chips'));
+      const satz = add(box, h('div','satz'));
+      const draw = (i) => {
+        satz.innerHTML = '';
+        f.varianten[i].teile.forEach(t => {
+          const n = add(satz, h('span', t.p ? 'praefix' : null, t.t));
+          if (t.p){ n.classList.add('pulse'); setTimeout(() => n.classList.remove('pulse'), 260); }
+        });
+        [...chips.children].forEach((c,j) => c.setAttribute('aria-pressed', j===i));
+      };
+      f.varianten.forEach((v,i) => {
+        const b = add(chips, h('button','chip', v.label));
+        b.type = 'button';
+        b.onclick = () => { draw(i); reveal(box); };
+      });
+      if (f.verb) add(box, h('div','small muted',
+        'Verb: <span class="de">' + f.verb + '</span> · Präfix: <span class="de">' + f.praefix + '</span>'));
+      draw(0);
+    },
+
+    glossen(f, box){
+      const bar = add(box, h('div','chips'));
+      const toggle = add(bar, h('button','chip','Скрыть глоссы'));
+      toggle.type = 'button';
+      const wrap = add(box, h('div'));
+      const satz = add(wrap, h('div','satz'));
+      const pop = add(wrap, h('div','glosspop'));
+      f.text.forEach(w => {
+        if (!w.g){ add(satz, h('span', null, w.t)); return; }
+        const b = add(satz, h('button','gloss', w.t));
+        b.type = 'button';
+        b.onclick = () => {
+          if (wrap.classList.contains('glossoff')) return;
+          pop.innerHTML = '<div class="de">' + (w.g.lemma || w.t) + '</div>' +
+            (w.g.tag ? '<div class="small muted">' + w.g.tag + '</div>' : '') +
+            (w.g.ru ? '<div>' + w.g.ru + '</div>' : '');
+          pop.classList.add('on');
+          reveal(box);
+        };
+      });
+      toggle.onclick = () => {
+        const off = wrap.classList.toggle('glossoff');
+        toggle.textContent = off ? 'Показать глоссы' : 'Скрыть глоссы';
+        if (off) pop.classList.remove('on');
+      };
+    },
+
+    wortfeld(f, box){
+      f.cluster.forEach(cl => {
+        add(box, h('h3', null, cl.name));
+        cl.woerter.forEach(w => {
+          const d = add(box, h('details','wf'));
+          add(d, h('summary', null, '<span class="de">' + w.de + '</span> — ' + w.ru));
+          const b = add(d, h('div','body'));
+          if (w.kollokation) b.innerHTML += '<div><span class="de">' + w.kollokation + '</span></div>';
+          if (w.beispiel) b.innerHTML += '<div>' + w.beispiel + '</div>';
+          d.addEventListener('toggle', () => { if (d.open) reveal(box); });
+        });
+      });
+    }
+  };
+
+  function reveal(box){
+    const b = box.querySelector('.beobachtung');
+    if (b) b.classList.remove('hidden-until');
+  }
+
+  if (DATA.figuren && DATA.figuren.length){
+    sec('Интерактив');
+    DATA.figuren.forEach(f => {
+      const box = add(root, h('div','fig'));
+      if (f.titel) add(box, h('h3', null, f.titel));
+      if (f.hinweis) add(box, h('div','hinweis', f.hinweis));
+      const fn = FIG[f.art];
+      if (fn) fn(f, box); else add(box, h('p','muted','Неизвестный тип фигуры: ' + f.art));
+      if (f.beobachtung) add(box, h('div','beobachtung hidden-until', '↑ ' + f.beobachtung));
+    });
+  }
+
+  /* --- 6. Грабли --- */
+  if (DATA.fallen && DATA.fallen.length){
+    sec('Грабли');
+    DATA.fallen.forEach(f => {
+      const d = add(root, h('div','falle'));
+      if (f.falsch) add(d, h('div','falsch de', f.falsch));
+      if (f.richtig) add(d, h('div','richtig de', f.richtig));
+      if (f.warum) add(d, h('div','small muted', f.warum));
+      if (f.text) add(d, h('div', null, f.text));
+    });
+  }
+
+  /* --- 7. Квиз --- */
+  const norm = s => (s||'').toLowerCase().trim()
+    .replace(/ß/g,'ss').replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue')
+    .replace(/[.,!?;:]/g,'').replace(/\s+/g,' ');
+
+  if (DATA.quiz && DATA.quiz.length){
+    sec('Квиз');
+    add(root, h('p','muted small',
+      'Пять вопросов на понимание. Отвечай до того, как перечитаешь разбор.'));
+
+    const KEY = 'de-expl:' + (DATA.meta.slug || DATA.meta.thema);
+    const done = new Array(DATA.quiz.length).fill(null);
+    const scoreBox = h('div','score');
+    const scoreTxt = h('div','small');
+    const resetBtn = h('button','btn ghost','Сбросить');
+    resetBtn.type = 'button';
+
+    function paint(){
+      const answered = done.filter(x => x !== null).length;
+      const right = done.filter(x => x === true).length;
+      scoreTxt.innerHTML = '<b>' + right + ' / ' + DATA.quiz.length + '</b> верно' +
+        (answered < DATA.quiz.length ? ' · отвечено ' + answered : (right === DATA.quiz.length
+          ? ' · можно считать тему пройденной' : ' · перечитай разбор и пройди заново'));
+      try { localStorage.setItem(KEY, JSON.stringify(done)); } catch(e){}
+    }
+
+    DATA.quiz.forEach((q, i) => {
+      const box = add(root, h('div','q'));
+      add(box, h('div','nr', 'Вопрос ' + (i+1)));
+      add(box, h('div','frage', q.frage));
+      const fb = h('div','feedback');
+
+      if (q.typ === 'wahl'){
+        q.optionen.forEach(o => {
+          const b = add(box, h('button','opt'));
+          b.type = 'button';
+          add(b, h('span', null, o.t));
+          if (o.warum) add(b, h('span','warum', o.warum));
+          b.onclick = () => {
+            if (done[i] !== null) return;
+            [...box.querySelectorAll('.opt')].forEach((x,j) => {
+              x.classList.add('shown');
+              x.classList.add(q.optionen[j].ok ? 'ok' : 'bad');
+              x.disabled = true;
+            });
+            done[i] = !!o.ok; paint();
+            fb.className = 'feedback on ' + (o.ok ? 'ok' : 'bad');
+            fb.innerHTML = o.ok ? 'Верно.' : 'Мимо. Верный вариант подсвечен зелёным.';
+          };
+        });
+      }
+
+      else if (q.typ === 'eingabe'){
+        const row = add(box, h('div','row'));
+        const inp = add(row, h('input'));
+        inp.type = 'text'; inp.placeholder = '…';
+        const btn = add(row, h('button','btn','Проверить'));
+        btn.type = 'button';
+        if (q.hinweis) add(box, h('div','small muted', q.hinweis));
+        const check = () => {
+          if (done[i] !== null) return;
+          const ok = (q.antworten||[]).some(a => norm(a) === norm(inp.value));
+          done[i] = ok; paint();
+          inp.disabled = true; btn.disabled = true;
+          fb.className = 'feedback on ' + (ok ? 'ok' : 'bad');
+          fb.innerHTML = (ok ? 'Верно. ' : 'Нет — правильно: <span class="de">' +
+            (q.antworten||[]).join(' / ') + '</span>. ') + (q.warum || '');
+        };
+        btn.onclick = check;
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+      }
+
+      else if (q.typ === 'ordnen'){
+        const slots = add(box, h('div','slots'));
+        const pool = add(box, h('div','chips'));
+        const picked = [];
+        const shuffled = q.teile.slice().sort((a,b) =>
+          norm(a) < norm(b) ? 1 : -1);   // детерминированно, без Math.random
+        shuffled.forEach(t => {
+          const b = add(pool, h('button','chip', t));
+          b.type = 'button';
+          b.onclick = () => {
+            if (done[i] !== null) return;
+            b.disabled = true; b.style.opacity = .35;
+            picked.push(t);
+            const s = add(slots, h('button','tok', t));
+            s.type = 'button';
+            s.onclick = () => {
+              if (done[i] !== null) return;
+              picked.splice(picked.indexOf(t), 1);
+              s.remove(); b.disabled = false; b.style.opacity = 1;
+            };
+          };
+        });
+        const row = add(box, h('div','row'));
+        const btn = add(row, h('button','btn','Проверить'));
+        btn.type = 'button';
+        btn.onclick = () => {
+          if (done[i] !== null) return;
+          const ok = picked.length === q.loesung.length &&
+            picked.every((t,j) => norm(t) === norm(q.loesung[j]));
+          done[i] = ok; paint();
+          btn.disabled = true;
+          fb.className = 'feedback on ' + (ok ? 'ok' : 'bad');
+          fb.innerHTML = (ok ? 'Верно. ' : 'Нет — правильный порядок: <span class="de">' +
+            q.loesung.join(' ') + '</span>. ') + (q.warum || '');
+        };
+      }
+
+      add(box, fb);
+    });
+
+    add(scoreBox, scoreTxt); add(scoreBox, resetBtn);
+    add(root, scoreBox);
+    resetBtn.onclick = () => { try { localStorage.removeItem(KEY); } catch(e){} location.reload(); };
+    paint();
+
+    add(root, h('div','gate',
+      'Не считай тему пройденной и не заливай карточки в Anki, пока не соберёшь ' +
+      DATA.quiz.length + '/' + DATA.quiz.length + '.'));
+
+    try {
+      const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (Array.isArray(saved) && saved.length === done.length){
+        add(root, h('div','small muted',
+          'Прошлый результат: ' + saved.filter(x => x === true).length + '/' + saved.length +
+          '. Кнопка «Сбросить» стирает его.'));
+      }
+    } catch(e){}
+  }
+
+  /* --- 8. Карточки --- */
+  if (DATA.karten && DATA.karten.length){
+    sec('Карточки');
+    add(root, h('p','muted small','Те же карточки лежат в заметке Obsidian в синтаксисе flashcards-obsidian.'));
+    DATA.karten.forEach(k => {
+      const d = add(root, h('div','karte'));
+      add(d, h('div', null, k.v));
+      add(d, h('div','r', k.r));
+    });
+  }
+
+  add(root, h('footer', null,
+    'Собрано скиллом <b>deutsch-explainer</b> · ' + (DATA.meta.datum || '') +
+    ' · работает офлайн, из <code>file://</code>'));
+
+  window.addEventListener('beforeprint', () => document.body.classList.add('reveal'));
+})();
+</script>
+</body>
+</html>
