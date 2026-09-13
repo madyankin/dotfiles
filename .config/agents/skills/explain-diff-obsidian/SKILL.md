@@ -1,0 +1,165 @@
+---
+name: explain-diff-obsidian
+description: Build a rich, interactive HTML explainer of a code change, diff, branch, or pull request and file it into the Obsidian vault together with a markdown stub, Anki cards, and a five-question quiz. Use when the user asks to explain, understand, or write up a diff/PR/branch/commit, or asks for an explainer note in their vault.
+---
+
+# Explain Diff → Obsidian
+
+Turn a code change into a document that teaches it. The deliverable is two files that sit
+next to each other in the vault:
+
+- `<slug>.html` — a single self-contained page: background, intuition, code walkthrough,
+  CSS diagrams, and five clickable quiz questions.
+- `<slug>.md` — an Obsidian stub: frontmatter, summary, takeaways, wikilinks, and a record
+  of the Anki cards that were pushed.
+  This is what vault search, the graph, and mobile see.
+
+The quiz is the point, not decoration. The working rule from the source of this idea: *don't
+send code to others until you can pass the quiz on it.*
+
+## Output location
+
+```
+<vault>/3 Resources/Explanations/YYYY-MM-DD <slug>.html
+<vault>/3 Resources/Explanations/YYYY-MM-DD <slug>.md
+```
+
+Date prefix keeps the folder time-sorted. `<slug>` is short, kebab-case, English, derived
+from what changed (`bidder-ttl-cache`, not `pr-4821`). Create the folder if missing.
+
+Find the vault: `$OBSIDIAN_VAULT` if set, otherwise the `path` of the vault in
+`~/Library/Application Support/obsidian/obsidian.json`:
+
+```bash
+VAULT="${OBSIDIAN_VAULT:-$(python3 -c 'import json,os;d=json.load(open(os.path.expanduser("~/Library/Application Support/obsidian/obsidian.json")));print(next(iter(d["vaults"].values()))["path"])')}"
+```
+
+The path contains spaces and lives in iCloud — quote it everywhere.
+
+## Workflow
+
+1. **Resolve the target.** Working-tree diff, `git diff <range>`, a branch, or `gh pr diff
+   <n>`. If the user was ambiguous, pick the most likely target, proceed, and state the
+   assumption in the page's summary.
+2. **Investigate the system, not the patch.** Read callers, tests, config, data models, and
+   the code paths on both sides of the change. Prefer checked-in tests and fixtures over
+   speculation. You are explaining behavior; a file-by-file diff readout is a failure mode.
+3. **Search the vault** for related notes so the stub can link into what already exists:
+   `obsidian search query="…" limit=10` when Obsidian is running, otherwise
+   `rg -il "<term>" "$VAULT"`.
+4. **Write the narrative before the HTML.** Answer, in order: what problem forced this
+   change; how the old system behaved; the smallest useful mental model of the new behavior;
+   how the implementation realizes that model; what edge cases and trade-offs follow.
+5. **Write the `.html`** from `references/HTML_TEMPLATE.md`.
+6. **Write the `.md` stub** from `references/STUB_TEMPLATE.md`.
+7. **Validate** against the checklist below. Fix, don't report around.
+8. **Hand off**: absolute path of both files, a `file://` URL for the browser, and one line
+   on where the quiz is interactive (see Rendering reality).
+
+## Page structure
+
+Title, one-paragraph summary, table of contents, then one continuous page — no top-level
+tabs, no separate pages.
+
+1. **Background** — only the system needed to follow the change. Open with a beginner mental
+   model inside a collapsed `<details>` so an experienced reader can skip it, then narrow to
+   the exact components, contracts, and prior behavior involved.
+2. **Intuition** — the core idea before any implementation detail. Small concrete toy inputs
+   and outputs. Show old versus new side by side whenever the comparison carries the point.
+3. **Code** — walk the changes in conceptual groups ordered by execution or dependency flow,
+   never alphabetically by filename. Cite `path/to/file.rb:42`. Quote the lines that matter;
+   do not dump the diff.
+4. **Quiz** — exactly five interactive multiple-choice questions. See
+   `references/QUIZ_RULES.md`; those rules are binding.
+
+Prose: plain, precise, systems-oriented. Explain jargon on first use. Smooth transitions
+between sections rather than a list of headings. Callouts for definitions, invariants, edge
+cases, and practical consequences.
+
+## Diagrams
+
+Pick a small set of diagram families and reuse them across the page instead of inventing a
+new visual each time. The useful ones:
+
+- flow diagrams for request, data, or control flow;
+- before/after panels for changed behavior;
+- labeled component cards for system boundaries;
+- compact tables for mappings, invariants, and toy data.
+
+Build them from semantic HTML and CSS. **Never ASCII art.** Label arrows and put real example
+values on them — a diagram of data movement without data teaches nothing. Give each figure a
+caption so the explanation survives without visual inspection.
+
+## Rendering reality (state this to the user on every run)
+
+The page lives in the vault but Obsidian is not a browser:
+
+- **Browser = full fidelity.** Clicking quiz options works only here. Hand over the `file://`
+  URL and say so.
+- **HTML Reader plugin (`obsidian-html-plugin`) = read-only preview, and it is not installed.**
+  Its own README says "almost all script codes cannot work": Text and High Restricted modes
+  strip scripts, Balance (the default) sanitizes them, and only Low Restricted / Unrestricted
+  execute anything. Installing it is the user's call; the skill does not require it.
+- **Local images never load** inside Obsidian (`<img src="./x.png">` is blocked). Use CSS
+  diagrams, or inline a data URI. No external images either — see the self-containment rule.
+- **Mobile** sees the `.md` stub, which is why the stub carries the summary and takeaways
+  rather than only a link.
+
+## HTML constraints
+
+- One file. Inline `<style>` and `<script>`. No CDN, no external fonts, no remote images, no
+  fetch. The page must work offline and inside the vault forever.
+- `<pre><code>…</code></pre>` for code. The CSS rule for `pre` **must** include
+  `white-space: pre` or `white-space: pre-wrap`, or the browser collapses the listing into a
+  single line. Check every block in the saved file before handing off.
+- Escape code-derived text for both HTML and JS contexts.
+- Keep the JavaScript small, namespaced, dependency-free, and attached with
+  `addEventListener`. No inline `onclick` handlers.
+- Responsive at phone width; visible focus states; correctness never conveyed by color alone.
+- Palette should read well next to Obsidian's theme — support `prefers-color-scheme: dark`.
+
+## Flashcards → Anki
+
+After the files are written, offer to turn the quiz and takeaways into Anki cards. Card
+creation is **not** this skill's job — invoke the `anki-cards` skill, which owns the Anki MCP
+(`http://127.0.0.1:3141/`, tools prefixed `mcp__anki__`) and the card-quality rules.
+
+- Deck: `Explanations::Code`. Create it if missing (`create_deck` supports `Parent::Child`).
+- Tag every card with the explainer slug plus the repo, e.g. `bidder-ttl-cache`, `dsp-core`,
+  so a later run can find them with `find_notes`.
+- 5–10 cards drawn from the quiz and the takeaways.
+- Record what was pushed in the stub's card section as plain `front → back` bullets, and put
+  the deck in the stub's `anki-deck` frontmatter.
+
+> [!warning] Never write `:::` lines into the stub.
+> The `flashcards-obsidian` plugin is installed and syncs any `:::` line it finds to Anki.
+> With the MCP as the single source of cards, a `:::` line means every card exists twice.
+> Use `→` in the record section.
+
+## Language
+
+Match the user's request language — asked in Russian, write the page and the stub in Russian.
+Code, identifiers, API names, and established technical terms stay English either way.
+
+## Validation checklist
+
+Run these before handing off:
+
+```bash
+grep -nE 'https?://|src="\./|@import' "<file>.html"   # must return nothing (links in prose are fine)
+grep -n 'white-space' "<file>.html"                   # every pre rule covered
+grep -n ':::' "<file>.md"                             # must return nothing — see Flashcards
+```
+
+- five questions, correct-answer position varied across them, feedback hidden until click,
+  answers absent from DOM order, `title` attributes, and accessibility labels
+- stub frontmatter parses; the link to the `.html` resolves; every wikilink target exists
+- say what you inspected and every assumption you made; never claim behavior the source does
+  not support
+
+## Files
+
+- `references/HTML_TEMPLATE.md` — page skeleton with the CSS, the quiz engine, and the
+  diagram families
+- `references/STUB_TEMPLATE.md` — the markdown stub
+- `references/QUIZ_RULES.md` — binding rules for writing the five questions
