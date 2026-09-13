@@ -635,7 +635,7 @@ const DATA = {
   /* --- 8. Карточки --- */
   if (DATA.karten && DATA.karten.length){
     sec('Карточки');
-    add(root, h('p','muted small','Те же карточки лежат в заметке Obsidian в синтаксисе flashcards-obsidian.'));
+    add(root, h('p','muted small','Те же карточки — в заметке Obsidian. В Anki (колода Deutsch) заливаются отдельным шагом.'));
     DATA.karten.forEach(k => {
       const d = add(root, h('div','karte'));
       add(d, h('div', null, k.v));

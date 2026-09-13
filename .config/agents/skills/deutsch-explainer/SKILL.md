@@ -14,6 +14,8 @@ Ported from Geoffrey Litt's `/explain-diff` idea — understanding is the bottle
 - Vault: `/Users/alexander/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes`
 - Output folder: `2 Areas/Deutsch/Explainers/` — note and HTML side by side.
 - Obsidian must be running (the `obsidian` CLI talks to the live app). See the `obsidian-cli` skill.
+- Flashcards: **Anki only**, via the `anki-cards` skill (MCP), always into the `Deutsch` deck.
+  No Obsidian flashcard-plugin syntax anywhere — the note lists cards as plain readable markdown.
 - **Metalanguage is Russian.** German stays German. Never write the explainer in English.
 
 ## Instructions
@@ -38,7 +40,7 @@ Read before generating:
 5. **Write the HTML**: copy `assets/template.html`, replace the `DATA` object, save as `2 Areas/Deutsch/Explainers/<slug>.html` with the `Write` tool.
 6. **Write the note** via `obsidian create … silent` per `references/obsidian-note.md`. Same content in plain markdown plus a link to the HTML — the note must stand alone on a phone.
 7. **Report**: both paths, inferred level, mode, which figures you used, how many cards.
-8. **Offer, don't do**: pushing cards to Anki (`anki-cards` skill) and appending new words to `Mein Wörterbuch.md` both need explicit approval first.
+8. **Offer, don't do**: pushing the cards to Anki (hand them to the `anki-cards` skill, deck `Deutsch`) and appending new words to `Mein Wörterbuch.md` both need explicit approval first. If Anki is down, say so — the cards stay in the note and can go up later.
 
 ## Modes
 
