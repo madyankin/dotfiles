@@ -11,10 +11,32 @@ Ported from Geoffrey Litt's `/explain-diff` idea — understanding is the bottle
 
 ## Setup
 
-- Vault: `/Users/alexander/Library/Mobile Documents/iCloud~md~obsidian/Documents/Notes`
-- Output folder: `2 Areas/Deutsch/Explainers/` — note and HTML side by side.
-- Obsidian must be running (the `obsidian` CLI talks to the live app). See the `obsidian-cli` skill.
-- Flashcards: **Anki only**, via the `anki-cards` skill (MCP), always into the `Deutsch` deck.
+**The HTML is the deliverable and never depends on Obsidian. The vault note is optional.**
+
+Nothing about the vault is hardcoded in this skill — it is configured *in Obsidian*, in the
+frontmatter of the `Deutsch` MOC note:
+
+```yaml
+---
+explainer_folder: 2 Areas/Deutsch/Explainers
+explainer_anki_deck: Deutsch
+---
+```
+
+Resolve it at the start of every run, in this order:
+
+1. Vault path — read `~/Library/Application Support/obsidian/obsidian.json` and take the registered
+   vault (the one with `"open": true` when several exist). Never type a vault path into this skill.
+2. Config — `obsidian read file="Deutsch"` and parse the frontmatter above.
+3. `explainer_folder` → where the note and its HTML go, side by side.
+   `explainer_anki_deck` → the Anki deck for step 8.
+
+**No config note, no vault, or Obsidian not running → HTML only.** Write it to the path the user
+asked for, or the current directory, say where it landed and why there was no note. Never stall the
+run waiting for Obsidian, and never invent a vault path. See `references/obsidian-note.md`.
+
+- Obsidian writes go through the `obsidian` CLI — see the `obsidian-cli` skill.
+- Flashcards: **Anki only**, via the `anki-cards` skill (MCP), into `explainer_anki_deck`.
   No Obsidian flashcard-plugin syntax anywhere — the note lists cards as plain readable markdown.
 - **Metalanguage is Russian.** German stays German. Never write the explainer in English.
 
@@ -37,10 +59,10 @@ Read before generating:
 2. **Classify the mode** (`text` / `grammatik` / `vokabeln` / `fehler`, see below) and say which one you picked.
 3. **Infer the level.** Estimate CEFR A1–C1 from word frequency and structures actually present. State the guess in one line — the user can override. Level controls **gloss density only**, never how deep the explanation goes.
 4. **Pick 1–3 interactive figures** from `references/interaktiv.md` that this material genuinely needs. `quiz` is always on; `glossen` is mandatory in `text` mode. Never ship all figures — an unused figure is noise.
-5. **Write the HTML**: copy `assets/template.html`, replace the `DATA` object, save as `2 Areas/Deutsch/Explainers/<slug>.html` with the `Write` tool.
-6. **Write the note** via `obsidian create … silent` per `references/obsidian-note.md`. Same content in plain markdown plus a link to the HTML — the note must stand alone on a phone.
-7. **Report**: both paths, inferred level, mode, which figures you used, how many cards.
-8. **Offer, don't do**: pushing the cards to Anki (hand them to the `anki-cards` skill, deck `Deutsch`) and appending new words to `Mein Wörterbuch.md` both need explicit approval first. If Anki is down, say so — the cards stay in the note and can go up later.
+5. **Write the HTML** (always): copy `assets/template.html`, replace the `DATA` object, save as `<explainer_folder>/<slug>.html` with the `Write` tool — or to the fallback path when there is no vault.
+6. **Write the note** (only when the vault resolved): `obsidian create … silent` per `references/obsidian-note.md`. Same content in plain markdown plus a link to the HTML — the note must stand alone on a phone.
+7. **Report**: the HTML path, the note path if there is one, inferred level, mode, which figures you used, how many cards.
+8. **Offer, don't do**: pushing the cards to Anki (hand them to the `anki-cards` skill, deck `explainer_anki_deck`) and appending new words to `Mein Wörterbuch.md` both need explicit approval first. If Anki is down, say so — the cards stay in the note and can go up later.
 
 ## Modes
 
@@ -66,7 +88,8 @@ Mixed input is fine — pick the dominant mode and say so.
 
 ## Errors
 
-- **`obsidian` CLI fails / connection refused** — Obsidian не запущен. Скажи об этом, HTML всё равно сохрани, заметку предложи создать после запуска. Не ретраить вслепую.
+- **`obsidian` CLI fails / connection refused** — Obsidian не запущен. Это не ошибка запуска: сохрани HTML, скажи, что заметки не будет, предложи создать её после старта приложения. Не ретраить вслепую.
+- **Нет заметки `Deutsch` или в ней нет `explainer_folder`** — вольт не настроен под этот скилл. Отдай HTML и одной строкой покажи, какой фронтматтер добавить.
 - **OCR нечитаем** — покажи, что удалось разобрать, и попроси кадр получше. Не угадывай слова.
 - **Ссылка за пейволлом или пустая** — скажи прямо и попроси текст копипастой.
 - **Материал не на немецком** — уточни, что имелось в виду, прежде чем генерировать.
