@@ -7,6 +7,10 @@ reuse what you keep rather than inventing new visuals per section.
 No MathJax, no KaTeX: they are CDN loads and the page must be self-contained. Use the `.eq`,
 `.frac`, and `.math` helpers below with Unicode symbols, and never bare `$…$`.
 
+For charts, node-link graphs, sliders, and stepped figures, see
+[VISUALIZATIONS.md](VISUALIZATIONS.md): it carries the `Viz` CSS and JS blocks to paste in at
+the marked points, and the rules for when a figure is worth building at all.
+
 The quiz engine below satisfies `QUIZ_RULES.md` mechanically (seeded per-question shuffle,
 feedback hidden until click, no correctness leaked into the DOM). Fill `QUIZ` with your five
 questions and leave the engine alone.
@@ -110,6 +114,10 @@ questions and leave the engine alone.
   .stepper .stage { min-height:5.5rem; }
   .stepper .note { color:var(--muted); font-size:.88rem; margin-top:.6rem; }
 
+  /* Viz — charts and node-link graphs.
+     Paste the CSS block from references/VISUALIZATIONS.md here when the page has figures,
+     together with its JS block below. Delete this comment if it has none. */
+
   /* Quiz */
   .q { background:var(--card); border:1px solid var(--line); border-radius:10px;
        padding:1rem 1.1rem; margin:1.1rem 0; }
@@ -204,6 +212,17 @@ questions and leave the engine alone.
   <p class="note"></p>
 </div>
 
+<figure>
+  <div class="viz-control">
+    <label for="«paramId»">«Parameter»</label>
+    <input type="range" id="«paramId»" min="«1»" max="«100»" value="«10»" step="«1»">
+    <output for="«paramId»" id="«paramId»Out">«10»</output>
+  </div>
+  <div id="«chartId»"></div>
+  <figcaption>«What the reader should notice as they drag — state it so the point survives
+  without touching the control.»</figcaption>
+</figure>
+
 <h2 id="misconceptions">«Common misconceptions»</h2>
 
 <div class="callout">
@@ -224,13 +243,16 @@ questions and leave the engine alone.
 <p class="score" id="score" hidden></p>
 
 <script>
+// Viz: paste the JS block from references/VISUALIZATIONS.md here when the page has figures.
+
 (function () {
   "use strict";
 
   // Worked-example stepper. Each step renders into .stage; `note` explains what just happened.
   // Delete this block if the page has no stepped example.
   var STEPS = [
-    { html: '«<div class=\"flow\">…</div>» — state after step 0', note: '«What to notice here»' }
+    // Either `html` for a static panel, or `render(stage)` to draw with Viz.
+    { html: '«<div class=\"flow\">…</div>» — «state after step 0»', note: '«What to notice here»' }
     // … one entry per step
   ];
 
@@ -244,7 +266,9 @@ questions and leave the engine alone.
     var at = 0;
 
     function render() {
-      stage.innerHTML = STEPS[at].html;
+      stage.innerHTML = "";
+      if (STEPS[at].render) STEPS[at].render(stage);      // e.g. Viz.graph(stage, {…})
+      else stage.innerHTML = STEPS[at].html;
       note.textContent = STEPS[at].note;
       counter.textContent = (at + 1) + " / " + STEPS.length;
       back.disabled = at === 0;
@@ -374,5 +398,8 @@ questions and leave the engine alone.
 - Five entries in `QUIZ`, correct-answer positions spread across the four slots after
   shuffling, each `why[]` covering every wrong option.
 - Stepper deleted if unused; if used, `STEPS` filled and the counter reads `1 / n` on load.
+- Figures: the `Viz` CSS and JS blocks pasted in if any figure uses them, every chart and
+  graph given a real `aria` sentence, every axis labelled with units, sliders mirrored into an
+  `<output>`, no invented numbers.
 - One toy instance carried through Intuition, Formal treatment, and Worked example — not
   three different examples.

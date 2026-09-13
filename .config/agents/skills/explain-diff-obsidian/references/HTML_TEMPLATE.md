@@ -1,8 +1,12 @@
 # HTML template
 
 Skeleton for the explainer page. Copy it, keep the structure and the CSS contracts, replace
-everything in `«»`. Delete the diagram families you don't use — but reuse the ones you keep
-rather than inventing new visuals per section.
+everything in `«»`. Delete the diagram families and the stepper you don't use — but reuse what
+you keep rather than inventing new visuals per section.
+
+For charts, node-link graphs, sliders, and stepped figures, see
+[VISUALIZATIONS.md](VISUALIZATIONS.md): it carries the `Viz` CSS and JS blocks to paste in at
+the marked points, and the rules for when a figure is worth building at all.
 
 The quiz engine below satisfies `QUIZ_RULES.md` mechanically (seeded per-question shuffle,
 feedback hidden until click, no correctness leaked into the DOM). Fill `QUIZ` with your five
@@ -83,6 +87,22 @@ questions and leave the engine alone.
   .ba .head { font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-bottom:.4rem; }
   @media (max-width:560px) { .ba { grid-template-columns:1fr; } .flow { flex-direction:column; } }
 
+  /* Stepper — walk a sequence one state at a time */
+  .stepper { background:var(--card); border:1px solid var(--line); border-radius:10px;
+             padding:.9rem 1rem; margin:1.4rem 0; }
+  .stepper .controls { display:flex; gap:.5rem; align-items:center; margin-bottom:.7rem; }
+  .stepper button { font:inherit; cursor:pointer; background:var(--bg); color:var(--fg);
+                    border:1px solid var(--line); border-radius:6px; padding:.3rem .7rem; }
+  .stepper button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .stepper button[disabled] { opacity:.45; cursor:default; }
+  .stepper .counter { color:var(--muted); font-size:.85rem; }
+  .stepper .stage { min-height:5.5rem; }
+  .stepper .note { color:var(--muted); font-size:.88rem; margin-top:.6rem; }
+
+  /* Viz — charts and node-link graphs.
+     Paste the CSS block from references/VISUALIZATIONS.md here when the page has figures,
+     together with its JS block below. Delete this comment if it has none. */
+
   /* Quiz */
   .q { background:var(--card); border:1px solid var(--line); border-radius:10px;
        padding:1rem 1.1rem; margin:1.1rem 0; }
@@ -155,6 +175,21 @@ questions and leave the engine alone.
   <figcaption>«Same input, both sides. State the observable difference in one sentence.»</figcaption>
 </figure>
 
+<figure>
+  <div id="«chartId»"></div>
+  <figcaption>«What the numbers show, where they came from, and what to notice.»</figcaption>
+</figure>
+
+<div class="stepper" id="trace">
+  <div class="controls">
+    <button type="button" data-step="-1">«Назад»</button>
+    <button type="button" data-step="1">«Вперёд»</button>
+    <span class="counter"></span>
+  </div>
+  <div class="stage"></div>
+  <p class="note"></p>
+</div>
+
 <h2 id="code">«Code»</h2>
 
 <h3>«Group 1 — ordered by execution flow, not filename»</h3>
@@ -173,6 +208,42 @@ questions and leave the engine alone.
 <p class="score" id="score" hidden></p>
 
 <script>
+// Viz: paste the JS block from references/VISUALIZATIONS.md here when the page has figures.
+
+(function () {
+  "use strict";
+
+  // Worked trace stepper. Each step renders a full state, not a delta, so jumping in
+  // mid-sequence still makes sense. Delete this block if the page has no stepped figure.
+  var STEPS = [
+    { html: '«<div class=\"flow\">…</div>» — «state after step 0»', note: '«What to notice»' }
+    // … one entry per step
+  ];
+
+  var box = document.getElementById("trace");
+  if (box && STEPS.length) {
+    var stage = box.querySelector(".stage");
+    var note = box.querySelector(".note");
+    var counter = box.querySelector(".counter");
+    var back = box.querySelector('[data-step="-1"]');
+    var fwd = box.querySelector('[data-step="1"]');
+    var at = 0;
+
+    function render() {
+      stage.innerHTML = "";
+      if (STEPS[at].render) STEPS[at].render(stage);      // e.g. Viz.graph(stage, {…})
+      else stage.innerHTML = STEPS[at].html;
+      note.textContent = STEPS[at].note;
+      counter.textContent = (at + 1) + " / " + STEPS.length;
+      back.disabled = at === 0;
+      fwd.disabled = at === STEPS.length - 1;
+    }
+    back.addEventListener("click", function () { if (at > 0) { at--; render(); } });
+    fwd.addEventListener("click", function () { if (at < STEPS.length - 1) { at++; render(); } });
+    render();
+  }
+})();
+
 (function () {
   "use strict";
 
@@ -289,3 +360,6 @@ questions and leave the engine alone.
 - No `http://`, `https://`, `src="./`, or `@import` outside prose links.
 - Five entries in `QUIZ`, correct-answer positions spread across the four slots after
   shuffling, each `why[]` covering every wrong option.
+- Figures: the `Viz` CSS and JS blocks pasted in if any figure uses them, every chart and
+  graph given a real `aria` sentence, every axis labelled with units, no invented numbers.
+- Stepper deleted if unused; if used, `STEPS` filled and the counter reads `1 / n` on load.

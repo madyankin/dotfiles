@@ -1,6 +1,6 @@
 ---
 name: explain-diff-obsidian
-description: Build a rich, interactive HTML explainer of a code change, diff, branch, or pull request and file it into the Obsidian vault together with a markdown stub, Anki cards, and a five-question quiz. Use when the user asks to explain, understand, or write up a diff/PR/branch/commit, or asks for an explainer note in their vault.
+description: Build a rich HTML explainer of a code change, diff, branch, or pull request — interactive charts, node-link graphs, stepped traces, and a five-question quiz — and file it into the Obsidian vault with a markdown stub and Anki cards. Use when the user asks to explain, understand, or write up a diff/PR/branch/commit, or asks for an explainer note in their vault.
 ---
 
 # Explain Diff → Obsidian
@@ -76,34 +76,50 @@ Prose: plain, precise, systems-oriented. Explain jargon on first use. Smooth tra
 between sections rather than a list of headings. Callouts for definitions, invariants, edge
 cases, and practical consequences.
 
-## Diagrams
+## Figures, graphs, and interactive visualizations
 
-Pick a small set of diagram families and reuse them across the page instead of inventing a
-new visual each time. The useful ones:
+Build a figure whenever it does work the prose cannot — and build it interactive whenever the
+reader would otherwise have to hold several states in their head. `references/VISUALIZATIONS.md`
+carries the full catalog, the ready-made `Viz` CSS/JS blocks, and the interaction patterns.
+Read it before writing the page.
 
-- flow diagrams for request, data, or control flow;
-- before/after panels for changed behavior;
-- labeled component cards for system boundaries;
-- compact tables for mappings, invariants, and toy data.
+The short version:
 
-Build them from semantic HTML and CSS. **Never ASCII art.** Label arrows and put real example
-values on them — a diagram of data movement without data teaches nothing. Give each figure a
-caption so the explanation survives without visual inspection.
+- **Charts** (`Viz.chart`, inline SVG, no library) for anything quantitative the change moves:
+  latency before/after across p50/p95/p99, allocations per request, hit rate against TTL. Only
+  with real numbers — a benchmark, CI timings, a dashboard the user pointed at. **Never invent
+  data to get a nicer picture**; label estimates as estimates in the caption.
+- **Node-link graphs** (`Viz.graph`) for structure with topology: call graphs, module
+  dependencies, state machines. Mark added or removed edges and name them in the caption.
+- **Steppers** for a request traced through the new path, one panel per hop, values carried at
+  each. Use one when the change reorders or short-circuits a sequence.
+- **Sliders** when a parameter has a regime the reader should feel — drag TTL, watch hit rate
+  and staleness trade off.
+- **Static families** — `.flow` for a linear pipeline, `.ba` for two states of one thing,
+  tables for mappings and toy data.
+
+Reuse a small set of families across the page; four instances of two families teach more than
+eight one-offs. **Never ASCII art.** Caption every figure with what to notice, label axes with
+units, and give every `Viz` call an `aria` sentence. A purely structural change — a rename, an
+extracted function — gets a before/after panel and nothing more.
 
 ## Rendering reality (state this to the user on every run)
 
 The page lives in the vault but Obsidian is not a browser:
 
-- **Browser = full fidelity.** Clicking quiz options works only here. Hand over the `file://`
-  URL and say so.
+- **Browser = full fidelity.** Quiz clicks, charts, steppers, and sliders work only here.
+  Hand over the `file://` URL and say so.
 - **HTML Reader plugin (`obsidian-html-plugin`) = read-only preview, and it is not installed.**
   Its own README says "almost all script codes cannot work": Text and High Restricted modes
   strip scripts, Balance (the default) sanitizes them, and only Low Restricted / Unrestricted
   execute anything. Installing it is the user's call; the skill does not require it.
-- **Local images never load** inside Obsidian (`<img src="./x.png">` is blocked). Use CSS
-  diagrams, or inline a data URI. No external images either — see the self-containment rule.
+- **Local images never load** inside Obsidian (`<img src="./x.png">` is blocked). Use CSS and
+  SVG figures, or inline a data URI. No external images either — see the self-containment rule.
+- **Figures are script-driven**, so under HTML Reader they render empty. The collapsible data
+  table `Viz.chart` emits is what survives there — keep it.
 - **Mobile** sees the `.md` stub, which is why the stub carries the summary and takeaways
-  rather than only a link.
+  rather than only a link. Obsidian renders Mermaid natively, so one small Mermaid diagram in
+  the stub carries the structural idea without opening the page.
 
 ## HTML constraints
 
@@ -148,18 +164,24 @@ Run these before handing off:
 ```bash
 grep -nE 'https?://|src="\./|@import' "<file>.html"   # must return nothing (links in prose are fine)
 grep -n 'white-space' "<file>.html"                   # every pre rule covered
+grep -n 'aria-label' "<file>.html"                    # every figure described, none says just "chart"
 grep -n ':::' "<file>.md"                             # must return nothing — see Flashcards
 ```
 
 - five questions, correct-answer position varied across them, feedback hidden until click,
   answers absent from DOM order, `title` attributes, and accessibility labels
-- stub frontmatter parses; the link to the `.html` resolves; every wikilink target exists
+- every figure: real data or a labelled estimate, axes with units, a caption saying what to
+  notice, a data table left in place, and controls reachable by keyboard
+- stub frontmatter parses; the link to the `.html` resolves; every wikilink target exists;
+  any Mermaid block renders
 - say what you inspected and every assumption you made; never claim behavior the source does
   not support
 
 ## Files
 
-- `references/HTML_TEMPLATE.md` — page skeleton with the CSS, the quiz engine, and the
-  diagram families
+- `references/HTML_TEMPLATE.md` — page skeleton with the CSS, the quiz engine, the stepper,
+  and the static diagram families
+- `references/VISUALIZATIONS.md` — when a figure is worth building, what kind to use, and the
+  `Viz` chart/graph blocks with the slider and stepper patterns
 - `references/STUB_TEMPLATE.md` — the markdown stub
 - `references/QUIZ_RULES.md` — binding rules for writing the five questions

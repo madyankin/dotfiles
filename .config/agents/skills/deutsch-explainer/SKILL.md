@@ -58,7 +58,7 @@ Read before generating:
    - Echo the extracted German back to the user in a short block before generating, so OCR slips get caught early. For a long text, echo the first few lines and the word count.
 2. **Classify the mode** (`text` / `grammatik` / `vokabeln` / `fehler`, see below) and say which one you picked.
 3. **Infer the level.** Estimate CEFR A1–C1 from word frequency and structures actually present. State the guess in one line — the user can override. Level controls **gloss density only**, never how deep the explanation goes.
-4. **Pick 1–3 interactive figures** from `references/interaktiv.md` that this material genuinely needs. `quiz` is always on; `glossen` is mandatory in `text` mode. Never ship all figures — an unused figure is noise.
+4. **Pick 1–4 interactive figures** from `references/interaktiv.md` that this material genuinely needs, and reach for a **diagram** (`feldermodell`, `zeitstrahl`, `raum`, `valenz`, `wortnetz`, `wortbau`, `fehlerprofil`) whenever the thing being explained is spatial, positional, temporal, or relational — that is most of German syntax. `quiz` is always on; `glossen` is mandatory in `text` mode. Never ship all figures — an unused figure is noise.
 5. **Write the HTML** (always): copy `assets/template.html`, replace the `DATA` object, save as `<explainer_folder>/<slug>.html` with the `Write` tool — or to the fallback path when there is no vault.
 6. **Write the note** (only when the vault resolved): `obsidian create … silent` per `references/obsidian-note.md`. Same content in plain markdown plus a link to the HTML — the note must stand alone on a phone.
 7. **Report**: the HTML path, the note path if there is one, inferred level, mode, which figures you used, how many cards.
@@ -79,6 +79,9 @@ Mixed input is fine — pick the dominant mode and say so.
 
 - **Intuition before tables.** Аналогия с русским идёт до любой парадигмы. Таблица без предшествующей интуиции — брак.
 - **Sensible order, not source order.** Разбор идёт от несущей конструкции к деталям, а не по порядку следования в тексте и не по алфавиту.
+- **Draw it when it is drawable.** Порядок слов, времена, предлоги места, управление глагола,
+  состав композита — всё это геометрия, и схема объясняет их лучше абзаца. Но диаграмма, которая
+  повторяет уже сказанное словами, — мусор: рисуй то, что текстом объясняется плохо.
 - **Everything is demonstrable.** Каждое грамматическое утверждение подкреплено примером из этого материала. Никаких декоративных правил «вообще про немецкий».
 - **Precompute everything.** Виджеты не думают в рантайме: все варианты, разборы и глоссы записаны в `DATA` во время генерации. HTML работает офлайн, из `file://`, без сети.
 - **Exactly 5 quiz questions.** Не 4, не 7. Квиз проверяет понимание, а не память на текст.

@@ -1,6 +1,6 @@
 ---
 name: explain-concept-obsidian
-description: Build a rich, interactive HTML explainer of an academic or technical concept — math, algorithms, operating systems, networks, physics, distributed systems — and file it into the Obsidian vault with a markdown stub, Anki cards, and a five-question quiz. Use when the user asks to learn, understand, or write a note about a concept, theorem, algorithm, or mechanism.
+description: Build a rich HTML explainer of an academic or technical concept — math, algorithms, operating systems, networks, physics — with interactive charts, stepped diagrams, parameter sliders, and a five-question quiz, filed into the Obsidian vault with a markdown stub and Anki cards. Use when the user asks to learn, understand, or write a note about a concept, theorem, algorithm, or mechanism.
 ---
 
 # Explain Concept → Obsidian
@@ -100,22 +100,36 @@ write bare `$…$`; it renders as literal dollar signs in a browser.
 The stub is ordinary Markdown, so `$…$` and `$$…$$` **do** work there (the vault has
 `obsidian-latex-suite`). Use real LaTeX in the stub, HTML math in the page.
 
-## Interactive figures
+## Figures, graphs, and interactive visualizations
 
-Where stepping through state teaches better than prose, build it — the quiz engine is not the
-only JavaScript allowed on the page. Good candidates: a Union-find sequence with the forest
-redrawn per operation, a page-table walk with the address decomposed, a recursion tree filling
-in, a projectile with adjustable initial velocity. Keep them small, keyboard-accessible, and
-dependency-free; the template's `.stepper` block is a starting point.
+For an academic note this is not decoration — a stepped forest or a growth curve often *is* the
+explanation. `references/VISUALIZATIONS.md` carries the full catalog, the ready-made `Viz`
+CSS/JS blocks, and the interaction patterns. Read it before writing the page.
 
-Static diagram families, reused rather than reinvented per section:
+The short version:
 
-- state-evolution panels (one box per step, values visible);
-- before/after panels for a transformation;
-- component/flow diagrams for mechanisms;
-- compact tables for mappings, complexities, and invariants.
+- **Complexity and growth** — `Viz.chart` line plot of the competing bounds over n, with the
+  crossover labelled and the reader's real input range marked.
+- **Structure state** — `Viz.graph` for the forest, tree, heap, or state machine, redrawn per
+  step inside the stepper. For an algorithms note this is the highest-value figure on the page:
+  the worked example becomes something you watch rather than parse.
+- **Amortized behavior** — per-operation cost across a sequence, so the expensive operation and
+  the cheap ones it pays for are visible at once.
+- **Parameter regimes** — a slider over load factor, branching factor, page size, or initial
+  velocity, redrawing the chart per value. The feel of a regime change is exactly what prose
+  cannot deliver.
+- **Measurements** — scatter for data with spread; never a line through points that aren't a
+  function.
+- **Derivations stay tables.** A derivation is not a chart.
 
-Build them from semantic HTML and CSS. **Never ASCII art.** Caption every figure.
+Carry **one toy instance** through Intuition, Formal treatment, and Worked example rather than
+switching examples per section. Reuse a small set of figure families. **Never ASCII art.**
+Caption every figure with what to notice, label axes with units, and give every `Viz` call an
+`aria` sentence. Most concepts need one plot of the governing function plus one stepped diagram
+of the setup — resist adding a third.
+
+**Never invent numbers.** Plot the actual function, or data from a source you cite; label
+estimates as estimates in the caption.
 
 ## Rendering reality (state this to the user on every run)
 
@@ -125,9 +139,12 @@ Build them from semantic HTML and CSS. **Never ASCII art.** Caption every figure
   Its README says "almost all script codes cannot work": Text and High Restricted modes strip
   scripts, Balance (the default) sanitizes them, only Low Restricted / Unrestricted execute
   anything. Installing it is the user's call.
-- **Local images never load** inside Obsidian. CSS diagrams, or inline data URIs.
+- **Local images never load** inside Obsidian. CSS and SVG figures, or inline data URIs.
+- **Figures are script-driven**, so under HTML Reader they render empty. The collapsible data
+  table `Viz.chart` emits is what survives there — keep it.
 - **Mobile** sees the `.md` stub, which is why the stub carries the summary, the takeaways,
-  and the key formulas rather than only a link.
+  and the key formulas rather than only a link. Obsidian renders Mermaid natively, so one small
+  Mermaid diagram in the stub carries the structural idea without opening the page.
 
 ## HTML constraints
 
@@ -175,12 +192,16 @@ and established technical terms stay as they are conventionally written.
 grep -nE 'https?://|src="\./|@import' "<file>.html"   # nothing outside prose links
 grep -n 'white-space' "<file>.html"                   # every pre rule covered
 grep -n '\$' "<file>.html"                            # no bare LaTeX — see Math without a CDN
+grep -n 'aria-label' "<file>.html"                    # every figure described, none says just "chart"
 grep -n ':::' "<file>.md"                             # must return nothing — see Flashcards
 ```
 
 - five questions, correct-answer position varied, feedback hidden until click, answers absent
   from DOM order, `title` attributes, and accessibility labels
 - stub frontmatter parses; the link to the `.html` resolves; every wikilink target exists
+- every figure: the real function or cited data, axes with units, a caption saying what to
+  notice, a data table left in place, sliders mirrored into an `<output>`, controls reachable
+  by keyboard
 - prerequisite gaps stated explicitly, not assumed
 - sources cited; say what you read and what you inferred; never assert a result you did not
   verify against a source
@@ -189,5 +210,7 @@ grep -n ':::' "<file>.md"                             # must return nothing — 
 
 - `references/HTML_TEMPLATE.md` — page skeleton with CSS, math helpers, the stepper, and the
   quiz engine
+- `references/VISUALIZATIONS.md` — when a figure is worth building, what kind to use, and the
+  `Viz` chart/graph blocks with the slider and stepper patterns
 - `references/STUB_TEMPLATE.md` — the markdown stub
 - `references/QUIZ_RULES.md` — binding rules for writing the five questions
