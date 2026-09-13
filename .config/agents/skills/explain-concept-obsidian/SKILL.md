@@ -72,10 +72,11 @@ Title, one-paragraph summary, table of contents, one continuous page.
    this section's job is to install it.
 3. **Formal treatment** — the precise definition or statement, then the argument: a proof
    sketch, an invariant, an amortized analysis, a derivation. Rigor at the level the concept
-   demands, not decoration.
+   demands, not decoration. The argument itself is stepped with `Viz.proof`, and a bound claim
+   carries the chart that shows it.
 4. **Worked example** — the toy instance from Intuition, stepped through with concrete
-   numbers and the state visible at each step. This is the section that makes it stick, so
-   make it interactive where stepping helps (see Interactive figures).
+   numbers and the state visible at each step. This section is **always** an interactive
+   stepper, never a static listing of steps.
 5. **Common misconceptions** — the wrong models people carry, and what each one predicts
    incorrectly. Distractors in the quiz should come from here.
 6. **Further reading** — the specific chapter, lecture, or paper, not a bare book title.
@@ -100,36 +101,41 @@ write bare `$…$`; it renders as literal dollar signs in a browser.
 The stub is ordinary Markdown, so `$…$` and `$$…$$` **do** work there (the vault has
 `obsidian-latex-suite`). Use real LaTeX in the stub, HTML math in the page.
 
-## Figures, graphs, and interactive visualizations
+## Figures are mandatory, and they go next to the text
 
-For an academic note this is not decoration — a stepped forest or a growth curve often *is* the
-explanation. `references/VISUALIZATIONS.md` carries the full catalog, the ready-made `Viz`
-CSS/JS blocks, and the interaction patterns. Read it before writing the page.
+For an academic note a figure is not decoration and not optional. **Every algorithm, data
+structure, proof, derivation, complexity claim, physical process, protocol, and state machine
+on the page gets its own interactive figure, placed immediately after the paragraph that
+explains it.** `references/VISUALIZATIONS.md` carries the rule in full, the `Viz` CSS/JS
+blocks, and every interaction pattern. Read it before writing the page.
 
-The short version:
+| What the section explains | What it must carry |
+|---|---|
+| Algorithm | Stepper over the narrated example, one panel per operation |
+| Data structure | `Viz.graph` of the structure, redrawn per operation in the stepper |
+| Proof, derivation, complexity argument | `Viz.proof` stepper — one line at a time with its justification |
+| Growth or bound claim | `Viz.chart` line plot of the competing bounds, crossover labelled |
+| Physical process | Parameter slider over the governing equation, chart or diagram, play button |
+| Protocol, state machine, lifecycle | `Viz.graph` stepped through the transitions |
+| Threshold or regime | A slider the reader can push past the threshold |
 
-- **Complexity and growth** — `Viz.chart` line plot of the competing bounds over n, with the
-  crossover labelled and the reader's real input range marked.
-- **Structure state** — `Viz.graph` for the forest, tree, heap, or state machine, redrawn per
-  step inside the stepper. For an algorithms note this is the highest-value figure on the page:
-  the worked example becomes something you watch rather than parse.
-- **Amortized behavior** — per-operation cost across a sequence, so the expensive operation and
-  the cheap ones it pays for are visible at once.
-- **Parameter regimes** — a slider over load factor, branching factor, page size, or initial
-  velocity, redrawing the chart per value. The feel of a regime change is exactly what prose
-  cannot deliver.
-- **Measurements** — scatter for data with spread; never a line through points that aren't a
-  function.
-- **Derivations stay tables.** A derivation is not a chart.
+Placement is part of the rule. A section that explains a mechanism carries its own figure;
+four such sections mean four figures, not one gallery at the bottom. The paragraph says what
+to look for, the figure lets the reader check it, the caption says what to notice. The
+algorithm stepper steps through **the same example the walkthrough narrates**, never a
+different one.
 
-Carry **one toy instance** through Intuition, Formal treatment, and Worked example rather than
-switching examples per section. Reuse a small set of figure families. **Never ASCII art.**
-Caption every figure with what to notice, label axes with units, and give every `Viz` call an
-`aria` sentence. Most concepts need one plot of the governing function plus one stepped diagram
-of the setup — resist adding a third.
+Skip a figure only when the subject genuinely has no state, no structure, and no varying
+quantity — or when the honest data does not exist. **Never invent numbers to get a nicer
+picture.** Plot the real function, cite real measurements, or say in one sentence, where the
+figure would have gone, why there isn't one.
 
-**Never invent numbers.** Plot the actual function, or data from a source you cite; label
-estimates as estimates in the caption.
+Beyond the mandatory set: scatter for data with spread (never a line through points that
+aren't a function), bar charts for per-operation cost across a sequence, `.flow` for a linear
+pipeline, `.ba` for exactly two states, tables for mappings and derivation justifications.
+Reuse a small set of families. **Never ASCII art.** Label axes with units, give every `Viz`
+call a real `aria` sentence, and carry one toy instance through Intuition, Formal treatment,
+and Worked example rather than switching examples per section.
 
 ## Rendering reality (state this to the user on every run)
 
@@ -199,9 +205,13 @@ grep -n ':::' "<file>.md"                             # must return nothing — 
 - five questions, correct-answer position varied, feedback hidden until click, answers absent
   from DOM order, `title` attributes, and accessibility labels
 - stub frontmatter parses; the link to the `.html` resolves; every wikilink target exists
+- **every algorithm, data structure, proof, bound, process, and state machine on the page has
+  its own interactive figure, sitting next to the text that explains it** — walk the page
+  section by section and check this before handing off
 - every figure: the real function or cited data, axes with units, a caption saying what to
   notice, a data table left in place, sliders mirrored into an `<output>`, controls reachable
-  by keyboard
+  by keyboard, no autoplay
+- any skipped figure justified in one sentence where it would have gone
 - prerequisite gaps stated explicitly, not assumed
 - sources cited; say what you read and what you inferred; never assert a result you did not
   verify against a source

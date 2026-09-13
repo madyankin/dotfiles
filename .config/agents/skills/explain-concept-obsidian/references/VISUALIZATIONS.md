@@ -3,22 +3,52 @@
 Graphs, charts, and interactive figures for the HTML page. The goal is understanding you
 can't get from prose — not ornament.
 
-## When a visualization earns its place
+## The rule: these subjects always get an interactive figure
 
-Add one when it does work prose cannot:
+Prose alone is not an acceptable explanation for anything with **state that changes, structure
+that connects, or a quantity that varies**. For the subjects below, an interactive figure is
+required, not optional:
 
-- a **quantity changes** and the shape of the change is the point (growth, latency, hit rate);
-- a **structure has topology** — parents, pointers, references, message order;
-- a **parameter has a regime** the reader should feel, not read about (what happens at
-  TTL = 0, at n = 10⁶, at load factor 0.9);
-- the reader must **trace state over steps** and holding it in their head is the hard part.
+| Subject | Required figure |
+|---|---|
+| Algorithm | Stepper over the real input, one panel per operation, state fully drawn |
+| Data structure | `Viz.graph` of the structure, redrawn per operation inside the stepper |
+| Proof or derivation | `Viz.proof` stepper — one line at a time, each with its justification |
+| Complexity or growth claim | `Viz.chart` line plot of the competing bounds, crossover marked |
+| Physical process | Parameter slider over the governing equation + chart or diagram, with play |
+| Protocol, state machine, lifecycle | `Viz.graph` stepped through the transitions |
+| Anything with a regime or threshold | Slider the reader can push past the threshold |
 
-Skip it when the data is two numbers (write the sentence), when the "chart" would just
-re-render a list, or when you'd have to invent the numbers. **Never fabricate data to get a
-nicer picture.** If the numbers are estimates, label them as estimates in the caption; if they
-come from a benchmark or a source, cite it.
+"I described it clearly in the text" does not discharge this. The figure is not a summary of
+the prose — it is the part of the explanation the prose cannot carry.
 
-One well-built figure the reader can poke at beats four static decorations.
+The only legitimate reasons to skip: the subject has no state, no structure, and no varying
+quantity (a naming convention, a definition with no mechanism); or the honest data does not
+exist and inventing it would be a lie. If you skip, **say why in the page**, in one sentence,
+where the figure would have been.
+
+## Placement: next to the text it explains
+
+A figure goes **immediately after the paragraph it illustrates**, inside that section. Never
+collect figures into a gallery at the end, never push them into an appendix, never make the
+reader scroll away from the sentence to find the picture that explains it.
+
+Concretely:
+
+- Each section that explains a mechanism carries its own figure. A page with four such
+  sections has four figures, not one big one at the bottom.
+- The figure and the paragraph form a unit: the paragraph says what to look for, the caption
+  says what to notice, the figure lets the reader check it themselves.
+- If a single figure serves three sections, it is in the wrong place — split it, or re-render
+  the same family with the state each section is about.
+- The stepper for an algorithm belongs in the walkthrough, stepping through exactly the
+  example the walkthrough narrates. Not a different example.
+
+## Never fake it
+
+**Never fabricate data to get a nicer picture.** If the numbers are estimates, label them as
+estimates in the caption; if they come from a benchmark or a source, cite it. Plot the actual
+function, or real measurements, or nothing.
 
 ## What to use for what
 
@@ -28,6 +58,7 @@ One well-built figure the reader can poke at beats four static decorations.
 | Discrete comparison across categories (p50/p95/p99, before/after) | `Viz.chart` bar |
 | Correlation, spread, individual measurements | `Viz.chart` scatter |
 | Trees, pointer structures, graphs, module dependencies | `Viz.graph` |
+| Proof, derivation, complexity argument | `Viz.proof` inside a stepper |
 | Pipeline, request path, message order | `.flow` HTML diagram |
 | Two states of the same thing | `.ba` before/after panels |
 | State evolving over discrete steps | `.stepper` |
@@ -117,6 +148,74 @@ var STEPS = [
     note: "«What just happened and why it matters»" }
 ];
 ```
+
+### Proof and derivation stepper
+
+Every proof, derivation, or complexity argument is stepped. The reader advances one line at a
+time and sees the justification for that line; future lines are dimmed and `aria-hidden` so
+the argument is not spoiled.
+
+```html
+<div class="stepper" id="proofWalk">
+  <div class="controls">
+    <button type="button" data-step="-1">«Назад»</button>
+    <button type="button" data-step="1">«Вперёд»</button>
+    <button type="button" data-play aria-pressed="false">▶</button>
+    <span class="counter"></span>
+  </div>
+  <div class="stage"></div>
+  <p class="note"></p>
+</div>
+```
+
+```js
+var LINES = [
+  { expr: '«<span class=\"math\">T(n)</span> = 2T(n/2) + n»', why: '«recurrence from the split»' },
+  { expr: '«= <span class=\"math\">n</span> log <span class=\"math\">n</span>»', why: '«master theorem, case 2»' }
+];
+var STEPS = LINES.map(function (_, i) {
+  return {
+    render: function (stage) { Viz.proof(stage, { steps: LINES, at: i }); },
+    note: LINES[i].why
+  };
+});
+```
+
+The point is that the reader can stop at the step they don't believe and stare at it. A static
+block of algebra hides exactly that step.
+
+### Play / pause for a process
+
+Physical processes and long operation sequences get a play button beside the step controls, so
+the reader can watch it run and then scrub back to the moment that surprised them:
+
+```js
+    var play = box.querySelector("[data-play]");
+    var timer = null;
+
+    function stop() {
+      if (timer) { clearInterval(timer); timer = null; }
+      if (play) { play.setAttribute("aria-pressed", "false"); play.textContent = "▶"; }
+    }
+    function go(d) { stop(); at = Math.min(STEPS.length - 1, Math.max(0, at + d)); render(); }
+
+    back.addEventListener("click", function () { go(-1); });
+    fwd.addEventListener("click", function () { go(1); });
+    if (play) play.addEventListener("click", function () {
+      if (timer) return stop();
+      if (at === STEPS.length - 1) { at = 0; render(); }       // replay from the start
+      play.setAttribute("aria-pressed", "true");
+      play.textContent = "⏸";
+      timer = setInterval(function () {
+        at++; render();
+        if (at >= STEPS.length - 1) stop();                    // stop on arrival, not a tick later
+      }, «1200»);
+    });
+```
+
+Any manual control stops playback — a reader who grabs the wheel keeps it. Never autoplay on
+load: motion the reader did not ask for is a distraction, and for some readers a problem.
+Respect `prefers-reduced-motion` by leaving playback opt-in, which this is.
 
 ### Toggle between two states
 
@@ -208,6 +307,19 @@ page has neither.
   .viz-control input[type=range] { flex:1 1 12rem; accent-color:var(--accent); }
   .viz-control output { font-family:ui-monospace, Menlo, monospace; color:var(--muted);
                         min-width:4rem; }
+
+  /* Proof / derivation stepper */
+  .proof { list-style:none; counter-reset:pf; padding:0; margin:1rem 0; }
+  .proof li { counter-increment:pf; display:grid; grid-template-columns:auto 1fr;
+              gap:.2rem 1rem; padding:.5rem .8rem; border-left:3px solid transparent;
+              border-radius:0 6px 6px 0; }
+  .proof li::before { content:"(" counter(pf) ")"; color:var(--muted); font-size:.8rem;
+                      font-family:ui-monospace, Menlo, monospace; grid-row:1; }
+  .proof .expr { font-family:ui-serif, Georgia, serif; font-size:1.02rem; }
+  .proof .why { grid-column:2; color:var(--muted); font-size:.84rem; }
+  .proof li.at { border-left-color:var(--accent); background:var(--accent-soft); }
+  .proof li.next { opacity:.28; }
+  .proof li.done { opacity:.85; }
 ```
 
 ### JS
@@ -394,7 +506,33 @@ var Viz = (function () {
     return svg;
   }
 
-  return { chart: chart, graph: graph };
+  /* spec: {steps:[{expr, why}], at:i} — derivation or proof revealed one step at a time.
+     `expr` is HTML (use the .math/.frac helpers); `why` is the justification. */
+  function proof(mount, spec) {
+    var at = spec.at == null ? spec.steps.length - 1 : spec.at;
+    var ol = document.createElement("ol");
+    ol.className = "proof";
+    spec.steps.forEach(function (st, i) {
+      var li = document.createElement("li");
+      li.className = i < at ? "done" : (i === at ? "at" : "next");
+      if (i > at) li.setAttribute("aria-hidden", "true");       // not yet revealed
+      var e = document.createElement("div");
+      e.className = "expr";
+      e.innerHTML = st.expr;
+      li.appendChild(e);
+      if (st.why) {
+        var w = document.createElement("div");
+        w.className = "why";
+        w.textContent = st.why;
+        li.appendChild(w);
+      }
+      ol.appendChild(li);
+    });
+    mount.appendChild(ol);
+    return ol;
+  }
+
+  return { chart: chart, graph: graph, proof: proof };
 })();
 ```
 
@@ -420,6 +558,11 @@ Viz.graph(mountEl, {
   radius: 18,
   aria: "one sentence describing the structure"
 });
+
+Viz.proof(mountEl, {
+  steps: [{ expr: "HTML for the line", why: "justification" }, …],
+  at: 2                                 // current line; later lines dimmed and aria-hidden
+});
 ```
 
 `Viz.graph` takes explicit `x`/`y` in any units and scales them to the viewport — compute the
@@ -428,3 +571,7 @@ give the root the midpoint `x` of its children, or the scaling will pin it to on
 draw an arrowhead at the `to` end; for a parent pointer, that means `{from: child, to:
 parent}`. Both axes stretch to fill, so a two-node figure lands corner to corner — add the
 surrounding nodes, or pad the coordinates, when that reads badly.
+
+`Viz.proof` renders the whole argument every call and dims what is past `at`, so a stepper
+re-renders it per step rather than mutating it. `expr` is HTML — use the `.math`, `.frac`, and
+`<sub>`/`<sup>` helpers, never bare `$…$`.

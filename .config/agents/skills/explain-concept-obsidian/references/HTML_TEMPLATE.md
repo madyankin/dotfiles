@@ -7,9 +7,11 @@ reuse what you keep rather than inventing new visuals per section.
 No MathJax, no KaTeX: they are CDN loads and the page must be self-contained. Use the `.eq`,
 `.frac`, and `.math` helpers below with Unicode symbols, and never bare `$…$`.
 
-For charts, node-link graphs, sliders, and stepped figures, see
+For charts, node-link graphs, sliders, proof walks, and stepped figures, see
 [VISUALIZATIONS.md](VISUALIZATIONS.md): it carries the `Viz` CSS and JS blocks to paste in at
-the marked points, and the rules for when a figure is worth building at all.
+the marked points, the interaction patterns, and the rule on which subjects **must** carry an
+interactive figure. Each figure belongs immediately after the paragraph it explains — the
+mounts below are placed that way on purpose; move them with their text, don't pool them.
 
 The quiz engine below satisfies `QUIZ_RULES.md` mechanically (seeded per-question shuffle,
 feedback hidden until click, no correctness leaked into the DOM). Fill `QUIZ` with your five
@@ -114,6 +116,19 @@ questions and leave the engine alone.
   .stepper .stage { min-height:5.5rem; }
   .stepper .note { color:var(--muted); font-size:.88rem; margin-top:.6rem; }
 
+  /* Proof / derivation stepper — paired with Viz.proof */
+  .proof { list-style:none; counter-reset:pf; padding:0; margin:1rem 0; }
+  .proof li { counter-increment:pf; display:grid; grid-template-columns:auto 1fr;
+              gap:.2rem 1rem; padding:.5rem .8rem; border-left:3px solid transparent;
+              border-radius:0 6px 6px 0; }
+  .proof li::before { content:"(" counter(pf) ")"; color:var(--muted); font-size:.8rem;
+                      font-family:ui-monospace, Menlo, monospace; grid-row:1; }
+  .proof .expr { font-family:ui-serif, Georgia, serif; font-size:1.02rem; }
+  .proof .why { grid-column:2; color:var(--muted); font-size:.84rem; }
+  .proof li.at { border-left-color:var(--accent); background:var(--accent-soft); }
+  .proof li.next { opacity:.28; }
+  .proof li.done { opacity:.85; }
+
   /* Viz — charts and node-link graphs.
      Paste the CSS block from references/VISUALIZATIONS.md here when the page has figures,
      together with its JS block below. Delete this comment if it has none. */
@@ -190,6 +205,18 @@ questions and leave the engine alone.
   · log <span class="math">n</span> + O(<span class="math">α(n)</span>)
 </div>
 
+<div class="stepper" id="proofWalk">
+  <div class="controls">
+    <button type="button" data-step="-1">«Назад»</button>
+    <button type="button" data-step="1">«Вперёд»</button>
+    <button type="button" data-play aria-pressed="false">▶</button>
+    <span class="counter"></span>
+  </div>
+  <div class="stage"></div>
+  <p class="note"></p>
+</div>
+<p class="sub">«One line on what the argument establishes, for the reader who won't step through it.»</p>
+
 <table class="derivation">
   <thead><tr><th>«Step»</th><th>«Justification»</th></tr></thead>
   <tbody>
@@ -206,6 +233,7 @@ questions and leave the engine alone.
   <div class="controls">
     <button type="button" data-step="-1">«Назад»</button>
     <button type="button" data-step="1">«Вперёд»</button>
+    <button type="button" data-play aria-pressed="false">▶</button>
     <span class="counter"></span>
   </div>
   <div class="stage"></div>
@@ -248,36 +276,73 @@ questions and leave the engine alone.
 (function () {
   "use strict";
 
-  // Worked-example stepper. Each step renders into .stage; `note` explains what just happened.
-  // Delete this block if the page has no stepped example.
-  var STEPS = [
-    // Either `html` for a static panel, or `render(stage)` to draw with Viz.
-    { html: '«<div class=\"flow\">…</div>» — «state after step 0»', note: '«What to notice here»' }
-    // … one entry per step
-  ];
+  // Stepper engine. Each step renders a FULL state, not a delta, so jumping in mid-sequence
+  // still makes sense. `render(stage)` draws with Viz; `html` is the static fallback.
+  // Mount one per stepped figure — a page normally has several, next to the text each explains.
+  window.mountStepper = function (boxId, STEPS) {
+    var box = document.getElementById(boxId);
+    if (!box || !STEPS.length) return;
 
-  var box = document.getElementById("walk");
-  if (box && STEPS.length) {
     var stage = box.querySelector(".stage");
     var note = box.querySelector(".note");
     var counter = box.querySelector(".counter");
     var back = box.querySelector('[data-step="-1"]');
     var fwd = box.querySelector('[data-step="1"]');
-    var at = 0;
+    var play = box.querySelector("[data-play]");
+    var timer = null, at = 0;
 
     function render() {
       stage.innerHTML = "";
-      if (STEPS[at].render) STEPS[at].render(stage);      // e.g. Viz.graph(stage, {…})
+      if (STEPS[at].render) STEPS[at].render(stage);      // e.g. Viz.graph / Viz.proof
       else stage.innerHTML = STEPS[at].html;
-      note.textContent = STEPS[at].note;
+      note.textContent = STEPS[at].note || "";
       counter.textContent = (at + 1) + " / " + STEPS.length;
       back.disabled = at === 0;
       fwd.disabled = at === STEPS.length - 1;
     }
-    back.addEventListener("click", function () { if (at > 0) { at--; render(); } });
-    fwd.addEventListener("click", function () { if (at < STEPS.length - 1) { at++; render(); } });
+    function stop() {
+      if (timer) { clearInterval(timer); timer = null; }
+      if (play) { play.setAttribute("aria-pressed", "false"); play.textContent = "▶"; }
+    }
+    function go(d) { stop(); at = Math.min(STEPS.length - 1, Math.max(0, at + d)); render(); }
+
+    back.addEventListener("click", function () { go(-1); });
+    fwd.addEventListener("click", function () { go(1); });
+    if (play) play.addEventListener("click", function () {          // never autoplay on load
+      if (timer) return stop();
+      if (at === STEPS.length - 1) { at = 0; render(); }
+      play.setAttribute("aria-pressed", "true");
+      play.textContent = "⏸";
+      timer = setInterval(function () {
+        at++; render();
+        if (at >= STEPS.length - 1) stop();                         // stop on arrival
+      }, 1200);
+    });
     render();
-  }
+  };
+})();
+
+(function () {
+  "use strict";
+
+  // «Proof / derivation walk» — Viz.proof re-renders the whole argument per step.
+  var LINES = [
+    { expr: '«<span class="math">T(n)</span> = 2T(n/2) + n»', why: '«recurrence from the split»' },
+    { expr: '«= <span class="math">n</span> log <span class="math">n</span>»', why: '«master theorem, case 2»' }
+  ];
+  mountStepper("proofWalk", LINES.map(function (_, i) {
+    return {
+      render: function (stage) { Viz.proof(stage, { steps: LINES, at: i }); },
+      note: LINES[i].why
+    };
+  }));
+
+  // «worked example» — one entry per step.
+  mountStepper("walk", [
+    { render: function (stage) { Viz.graph(stage, { nodes: «…», edges: «…», aria: "«state after step 1»" }); },
+      note: "«What just happened and why it matters»" }
+    // … one entry per step
+  ]);
 })();
 
 (function () {

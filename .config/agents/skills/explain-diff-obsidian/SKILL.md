@@ -80,10 +80,20 @@ cases, and practical consequences.
 
 Build a figure whenever it does work the prose cannot — and build it interactive whenever the
 reader would otherwise have to hold several states in their head. `references/VISUALIZATIONS.md`
-carries the full catalog, the ready-made `Viz` CSS/JS blocks, and the interaction patterns.
-Read it before writing the page.
+carries the full catalog, the `Viz` CSS/JS blocks, and the interaction patterns. Read it
+before writing the page.
 
-The short version:
+**Mandatory, not optional:** if the change touches an algorithm, a data structure, a proof or
+complexity argument, a protocol, a state machine, or any process with steps, that part of the
+page gets an interactive figure — a stepper over the real sequence, a `Viz.graph` of the
+structure, a `Viz.proof` walk through the argument. A changed algorithm explained only in
+prose is an unfinished explainer.
+
+Placement is part of the rule: the figure goes **immediately after the paragraph it
+illustrates**, inside that section. Never a gallery at the bottom. The stepper for a traced
+request belongs in the walkthrough, stepping through the same example the walkthrough narrates.
+
+The rest of the toolkit:
 
 - **Charts** (`Viz.chart`, inline SVG, no library) for anything quantitative the change moves:
   latency before/after across p50/p95/p99, allocations per request, hit rate against TTL. Only
@@ -91,10 +101,9 @@ The short version:
   data to get a nicer picture**; label estimates as estimates in the caption.
 - **Node-link graphs** (`Viz.graph`) for structure with topology: call graphs, module
   dependencies, state machines. Mark added or removed edges and name them in the caption.
-- **Steppers** for a request traced through the new path, one panel per hop, values carried at
-  each. Use one when the change reorders or short-circuits a sequence.
 - **Sliders** when a parameter has a regime the reader should feel — drag TTL, watch hit rate
   and staleness trade off.
+- **Play/pause** beside the step controls when the sequence is long enough to watch run.
 - **Static families** — `.flow` for a linear pipeline, `.ba` for two states of one thing,
   tables for mappings and toy data.
 
@@ -170,8 +179,10 @@ grep -n ':::' "<file>.md"                             # must return nothing — 
 
 - five questions, correct-answer position varied across them, feedback hidden until click,
   answers absent from DOM order, `title` attributes, and accessibility labels
+- **any algorithm, data structure, protocol, or stepped process the change touches has an
+  interactive figure next to the text explaining it**
 - every figure: real data or a labelled estimate, axes with units, a caption saying what to
-  notice, a data table left in place, and controls reachable by keyboard
+  notice, a data table left in place, controls reachable by keyboard, no autoplay
 - stub frontmatter parses; the link to the `.html` resolves; every wikilink target exists;
   any Mermaid block renders
 - say what you inspected and every assumption you made; never claim behavior the source does
