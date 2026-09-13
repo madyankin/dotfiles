@@ -44,8 +44,18 @@ header .meta span{white-space:normal;overflow-wrap:anywhere}
 .fig{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   padding:1rem;margin:1rem 0}
 .fig .hinweis{color:var(--muted);font-size:.88rem;margin:.1rem 0 .9rem}
+.leit{border-left:4px solid var(--accent);background:var(--accent-soft)}
+.leit .ziel{color:var(--accent);font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.analyse-step{margin:1.2rem 0 1.8rem}
+.analyse-step>.card{margin-bottom:.55rem}
+.analyse-detail{border:1px solid var(--line);border-radius:8px;margin:.55rem 0;overflow:hidden}
+.analyse-detail summary{cursor:pointer;padding:.45rem .65rem;font-size:.88rem;color:var(--muted)}
+.analyse-detail .body{padding:0 .65rem .65rem;font-size:.92rem}
+.quiz-figure{display:inline-block;margin:0 0 .55rem;font-size:.86rem}
 .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.2rem 0 .9rem}
 button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,summary:focus-visible,[tabindex]:focus-visible{
+  outline:3px solid var(--accent);outline-offset:3px}
 .chip{background:transparent;border:1px solid var(--line);border-radius:999px;
   padding:.3rem .8rem;font-size:.9rem}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
@@ -180,6 +190,13 @@ const DATA = {
     "После разбора ты перестанешь гадать между <span class='de'>in die Stadt</span> и <span class='de'>in der Stadt</span> — и будешь выбирать падеж за полсекунды, по одному вопросу к глаголу."
   ],
 
+  leitbeispiel: {
+    de: "Ich stelle die Lampe in die Ecke. Danach steht sie in der Ecke.",
+    ru: "Я ставлю лампу в угол. После этого она стоит в углу.",
+    ziel: "Следи только за тем, меняется ли место лампы.",
+    grenze: "С фиксированным управлением вроде warten auf эта подсказка не работает."
+  },
+
   intuition: [
     { art: "p", text: "В русском предлог «в» тоже работает на два падежа: «иду <b>в город</b>» (винительный) и «живу <b>в городе</b>» (предложный). Немецкий делает ровно то же самое, только вторым падежом берёт Dativ." },
     { art: "p", text: "Вопрос, который решает всё: <b>Wohin?</b> (куда, есть перемещение) → Akkusativ. <b>Wo?</b> (где, ничего не движется) → Dativ. Смотри не на предлог, а на глагол." },
@@ -197,18 +214,18 @@ const DATA = {
   ],
 
   analyse: [
-    { de: "Ich stelle die Lampe in die Ecke.",
+    { de: "Ich stelle die Lampe in die Ecke.", figure_id: "place-case", anker: true,
       wort: "я ставлю лампу в угол",
       frei: "Я ставлю лампу в угол.",
       warum: "<span class='de'>stellen</span> — глагол перемещения: лампа меняет место. Значит вопрос <span class='de'>Wohin?</span> и <span class='de'>in</span> тянет Akkusativ: <span class='de'>die Ecke</span> остаётся <span class='de'>die</span> (женский род, Akk = Nom), а вот в мужском было бы видно — <span class='de'>in den Schrank</span>." },
-    { de: "Die Lampe steht in der Ecke.",
+    { de: "Die Lampe steht in der Ecke.", figure_id: "check-case", anker: true,
       wort: "лампа стоит в углу",
       frei: "Лампа стоит в углу.",
       warum: "<span class='de'>stehen</span> — состояние, ничего не движется. Вопрос <span class='de'>Wo?</span> → Dativ, и женский род наконец показывает разницу: <span class='de'>die Ecke → in der Ecke</span>." }
   ],
 
   figuren: [
-    { art: "kasus",
+    { id: "place-case", art: "kasus", aria: "Сравнение Akkusativ при движении и Dativ при положении с предлогом in.",
       titel: "Один предлог, два падежа",
       hinweis: "Кликай по подчёркнутым группам.",
       beobachtung: "Предлог не изменился ни разу — падеж выбрал глагол.",
@@ -221,7 +238,7 @@ const DATA = {
           warum: "<span class='de'>stehen</span> = положение → Wo? → Dativ." },
         { t: "." }
       ] },
-    { art: "wortstellung",
+    { id: "check-case", art: "wortstellung", aria: "Три варианта предложений для проверки выбора падежа.",
       titel: "Проверь себя на вариантах",
       hinweis: "Щёлкай — каждый вариант объяснит себя.",
       beobachtung: "Ошибка почти всегда в том, что падеж взяли от предлога, а не от глагола.",
@@ -241,25 +258,25 @@ const DATA = {
   ],
 
   quiz: [
-    { typ: "wahl", frage: "Почему <span class='de'>Ich gehe in die Stadt</span>, а не <span class='de'>in der Stadt</span>?",
+    { typ: "wahl", fokus: "направление", figure_id: "place-case", frage: "Почему <span class='de'>Ich gehe in die Stadt</span>, а не <span class='de'>in der Stadt</span>?",
       optionen: [
         { t: "Движение к цели → Akkusativ", ok: true, warum: "<span class='de'>gehen</span> задаёт направление, вопрос Wohin?" },
         { t: "<span class='de'>Stadt</span> женского рода", ok: false, warum: "Род влияет на форму артикля, но не на выбор падежа." },
         { t: "<span class='de'>in</span> всегда требует Akkusativ", ok: false, warum: "<span class='de'>in</span> — Wechselpräposition, с <span class='de'>wohnen</span> будет Dativ." }
       ] },
-    { typ: "wahl", frage: "Что не так в <span class='de'>Das Buch liegt auf den Tisch</span>?",
+    { typ: "wahl", fokus: "положение", frage: "Что не так в <span class='de'>Das Buch liegt auf den Tisch</span>?",
       optionen: [
         { t: "<span class='de'>liegen</span> — состояние, нужен Dativ: <span class='de'>auf dem Tisch</span>", ok: true, warum: "Книга никуда не перемещается — вопрос Wo?" },
         { t: "Ничего, предложение верное", ok: false, warum: "Akkusativ тут означал бы, что книга в процессе приземления на стол." },
         { t: "<span class='de'>auf</span> не бывает с <span class='de'>Tisch</span>", ok: false, warum: "Бывает, и именно с ним — вопрос только в падеже." }
       ] },
-    { typ: "eingabe", frage: "Вставь артикль: <span class='de'>Ich lege das Handy auf ___ Tisch.</span>",
+    { typ: "eingabe", fokus: "Akkusativ", frage: "Вставь артикль: <span class='de'>Ich lege das Handy auf ___ Tisch.</span>",
       hinweis: "<span class='de'>legen</span> — куда или где?", antworten: ["den"],
       warum: "<span class='de'>legen</span> = кладу, движение → Akkusativ, <span class='de'>der Tisch → den Tisch</span>." },
-    { typ: "eingabe", frage: "Вставь артикль: <span class='de'>Das Handy liegt auf ___ Tisch.</span>",
+    { typ: "eingabe", fokus: "Dativ", frage: "Вставь артикль: <span class='de'>Das Handy liegt auf ___ Tisch.</span>",
       hinweis: "Тот же стол, другой глагол.", antworten: ["dem"],
       warum: "<span class='de'>liegen</span> = лежит, положение → Dativ, <span class='de'>der Tisch → dem Tisch</span>." },
-    { typ: "ordnen", frage: "Собери предложение: «Она вешает куртку в шкаф».",
+    { typ: "ordnen", fokus: "порядок слов", frage: "Собери предложение: «Она вешает куртку в шкаф».",
       teile: ["Sie", "hängt", "die Jacke", "in", "den Schrank"],
       loesung: ["Sie", "hängt", "die Jacke", "in", "den Schrank"],
       warum: "Глагол на второй позиции, <span class='de'>hängen</span> = вешает → Akkusativ → <span class='de'>den Schrank</span>." }
@@ -332,6 +349,14 @@ const DATA = {
           z.forEach(c => add(r, h('td', null, c))); });
       }
     });
+    if (DATA.leitbeispiel){
+      const l = add(root, h('div','card leit'));
+      add(l, h('div','ziel','Опорный пример'));
+      add(l, h('div','de',DATA.leitbeispiel.de));
+      add(l, h('div','small muted',DATA.leitbeispiel.ru));
+      if (DATA.leitbeispiel.ziel) add(l,h('p',null,DATA.leitbeispiel.ziel));
+      if (DATA.leitbeispiel.grenze) add(l,h('div','small muted','Граница подсказки: '+DATA.leitbeispiel.grenze));
+    }
   }
 
   /* --- 3. Что надо помнить --- */
@@ -344,16 +369,28 @@ const DATA = {
   /* --- 4. Разбор --- */
   if (DATA.analyse && DATA.analyse.length){
     sec('Разбор');
+    const figureMounts = {};
     DATA.analyse.forEach(a => {
-      if (a.titel) add(root, h('h3', null, a.titel));
-      const c = add(root, h('div','card'));
+      const step = add(root,h('section','analyse-step'));
+      if (a.titel) add(step, h('h3', null, a.titel));
+      const c = add(step, h('div','card'));
       const origins = {zitat:'Цитата',loesung:'Восстановленный ответ',beispiel:'Учебный пример'};
       if (a.herkunft || a.quelle) add(c, h('div','small muted', [origins[a.herkunft], a.quelle].filter(Boolean).join(' · ')));
       add(c, h('div','de', a.de));
       if (a.wort) add(c, h('div','small muted', 'дословно: ' + a.wort));
       if (a.frei) add(c, h('div','small', a.frei));
       if (a.warum) add(c, h('p', null, a.warum));
+      (a.details || []).forEach(detail => {
+        const d=add(c,h('details','analyse-detail'));
+        add(d,h('summary',null,detail.titel));
+        add(d,h('div','body',detail.text));
+      });
+      if (a.figure_id){
+        const mount=add(step,h('div','figure-mount'));
+        figureMounts[a.figure_id]=mount;
+      }
     });
+    root._figureMounts = figureMounts;
   }
 
   /* --- 5. Интерактив --- */
@@ -719,15 +756,24 @@ const DATA = {
   }
 
   if (DATA.figuren && DATA.figuren.length){
-    sec('Интерактив');
+    const fallback = [];
     DATA.figuren.forEach(f => {
-      const box = add(root, h('div','fig'));
+      const mount = root._figureMounts && root._figureMounts[f.id];
+      if (!mount) fallback.push(f);
+      const box = add(mount || root, h('div','fig'));
+      if (f.id) box.id='fig-'+f.id;
+      box.setAttribute('role','group');
+      box.setAttribute('aria-label',f.aria || f.titel || 'Интерактивная схема');
       if (f.titel) add(box, h('h3', null, f.titel));
       if (f.hinweis) add(box, h('div','hinweis', f.hinweis));
       const fn = FIG[f.art];
       if (fn) fn(f, box); else add(box, h('p','muted','Неизвестный тип фигуры: ' + f.art));
       if (f.beobachtung) add(box, h('div','beobachtung hidden-until', '↑ ' + f.beobachtung));
     });
+    if (fallback.length){
+      const firstBox=document.getElementById('fig-'+fallback[0].id);
+      if (firstBox) root.insertBefore(h('h2',null,'Дополнительные схемы'),firstBox);
+    }
   }
 
   /* --- 6. Грабли --- */
@@ -793,6 +839,10 @@ const DATA = {
       const box = add(root, h('div','q'));
       add(box, h('div','nr', 'Вопрос ' + (i+1)));
       add(box, h('div','frage', q.frage));
+      if (q.figure_id){
+        const link=add(box,h('a','quiz-figure','↗ Открыть связанную схему'));
+        link.href='#fig-'+q.figure_id;
+      }
       const fb = h('div','feedback');
 
       if (q.typ === 'wahl'){
