@@ -18,7 +18,7 @@ YADM_DIR="$HOME/.config/yadm"
 PKG_DIR="$YADM_DIR/packages"
 STATE="$PKG_DIR/.selection"          # untracked, machine-specific
 
-PKG_GROUPS="essentials personal claude codex cursor goose"
+PKG_GROUPS="essentials personal claude codex goose"
 
 DRY_RUN=false
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
@@ -40,7 +40,6 @@ group_desc() {
     personal)   echo "music, journaling, books, backups" ;;
     claude)     echo "Claude Code (Anthropic)" ;;
     codex)      echo "Codex (OpenAI)" ;;
-    cursor)     echo "Cursor editor" ;;
     goose)      echo "Goose (Block)" ;;
   esac
 }

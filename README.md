@@ -24,7 +24,7 @@ from the work tree by a sparse-checkout rule so it does not sit in `$HOME`.
     crontab                   installed by scripts/cron.sh
     packages/Brewfile.*       one manifest per install group
     scripts/                  install.sh, agents.sh, editors.sh, macos.sh, …
-    editors/                  shared Cursor + VS Code settings
+    editors/                  VS Code settings
   nvim/  tmux/  aerospace/  iterm/  zed/  htop/  mc/  gh/  goose/
 ```
 
@@ -57,7 +57,7 @@ from the work tree by a sparse-checkout rule so it does not sit in `$HOME`.
 
 `~/.config/yadm/scripts/install.sh` — re-runnable at any time.
 
-Groups: `essentials`, `personal`, `claude`, `codex`, `cursor`, `goose`. Each is
+Groups: `essentials`, `personal`, `claude`, `codex`, `goose`. Each is
 backed by `packages/Brewfile.<group>` (or an npm global). Select a group as a
 whole with `<All>`, or expand it to toggle individual packages. The wizard opens
 pre-filled from what is actually installed.
@@ -133,7 +133,7 @@ mistaken `add -A` at `$HOME` cannot publish them.
 ~/.agents        -> .config/agents          (tracked; goose resolves through it)
 ~/.claude/skills -> ../.config/agents/skills
 ~/.claude/agents -> ../.config/agents/agents
-… same for ~/.codex, ~/.cursor, ~/.goose
+… same for ~/.codex, ~/.goose
 ```
 
 `~/.codex/skills` is a real directory holding codex's own `.system/`, so the
@@ -154,6 +154,6 @@ lock entry; fork it deliberately instead.
 
 ## Editors
 
-Cursor and VS Code share `yadm/editors/{settings.json,keybindings.json}` via
-symlink. `scripts/editors.sh sync` reconciles installed extensions against
+VS Code reads `yadm/editors/{settings.json,keybindings.json}` via symlink.
+`scripts/editors.sh sync` reconciles installed extensions against
 `editors/extensions.txt`; the sync script runs it every two hours.

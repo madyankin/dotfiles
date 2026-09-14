@@ -21,7 +21,6 @@
     "files.autoSave": "onFocusChange",
     "window.systemColorTheme": "auto",
     "workbench.preferredLightColorTheme": "GitHub Light",
-    "cursor.composer.textSizeScale": 1.15,
     "workbench.tips.enabled": false,
     "workbench.startupEditor": "none",
     "workbench.editor.showTabs": "single",

@@ -23,7 +23,6 @@ cask "font-jetbrains-mono-nerd-font"
 
 # --- Editors ---
 brew "neovim"
-cask "cursor"
 cask "visual-studio-code"
 
 # --- Mac App Store ---

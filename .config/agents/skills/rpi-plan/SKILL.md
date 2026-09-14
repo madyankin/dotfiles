@@ -186,4 +186,4 @@ Always separate into:
 - Write instructions as behavior contracts, not provider-specific syntax
 - Prefer capability language like "spawn parallel research agents" over slash-command-only guidance
 - If a named tool is unavailable, use the closest equivalent behavior and continue
-- Avoid assumptions that only hold for one runtime (OpenCode, Codex, Claude, Cursor)
+- Avoid assumptions that only hold for one runtime (OpenCode, Codex, Claude)

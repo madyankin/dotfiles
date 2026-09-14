@@ -111,11 +111,6 @@ run = 'move-node-to-workspace web'
 if.app-id = 'app.zen-browser.zen'
 run = 'move-node-to-workspace web'
 
-# Cursor → dev
-[[on-window-detected]]
-if.app-id = 'com.todesktop.230313mzl4w4u92'
-run = 'move-node-to-workspace dev'
-
 # VS Code → dev
 [[on-window-detected]]
 if.app-id = 'com.microsoft.VSCode'
