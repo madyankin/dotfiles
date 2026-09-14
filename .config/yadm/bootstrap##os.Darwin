@@ -41,6 +41,9 @@ log "ZSH"
 log "Cron"
 ./scripts/cron.sh
 
+log "Alfred"
+./scripts/alfred.sh setup
+
 log "Agent configs"
 ./scripts/agents.sh
 

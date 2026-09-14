@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+# Refuse to commit credentials.
+#
+# The work tree is $HOME and the sync cron commits unattended every two hours,
+# so a secret that lands in a tracked file would be pushed to a public repo
+# without anyone looking. Alfred workflows are the known offender — at least one
+# keeps a plaintext OpenAI key in its prefs.plist — but this guards everything.
+#
+# Patterns are deliberately strict so that prose describing a key format (in the
+# README, in .gitignore comments) does not trip them; only things shaped like an
+# actual credential match.
+set -uo pipefail
+
+PATTERNS='sk-[A-Za-z0-9_-]{20,}
+sk-proj-[A-Za-z0-9_-]{20,}
+ghp_[A-Za-z0-9]{36}
+gho_[A-Za-z0-9]{36}
+github_pat_[A-Za-z0-9_]{50,}
+AKIA[0-9A-Z]{16}
+xox[baprs]-[A-Za-z0-9-]{10,}
+-----BEGIN [A-Z ]*PRIVATE KEY-----
+_authToken=[A-Za-z0-9_./+-]{16,}'
+
+staged="$(yadm diff --cached --name-only --diff-filter=ACM)"
+[[ -z "$staged" ]] && exit 0
+
+found=0
+while IFS= read -r file; do
+  [[ -z "$file" ]] && continue
+  # Only the staged content, and only the added lines.
+  content="$(yadm diff --cached -U0 -- "$file" 2>/dev/null | grep '^+' | grep -v '^+++')"
+  [[ -z "$content" ]] && continue
+  hits=""
+  while IFS= read -r pat; do
+    [[ -z "$pat" ]] && continue
+    grep -qE -- "$pat" <<<"$content" || continue
+    hits="$hits$(grep -oE -- "$pat" <<<"$content")
+"
+  done <<<"$PATTERNS"
+
+  if [[ -n "${hits// /}" ]]; then
+    echo "✗ possible credential in $file" >&2
+    # Longest match first, so sk-proj-… is shown rather than its sk-… prefix.
+    awk '{ print length, $0 }' <<<"$hits" | sort -rn | cut -d' ' -f2- \
+      | awk '!seen[substr($0,1,12)]++' | head -3 \
+      | sed 's/\(.\{12\}\).*/\1…<redacted>/' | sed 's/^/    /' >&2
+    found=1
+  fi
+done <<<"$staged"
+
+if [[ $found -eq 1 ]]; then
+  cat >&2 <<'MSG'
+
+Commit refused. Remove the credential, or add the file to .gitignore.
+This hook lives in .config/yadm/hooks/pre_commit; to bypass it once:
+  YADM_HOOK_SKIP=1 yadm commit ...
+MSG
+  [[ "${YADM_HOOK_SKIP:-}" == "1" ]] && { echo "(bypassed)" >&2; exit 0; }
+  exit 1
+fi
+
+exit 0

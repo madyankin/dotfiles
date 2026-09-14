@@ -14,6 +14,10 @@ cd "$HOME" || exit 1
 # rather than waiting for the next run two hours later.
 "$HOME/.config/yadm/scripts/editors.sh" sync >/dev/null 2>&1 || true
 
+# Keep the Alfred workflow list current, so a workflow added or removed since
+# the last run is recorded rather than drifting.
+"$HOME/.config/yadm/scripts/alfred.sh" save >/dev/null 2>&1 || true
+
 # Sync down before staging, so a rebase never lands on a dirty index.
 yadm pull --rebase --autostash >/dev/null 2>&1 || exit 1
 

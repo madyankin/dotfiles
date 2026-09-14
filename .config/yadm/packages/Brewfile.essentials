@@ -21,6 +21,9 @@ brew "yadm"
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
 
+# --- Productivity ---
+cask "alfred"
+
 # --- Editors ---
 brew "neovim"
 cask "visual-studio-code"

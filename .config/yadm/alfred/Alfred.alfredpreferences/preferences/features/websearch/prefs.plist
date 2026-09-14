@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>customSites</key>
+	<dict>
+		<key>8341979A-0F95-4730-AFA8-F3C2D7806449</key>
+		<dict>
+			<key>enabled</key>
+			<true/>
+			<key>keyword</key>
+			<string>p</string>
+			<key>text</key>
+			<string>Perplexity</string>
+			<key>url</key>
+			<string>https://www.perplexity.ai/?s=o&amp;q={query}</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

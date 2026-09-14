@@ -122,3 +122,18 @@ __pycache__/
 # overrides that, so they need a real ignore rule or every run commits them.
 .config/yadm/bootstrap
 .config/zsh/.zshrc
+
+# --- Alfred ---
+# The complete preference bundle lives in .config/yadm/alfred/ (Alfred's sync
+# folder points there), but only part of it is tracked.
+#
+# Machine-specific: Alfred keeps per-machine hotkeys and appearance here.
+.config/yadm/alfred/Alfred.alfredpreferences/preferences/local/
+# Third-party workflows are reinstalled from workflows.txt rather than vendored;
+# own workflows (no `webaddress` in info.plist) are re-included below.
+.config/yadm/alfred/Alfred.alfredpreferences/workflows/*
+!.config/yadm/alfred/Alfred.alfredpreferences/workflows/user.workflow.CF70B6B1-0418-4CD8-A46E-0819B46E5920/
+# Never track a workflow's settings file — the OpenAI workflow stores a
+# plaintext API key in one. This rule comes last so it applies inside the
+# re-included directories too.
+.config/yadm/alfred/Alfred.alfredpreferences/workflows/*/prefs.plist
