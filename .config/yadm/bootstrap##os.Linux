@@ -4,6 +4,13 @@
 # suffix — no $OSTYPE branching needed.
 set -e
 
+# GitHub renders a README only from the repository root, but a README sitting
+# in $HOME is clutter. Track it at the root and exclude it from the work tree.
+if ! yadm sparse-checkout list &>/dev/null; then
+  yadm sparse-checkout init --no-cone
+  yadm sparse-checkout set '/*' '!/README.md'
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 

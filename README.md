@@ -3,6 +3,10 @@
 Managed with [yadm](https://yadm.io). The work tree is `$HOME`, so everything
 below is about being deliberate with what that implies.
 
+This file is tracked at the repository root so GitHub renders it, and excluded
+from the work tree by a sparse-checkout rule so it does not sit in `$HOME`.
+`bootstrap` sets that rule up on a fresh clone.
+
 ## Layout
 
 ```
