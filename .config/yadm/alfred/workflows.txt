@@ -1,44 +1,7 @@
 # Third-party Alfred workflows, reinstalled by `alfred.sh install`.
 # Own workflows are tracked in git instead and are not listed here.
 # bundleid<TAB>name<TAB>version<TAB>source
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-||||||| Stash base
-de.chris-grieser.atop	atop	1.8.0	https://chris-grieser.de/
-com.vitorgalvao.alfred.calmnotifications	Calm Notifications	25.1	https://github.com/vitorgalvao/calm-notifications-workflow/
-com.alfredapp.vitor.openai	ChatGPT / DALL-E	2024.9	https://github.com/alfredapp/openai-workflow/
-com.benjamino.folderify	Folderify	1.4.1	https://github.com/BenjaminOddou/alfred-folderify
-de.chris-grieser.homebrew	Homebrew	1.2.8	https://chris-grieser.de/
-de.samuelraub.prettyjson	Pretty JSON	1.0.0	https://github.com/samuelraub/pretty-json-alfred-workflow
-com.vitorgalvao.alfred.screenshots	Screenshots	2024.3	https://github.com/vitorgalvao/screenshots-workflow/
-de.chris-grieser.shimmering-obsidian	Shimmering Obsidian	4.2.8	https://chris-grieser.de/
-com.alfredapp.vitor.shortcuts	Shortcuts	2023.8	https://github.com/alfredapp/shortcuts-workflow/
-com.alfredapp.vitor.switchappearance	Switch Appearance	2023.2	https://github.com/alfredapp/switch-appearance-workflow/
-com.alfredapp.vitor.systemsettings	System Settings	2023.3	https://github.com/alfredapp/system-settings-workflow/
-com.xilopaint.alfredapp.things	Things	2.0.1	https://github.com/xilopaint/alfred-things
-com.alfredapp.vitor.thumbnailnavigation	Thumbnail Navigation	2024.3	https://github.com/alfredapp/thumbnail-navigation-workflow/
-timer.workflow	Timer	1.5.0	http://colomolome.com
-com.xilopaint.alfredapp.urbandictionary	Urban Dictionary	2.7.0	https://github.com/xilopaint/alfred-urban-dictionary
-=======
-de.chris-grieser.atop	atop	1.8.0	https://chris-grieser.de/
-com.vitorgalvao.alfred.calmnotifications	Calm Notifications	25.1	https://github.com/vitorgalvao/calm-notifications-workflow/
-com.benjamino.folderify	Folderify	1.4.1	https://github.com/BenjaminOddou/alfred-folderify
-de.chris-grieser.homebrew	Homebrew	1.2.8	https://chris-grieser.de/
-de.samuelraub.prettyjson	Pretty JSON	1.0.0	https://github.com/samuelraub/pretty-json-alfred-workflow
-com.vitorgalvao.alfred.screenshots	Screenshots	2024.3	https://github.com/vitorgalvao/screenshots-workflow/
-de.chris-grieser.shimmering-obsidian	Shimmering Obsidian	4.2.8	https://chris-grieser.de/
-com.alfredapp.vitor.shortcuts	Shortcuts	2023.8	https://github.com/alfredapp/shortcuts-workflow/
-com.alfredapp.vitor.switchappearance	Switch Appearance	2023.2	https://github.com/alfredapp/switch-appearance-workflow/
-com.alfredapp.vitor.systemsettings	System Settings	2023.3	https://github.com/alfredapp/system-settings-workflow/
-com.xilopaint.alfredapp.things	Things	2.0.1	https://github.com/xilopaint/alfred-things
-com.alfredapp.vitor.thumbnailnavigation	Thumbnail Navigation	2024.3	https://github.com/alfredapp/thumbnail-navigation-workflow/
-timer.workflow	Timer	1.5.0	http://colomolome.com
-com.xilopaint.alfredapp.urbandictionary	Urban Dictionary	2.7.0	https://github.com/xilopaint/alfred-urban-dictionary
->>>>>>> Stashed changes
-||||||| Stash base
-=======
 com.vitorgalvao.alfred.calmnotifications	Calm Notifications	25.1	https://github.com/vitorgalvao/calm-notifications-workflow/
 com.miromannino.new-terminal-window	New Terminal Window		miromannino.com
 com.alfredapp.vitor.switchappearance	Switch Appearance	2024.1	https://github.com/alfredapp/switch-appearance-workflow/
 timer.workflow	Timer	1.5.0	http://colomolome.com
->>>>>>> Stashed changes
