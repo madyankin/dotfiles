@@ -18,3 +18,10 @@ mas "Day One", id: 1055511498
 mas "GarageBand", id: 682658836
 mas "Strongbox", id: 1481853033
 mas "Moneywiz", id: 1511185140
+
+# --- Added with the Omarchy sweep ---
+cask "pinta"          # basic image edits
+cask "libreoffice"
+brew "ical-buddy"
+brew "whisper-cpp"
+brew "ollama"

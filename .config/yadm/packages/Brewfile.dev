@@ -1,0 +1,53 @@
+# Dev: the toolchain this machine actually runs on.
+#
+# Everything here was already installed and manifested nowhere, which meant a
+# rebuilt machine would have silently lacked it. Chosen from `brew leaves`
+# (top-level, ~46 packages) rather than `brew list --formula` (~179, mostly
+# transitive dependencies that have no business in a manifest).
+
+# --- CLI ---
+brew "ripgrep"
+brew "fd"
+brew "btop"
+brew "tmux"
+brew "direnv"
+brew "coreutils"
+brew "cloc"
+brew "copier"          # project templating
+brew "poppler"
+brew "ffmpeg"
+brew "yt-dlp"
+brew "fastfetch"          # Omarchy's system-info banner
+
+# --- Git / containers ---
+brew "lazygit"
+brew "lazydocker"
+brew "docker"
+brew "gh"
+
+# --- Languages / build ---
+brew "go"
+brew "uv"
+
+# --- Quality gates ---
+brew "shellcheck"
+brew "shfmt"
+brew "bats-core"
+brew "pre-commit"
+brew "lefthook"
+
+# --- Docs / diagrams ---
+brew "mermaid-cli"
+
+# --- Agents ---
+brew "opencode"
+
+# --- Apps ---
+cask "iterm2"             # fallback terminal; Ghostty is in essentials
+cask "zed"
+cask "fork"
+cask "orbstack"
+cask "karabiner-elements" # caps_lock -> hyper, which every WM binding needs
+cask "1password-cli"
+cask "amethyst"           # the tiler actually in use here
+cask "rectangle"

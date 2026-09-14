@@ -18,7 +18,7 @@ YADM_DIR="$HOME/.config/yadm"
 PKG_DIR="$YADM_DIR/packages"
 STATE="$PKG_DIR/.selection"          # untracked, machine-specific
 
-PKG_GROUPS="essentials personal claude codex goose"
+PKG_GROUPS="essentials dev work personal goose"
 
 DRY_RUN=false
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
@@ -26,20 +26,26 @@ DRY_RUN=false
 # ---------------------------------------------------------------- manifests --
 
 # Groups backed by an npm global rather than a Brewfile.
+#
+# Currently none. The agent CLIs moved out of here for two reasons:
+#   - claude is the `claude-code` Homebrew cask now, not an npm global, so the
+#     old mapping could never report itself installed;
+#   - codex, gemini-cli, pi and agent-browser are mise `npm:` backend tools in
+#     ~/.config/mise/config.toml. `npm install -g` binds a CLI to one node
+#     version, and it disappears the moment a project pins another.
+# The machinery stays so a future npm-only group needs no plumbing.
 npm_pkg() {
   case "$1" in
-    claude) echo "@anthropic-ai/claude-code" ;;
-    codex)  echo "@openai/codex" ;;
-    *)      return 1 ;;
+    *) return 1 ;;
   esac
 }
 
 group_desc() {
   case "$1" in
     essentials) echo "CLI, fonts, editors, everyday apps" ;;
+    dev)        echo "dev toolchain, TUIs, containers, quality gates" ;;
+    work)       echo "Remerge infra: cloud, IaC, security scanners" ;;
     personal)   echo "music, journaling, books, backups" ;;
-    claude)     echo "Claude Code (Anthropic)" ;;
-    codex)      echo "Codex (OpenAI)" ;;
     goose)      echo "Goose (Block)" ;;
   esac
 }

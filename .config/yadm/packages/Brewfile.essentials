@@ -3,15 +3,17 @@
 
 # --- CLI ---
 brew "bat"
-brew "delta"
+brew "git-delta"      # canonical name; "delta" is an alias and never matches brew list
 brew "git"
 brew "gnupg"
 brew "fd"
+brew "fzf"            # was a ~/.fzf git clone with an absolute username in it
 brew "jq"
 brew "htop"
 brew "mas"
-brew "mc"
+brew "midnight-commander"  # canonical name; "mc" is an alias
 brew "mise"
+brew "ruby"           # ~/.zshenv pins /opt/homebrew/opt/ruby/bin; asdf used to supply ruby
 brew "pinentry-mac"
 brew "powerlevel10k"
 brew "speedtest-cli"
@@ -21,12 +23,24 @@ brew "yadm"
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
 
+# --- Terminal ---
+cask "ghostty"
+
 # --- Productivity ---
 cask "alfred"
 
 # --- Editors ---
 brew "neovim"
 cask "visual-studio-code"
+
+# --- Agents ---
+cask "claude-code"    # was the npm global @anthropic-ai/claude-code
+
+# --- GUIs (Omarchy parity) ---
+cask "obsidian"
+cask "iina"           # covers Omarchy's mpv
+cask "localsend"      # AirDrop-alike that also talks to Linux and Android
+cask "signal"
 
 # --- Mac App Store ---
 mas "Amphetamine", id: 937984704

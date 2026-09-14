@@ -1,0 +1,15 @@
+# Work: Remerge infrastructure and review tooling.
+#
+# Separate group so a personal machine can skip the lot.
+
+brew "awscli"
+brew "opentofu"
+brew "mkcert"
+brew "hadolint"
+brew "semgrep"
+brew "bagel"
+tap "remerge/agent-sandbox"
+brew "agent-sandbox"   # tap-qualified names never match `brew list --formula`
+
+cask "google-cloud-sdk"
+cask "tailscale-app"
