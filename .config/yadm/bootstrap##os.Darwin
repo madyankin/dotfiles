@@ -1,0 +1,41 @@
+#!/bin/bash
+#
+# macOS bootstrap. Selected automatically by `yadm alt` via the ##os.Darwin
+# suffix — no $OSTYPE branching needed.
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+log() { echo ""; echo "━━━ $1 ━━━"; }
+
+log "macOS Defaults"
+./scripts/macos.sh
+
+log "Homebrew"
+./scripts/homebrew.sh
+
+# Accept Xcode license (if Xcode is installed)
+if [[ -d "/Applications/Xcode.app" ]]; then
+  log "Xcode License"
+  sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+  sudo xcodebuild -license accept
+fi
+
+log "iTerm2"
+./scripts/iterm.sh
+
+log "Editors"
+./scripts/editors.sh
+
+log "ZSH"
+./scripts/zsh.sh
+
+log "Cron"
+./scripts/cron.sh
+
+log "Agents"
+./scripts/agents.sh
+
+echo ""
+echo "✓ Bootstrap complete"

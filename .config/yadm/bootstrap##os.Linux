@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# Linux bootstrap. Selected automatically by `yadm alt` via the ##os.Linux
+# suffix — no $OSTYPE branching needed.
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+log() { echo ""; echo "━━━ $1 ━━━"; }
+
+log "Linux Setup"
+./scripts/linux.sh
+
+log "ZSH"
+./scripts/zsh.sh
+
+log "Cron"
+./scripts/cron.sh
+
+log "Agents"
+./scripts/agents.sh
+
+echo ""
+echo "✓ Bootstrap complete"
