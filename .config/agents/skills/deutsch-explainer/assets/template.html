@@ -48,6 +48,9 @@ header .meta span{white-space:normal;overflow-wrap:anywhere}
 .leit .ziel{color:var(--accent);font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .analyse-step{margin:1.2rem 0 1.8rem}
 .analyse-step>.card{margin-bottom:.55rem}
+.merk{display:flex;flex-wrap:wrap;gap:.5rem;margin:.2rem 0 .4rem}
+.merk li{list-style:none;flex:1 1 14rem;background:var(--accent-soft);border:1px solid var(--accent);
+  border-left-width:4px;border-radius:var(--radius);padding:.5rem .7rem;font-weight:600}
 .analyse-detail{border:1px solid var(--line);border-radius:8px;margin:.55rem 0;overflow:hidden}
 .analyse-detail summary{cursor:pointer;padding:.45rem .65rem;font-size:.88rem;color:var(--muted)}
 .analyse-detail .body{padding:0 .65rem .65rem;font-size:.92rem}
@@ -196,6 +199,12 @@ const DATA = {
     ziel: "Следи только за тем, меняется ли место лампы.",
     grenze: "С фиксированным управлением вроде warten auf эта подсказка не работает."
   },
+
+  merksatz: [
+    "Двигается → Akkusativ. Стоит → Dativ.",
+    "Падеж выбирает глагол, а не предлог.",
+    "stellen/legen — рука. stehen/liegen — глаз."
+  ],
 
   intuition: [
     { art: "p", text: "В русском предлог «в» тоже работает на два падежа: «иду <b>в город</b>» (винительный) и «живу <b>в городе</b>» (предложный). Немецкий делает ровно то же самое, только вторым падежом берёт Dativ." },
@@ -357,6 +366,13 @@ const DATA = {
       if (DATA.leitbeispiel.ziel) add(l,h('p',null,DATA.leitbeispiel.ziel));
       if (DATA.leitbeispiel.grenze) add(l,h('div','small muted','Граница подсказки: '+DATA.leitbeispiel.grenze));
     }
+  }
+
+  /* --- 2b. Мнемоника --- */
+  if (DATA.merksatz && DATA.merksatz.length){
+    sec('Мнемоника');
+    const ul = add(root, h('ul','merk'));
+    DATA.merksatz.forEach(t => add(ul, h('li', null, t)));
   }
 
   /* --- 3. Что надо помнить --- */

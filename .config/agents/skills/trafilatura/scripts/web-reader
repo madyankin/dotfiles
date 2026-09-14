@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+
+SKILL_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+VENV="${WEB_READER_VENV:-$SKILL_DIR/.venv}"
+SANITIZER="${WEB_READER_SANITIZER:-$HOME/.agents/skills/sanitize-web-content.py}"
+
+if [ ! -r "$SANITIZER" ]; then
+  echo "web-reader: sanitizer is not readable: $SANITIZER" >&2
+  exit 1
+fi
+
+if [ ! -x "$VENV/bin/python" ]; then
+  python3 -m venv "$VENV"
+  "$VENV/bin/python" -m pip install --disable-pip-version-check "trafilatura>=2,<3"
+fi
+
+export PATH="$VENV/bin:$PATH"
+cp "$SANITIZER" "$SKILL_DIR/scripts/sanitize-web-content.py"
+exec "$VENV/bin/python" "$SKILL_DIR/scripts/read-web.py" "$@"

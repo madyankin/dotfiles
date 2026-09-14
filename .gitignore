@@ -60,3 +60,26 @@ outpunk.xcuserdatad
 _scratchpad
 .vercel
 .env*.local
+
+# --- yadm repo hygiene (reorg 2026-09-14) ---
+# Build artifacts and tool-generated state that must never enter the repo.
+# The sync script uses a scoped `yadm add -A`, so these rules are load-bearing.
+__pycache__/
+*.pyc
+*.bak
+*.bak.[0-9]
+
+# Skill build output
+.config/agents/skills/dist/
+
+# Tool-generated, machine-local
+.config/vercel-plugin/
+.config/iterm2/
+.config/goose/skills/
+
+# Per-machine agent config (deliberately not shared between machines)
+/.claude/settings.json
+/.claude/settings.local.json
+
+# Tool-managed shell init
+/.zprofile
