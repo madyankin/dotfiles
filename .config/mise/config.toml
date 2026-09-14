@@ -1,0 +1,28 @@
+# Global runtime versions. mise owns these; asdf has been removed.
+#
+# The key is `node`, not `nodejs` — the old ~/.tool-versions used the asdf
+# spelling, which mise ignores. That mismatch is why every runtime reported
+# (missing) while asdf's shims quietly won.
+#
+# Ruby is deliberately absent: Homebrew's ruby 3.4 is installed and pinned in
+# ~/.zshenv, and a mise ruby means a source build. Move it here when that pin
+# goes away.
+
+[tools]
+node = "24"
+python = "3.13"
+
+# Agent CLIs via mise's npm backend rather than `npm install -g`. Globals
+# installed with npm belong to ONE node version and vanish when a project
+# pins another (e.g. ~/Code/.tool-versions pins node 22.18.0). These do not.
+"npm:@openai/codex" = "latest"
+"npm:@google/gemini-cli" = "latest"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+# caveman-code needs one interactive `mise install` — mise's npm installer
+# asks for approval and auto-declines when run non-interactively.
+# "npm:@juliusbrussee/caveman-code" = "latest"
+"npm:agent-browser" = "latest"
+
+[settings]
+# Keep .tool-versions in project repos working (e.g. ~/Code/.tool-versions).
+legacy_version_file = true
