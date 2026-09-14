@@ -2,6 +2,7 @@
 # Own workflows are tracked in git instead and are not listed here.
 # bundleid<TAB>name<TAB>version<TAB>source
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 ||||||| Stash base
 de.chris-grieser.atop	atop	1.8.0	https://chris-grieser.de/
 com.vitorgalvao.alfred.calmnotifications	Calm Notifications	25.1	https://github.com/vitorgalvao/calm-notifications-workflow/
@@ -33,4 +34,11 @@ com.xilopaint.alfredapp.things	Things	2.0.1	https://github.com/xilopaint/alfred-
 com.alfredapp.vitor.thumbnailnavigation	Thumbnail Navigation	2024.3	https://github.com/alfredapp/thumbnail-navigation-workflow/
 timer.workflow	Timer	1.5.0	http://colomolome.com
 com.xilopaint.alfredapp.urbandictionary	Urban Dictionary	2.7.0	https://github.com/xilopaint/alfred-urban-dictionary
+>>>>>>> Stashed changes
+||||||| Stash base
+=======
+com.vitorgalvao.alfred.calmnotifications	Calm Notifications	25.1	https://github.com/vitorgalvao/calm-notifications-workflow/
+com.miromannino.new-terminal-window	New Terminal Window		miromannino.com
+com.alfredapp.vitor.switchappearance	Switch Appearance	2024.1	https://github.com/alfredapp/switch-appearance-workflow/
+timer.workflow	Timer	1.5.0	http://colomolome.com
 >>>>>>> Stashed changes
