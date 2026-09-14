@@ -1,0 +1,20 @@
+# Personal: music, journaling, books, backups.
+# Transcribed 1:1 from homebrew.sh install_personal().
+
+# --- Backup & security ---
+cask "arq"
+
+# --- Apps ---
+cask "anki"
+cask "battle-net"
+cask "bias-fx"
+cask "guitar-pro"
+cask "skim"
+cask "zotero"
+
+# --- Mac App Store ---
+mas "Xcode", id: 497799835
+mas "Day One", id: 1055511498
+mas "GarageBand", id: 682658836
+mas "Strongbox", id: 1481853033
+mas "Moneywiz", id: 1511185140

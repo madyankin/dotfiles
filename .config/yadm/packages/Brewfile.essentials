@@ -1,0 +1,38 @@
+# Essentials: CLI tools, fonts, editors, everyday apps.
+# Transcribed 1:1 from homebrew.sh install_essentials().
+
+# --- CLI ---
+brew "bat"
+brew "delta"
+brew "git"
+brew "gnupg"
+brew "fd"
+brew "jq"
+brew "htop"
+brew "mas"
+brew "mc"
+brew "mise"
+brew "pinentry-mac"
+brew "powerlevel10k"
+brew "speedtest-cli"
+brew "yadm"
+
+# --- Fonts ---
+cask "font-jetbrains-mono"
+cask "font-jetbrains-mono-nerd-font"
+
+# --- Editors ---
+brew "neovim"
+cask "cursor"
+cask "visual-studio-code"
+
+# --- Mac App Store ---
+mas "Amphetamine", id: 937984704
+mas "The Unarchiver", id: 425424353
+mas "Hidden Bar", id: 1452453066
+mas "Dark Reader", id: 1438243180
+mas "Untrap", id: 1637438059
+mas "DaisyDisk", id: 411643860
+mas "Things 3", id: 904280696
+mas "SponsorBlock for YouTube", id: 1573461917
+mas "DeArrow for YouTube", id: 6451469297
