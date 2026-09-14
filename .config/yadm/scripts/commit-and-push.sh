@@ -26,7 +26,24 @@ yadm pull --rebase --autostash >/dev/null 2>&1 || exit 1
 # sweep in ~/Documents, ~/Downloads, ~/Projects — everything not ignored.
 #   -u          : changes to files already tracked, anywhere
 #   -A <dirs>   : new files too, but only where new dotfiles legitimately appear
-yadm add -u
+# `add -u` stages the DELETION of any tracked file missing on the machine
+# running this. Correct for shared config — delete a file on purpose and the
+# removal syncs — and destructive for anything that is per-machine.
+#
+# Alfred's own workflows are per-machine: a workflow absent here means "not
+# installed on this machine", not "deleted". Without the exclusion below,
+# commit 1e6de0b deleted the tracked App launcher workflow for BOTH machines
+# simply because the syncing machine did not have it.
+ALFRED_WORKFLOWS='.config/yadm/alfred/Alfred.alfredpreferences/workflows'
+
+yadm add -u -- . ":(exclude)$ALFRED_WORKFLOWS"
+
+# Same directory, additions and modifications only. --ignore-removal is the
+# whole point: new and changed workflow files are recorded, missing ones are
+# left alone.
+if [[ -d "$ALFRED_WORKFLOWS" ]]; then
+  yadm add --ignore-removal -- "$ALFRED_WORKFLOWS"
+fi
 
 # git aborts the entire `add` on a pathspec that matches nothing, staging
 # NOTHING — so only pass directories that actually exist on this machine.
