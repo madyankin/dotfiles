@@ -8,7 +8,11 @@ set -e
 # in $HOME is clutter. Track it at the root and exclude it from the work tree.
 if ! yadm sparse-checkout list &>/dev/null; then
   yadm sparse-checkout init --no-cone
-  yadm sparse-checkout set '/*' '!/README.md'
+  # --no-cone repeated on `set`, and the pattern anchored with a leading
+  # slash. Without both, git stored it as `!README.md`, which is a
+  # gitignore-style pattern matching README.md at ANY depth — so every
+  # README in a subdirectory silently refused to be tracked.
+  yadm sparse-checkout set --no-cone '/*' '!/README.md'
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -32,6 +36,9 @@ fi
 log "iTerm2"
 ./scripts/iterm.sh
 
+log "CLI"
+./scripts/bin.sh
+
 log "Editors"
 ./scripts/editors.sh
 
@@ -43,9 +50,18 @@ log "Cron"
 
 log "Alfred"
 ./scripts/alfred.sh setup
+/usr/bin/python3 ./scripts/alfred-dot-workflow.py
 
 log "Agent configs"
 ./scripts/agents.sh
+
+# After Alfred, because the render binds Alfred's light/dark theme pair.
+log "Theme"
+./scripts/theme.sh render
+
+# Last: report anything the steps above could not fix. Never fatal.
+log "Doctor"
+./bin/dot doctor || true
 
 echo ""
 echo "✓ Bootstrap complete"
