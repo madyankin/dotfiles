@@ -94,3 +94,10 @@ __pycache__/
 .config/zsh/.zsh_sessions/
 .config/zsh/.zcompdump
 .config/zsh/.zcompdump-*
+
+# Tool state and credentials next to configs that ARE tracked
+.config/gh/hosts.yml
+.config/zed/prompts/
+.config/zed/conversations/
+.config/zed/extensions/
+.config/zed/db/

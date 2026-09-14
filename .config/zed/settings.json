@@ -1,0 +1,86 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "outline_panel": {
+    "dock": "left"
+  },
+  "collaboration_panel": {
+    "dock": "left"
+  },
+  "git_panel": {
+    "dock": "left"
+  },
+  "cli_default_open_behavior": "existing_window",
+  "agent": {
+    "dock": "right",
+    "sidebar_side": "right",
+    "favorite_models": [],
+    "model_parameters": []
+  },
+  "preview_tabs": {
+    "enable_preview_file_from_code_navigation": true,
+    "enabled": true
+  },
+  "title_bar": {
+    "show_branch_name": true,
+    "show_onboarding_banner": true,
+    "show_project_items": true,
+    "show_sign_in": false
+  },
+  "terminal": {
+    "font_size": 14.0
+  },
+  "project_panel": {
+    "dock": "left",
+    "auto_reveal_entries": false
+  },
+  "base_keymap": "VSCode",
+  "status_bar": {
+    "experimental.show": false
+  },
+  "tab_bar": {
+    "show_tab_bar_buttons": true,
+    "show_nav_history_buttons": true,
+    "show": false
+  },
+  "minimap": {
+    "show": "never"
+  },
+  "scrollbar": {
+    "axes": {
+      "horizontal": true
+    }
+  },
+  "autosave": "on_focus_change",
+  "buffer_font_fallbacks": [
+    "Menlo",
+    "Monaco",
+    "Courier New",
+    "monospace"
+  ],
+  "buffer_font_family": "JetBrains Mono",
+  "indent_guides": {
+    "enabled": false
+  },
+  "agent_servers": {
+    "codex-acp": {
+      "type": "registry"
+    },
+    "claude-acp": {
+      "type": "registry"
+    }
+  },
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Ayu Dark",
+  },
+}
