@@ -101,3 +101,15 @@ __pycache__/
 .config/zed/conversations/
 .config/zed/extensions/
 .config/zed/db/
+
+# --- Never commit, under any circumstances ---
+# The yadm worktree is $HOME, so a mistaken `yadm add -A` at the repo root
+# would otherwise sweep private keys and API tokens into a public repo.
+/.ssh/
+/.gnupg/
+/.aws/
+/.netrc
+/.npmrc
+/.docker/config.json
+/.claude.json
+/.claude.json.backup
