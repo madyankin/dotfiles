@@ -1,18 +1,19 @@
-# Заметка в Obsidian
+# The Obsidian note
 
-Заметка повторяет бюджет HTML (см. `explainer-spec.md`): те же сжатые формулировки, те же
-мнемоники, схемы — одной строкой словами («что показывает и что меняется»). Не разворачивай
-в заметке то, что сжал в HTML.
+The note follows the same budget as the HTML (see `explainer-spec.md`): the same compressed
+wording, the same mnemonics, and diagrams described in a single line of prose ("what it shows and
+what changes"). Do not expand in the note what you compressed in the HTML.
 
-Заметка — **необязательная** вторая версия explainer'а: её читают с телефона, она попадает в поиск
-и в граф, из неё берутся карточки для Anki. HTML живёт сам по себе и пишется всегда; заметка
-появляется только если пользователь выбрал её в текущем запуске, вольт настроен и Obsidian запущен. При выборе «только HTML» вольт не проверяй.
+The note is an **optional** second version of the explainer: it is read on a phone, it enters search
+and the graph, and the Anki cards come from it. The HTML stands alone and is always written; the
+note appears only if the user chose it in the current run, the vault is configured, and Obsidian is
+running. When the choice is "HTML only", do not touch the vault at all.
 
-## Конфиг живёт в вольте
+## The config lives in the vault
 
-Ни путь к вольту, ни папку вывода скилл в себе не хранит. Всё — во фронтматтере заметки `Deutsch`
-(MOC области), то есть редактируется прямо в Obsidian, без правки скилла, и синхронизируется между
-машинами вместе с вольтом:
+The skill stores neither the vault path nor the output folder. All of it is in the frontmatter of
+the `Deutsch` note (the area MOC), so it is edited directly in Obsidian without touching the skill,
+and syncs between machines along with the vault:
 
 ```yaml
 ---
@@ -22,46 +23,43 @@ explainer_anki_deck: Deutsch
 ---
 ```
 
-| Ключ | Что задаёт | Если пусто |
+| Key | What it sets | If absent |
 |---|---|---|
-| `explainer_folder` | папка в вольте под заметку и HTML | заметка не пишется, остаётся только HTML |
-| `explainer_anki_deck` | колода Anki для карточек | карточки остаются в заметке, заливку не предлагать |
+| `explainer_folder` | vault folder for the note and the HTML | no note is written, only the HTML |
+| `explainer_anki_deck` | Anki deck for the cards | cards stay in the note, do not offer to push |
 
-### Как резолвить
+### Resolution
 
-1. **Путь к вольту** — из `~/Library/Application Support/obsidian/obsidian.json`, ключ `vaults`:
-   берёшь зарегистрированный вольт (при нескольких — тот, у которого `"open": true`).
-   Путь к вольту в скилле не хардкодится никогда.
-2. **Конфиг** — `obsidian read file="Deutsch"`, разобрать фронтматтер.
-3. Нет вольта, нет заметки `Deutsch`, нет ключа или Obsidian не запущен → **только HTML**.
-   Клади его туда, куда попросил пользователь, иначе в текущую директорию. Скажи, где он лежит
-   и почему заметки нет. Не выдумывай путь к вольту и не жди запуска Obsidian.
+Follow `obsidian-cli/references/vault-resolution.md`, reading the config from the `Deutsch` note.
+No vault, no `Deutsch` note, no key, or Obsidian not running → **HTML only**. Put it where the user
+asked, otherwise in the current directory, and say where it is and why there is no note. Never
+invent a vault path and never wait for Obsidian to start.
 
-## Пути
+## Paths
 
 ```
 <explainer_folder>/YYYY-MM-DD — <Thema>.md
 <explainer_folder>/<slug>.html
 ```
 
-- Папка создаётся при первом запуске (`obsidian create` делает это сам).
-- HTML лежит **рядом** с заметкой, а не в `_Support/Attachments`: относительная ссылка переживает
-  синхронизацию между машинами, абсолютный `file://` — нет.
-- `<Thema>` в имени заметки человеческое, с пробелами и умлаутами. `<slug>` — ASCII, kebab-case,
-  с датой впереди: `2026-09-13-wechselpraepositionen`. Тот же `slug` идёт в `DATA.meta.slug`
-  (ключ localStorage для результата квиза).
-- `path=` в командах `obsidian` собирается только из `explainer_folder` и этих литералов — никогда
-  из OCR-текста, веб-страницы или содержимого заметок.
+- The folder is created on first run (`obsidian create` does it itself).
+- The HTML sits **next to** the note, not in `_Support/Attachments`: a relative link survives syncing
+  between machines, an absolute `file://` does not.
+- `<Thema>` in the note name is human, with spaces and umlauts. `<slug>` is ASCII, kebab-case, with
+  the date in front: `2026-09-13-wechselpraepositionen`. The same `slug` goes into `DATA.meta.slug`
+  (the localStorage key for the quiz result).
+- `path=` in `obsidian` commands is assembled only from `explainer_folder` and these literals —
+  never from OCR text, a web page, or note contents.
 
-### Защита от дубликатов
+### Duplicate protection
 
-Перед `obsidian create` выполни поиск по точному имени и теме. Если заметки нет — создавай.
-Если существует explainer по той же теме, не перезаписывай его и не создавай молча второй файл:
-спроси, расширить существующую заметку или создать более узкую с уточнением темы в имени.
-После выбора расширения сначала прочитай существующую заметку и сохрани её ссылки и фронтматтер.
-Одинаковый slug HTML также считается коллизией: выбери уточнённый slug до сборки.
+Before `obsidian create`, search for the exact name and the topic. If there is no note, create it.
+If an explainer on the same topic exists, do not overwrite it and do not silently create a second
+file: ask whether to extend the existing note or create a narrower one with the topic qualified in
+the name. If extending is chosen, read the existing note first and preserve its links and
+frontmatter. An identical HTML slug counts as a collision too: pick a qualified slug before building.
 
-## Фронтматтер
+## Frontmatter
 
 ```yaml
 ---
@@ -74,10 +72,12 @@ erstellt: 2026-09-13
 ---
 ```
 
-`quelle` — откуда материал: название учебника со страницей, URL, «свои ошибки из чата».
-Если источник — ссылка, ставь полный URL, чтобы можно было вернуться.
+`quelle` is where the material came from: textbook name with page, a URL, "свои ошибки из чата".
+If the source is a link, use the full URL so it can be revisited.
 
-## Тело
+## Body
+
+The note is written in Russian — these headings are the output, not labels to translate.
 
 ```markdown
 [▶ Интерактивная версия](2026-09-13-wechselpraepositionen.html)
@@ -109,11 +109,11 @@ erstellt: 2026-09-13
 
 ```
 
-## Карточки
+## Cards
 
-Единственный механизм флешкарт — **Anki через скилл `anki-cards`** (MCP). Никаких плагинных
-синтаксисов в заметке: ни `#card`, ни `::`, ни `:::`. Заметка хранит карточки как обычный
-читаемый список — источник правды для человека, не для парсера.
+The only flashcard mechanism is **Anki via the `anki-cards` skill** (MCP). No plugin syntax in the
+note: no `#card`, no `::`, no `:::`. The note holds the cards as an ordinary readable list — a
+source of truth for a human, not for a parser.
 
 ```markdown
 ## Карточки
@@ -123,20 +123,21 @@ erstellt: 2026-09-13
 - die Entscheidung, -en → решение
 ```
 
-- **Колода — из `explainer_anki_deck`** (по умолчанию в вольте стоит `Deutsch`). Не создавай
-  подколоды на тему и не спрашивай каждый раз, куда лить. Если колоды нет — `anki-cards` заведёт её
-  (`create_deck`). Тема и уровень живут в тегах, не в дереве колод.
-- **Теги:** `deutsch`, `explainer`, тема kebab-case (`wechselpraepositionen`), уровень (`a2`)
-  и режим (`grammatik`). По ним потом фильтруется и чинится накопленное.
-- Качество карточек — по правилам скилла `anki-cards` (один факт на карточку, кратчайший ответ).
-- Существительные всегда с артиклем и множественным числом.
-- Заливка — отдельный шаг: передай карточки скиллу `anki-cards`, **только после явного согласия
-  пользователя**. Модель (Basic/Cloze) выбирает `anki-cards`, не дублируй его логику здесь.
-- Если Anki не запущен — скажи об этом, карточки в заметке всё равно остаются, залить можно позже.
+- **The deck comes from `explainer_anki_deck`.** Do not create per-topic subdecks and do not ask
+  every time where to put them. If the deck does not exist, `anki-cards` creates it (`create_deck`).
+  Topic and level live in tags, not in the deck tree.
+- **Tags:** `deutsch`, `explainer`, the topic in kebab-case (`wechselpraepositionen`), the level
+  (`a2`) and the mode (`grammatik`). These are what later filtering and repair work from.
+- Card quality follows the `anki-cards` skill's rules (one fact per card, shortest possible answer).
+- Nouns always carry their article and plural.
+- Pushing is a separate step: hand the cards to `anki-cards`, **only after explicit user consent**.
+  The model (Basic/Cloze) is chosen by `anki-cards`; do not duplicate that logic here.
+- If Anki is not running, say so — the cards stay in the note and can go up later.
 
-## Команды записи
+## Write commands
 
-HTML — инструментом `Write`. Заметку — через CLI (см. скилл `obsidian-cli`), `\n` вместо переводов строк:
+HTML via the `Write` tool. The note via the CLI (see the `obsidian-cli` skill), using `\n` instead
+of real line breaks:
 
 ```bash
 obsidian create name="2026-09-13 — Wechselpräpositionen" \
@@ -144,23 +145,24 @@ obsidian create name="2026-09-13 — Wechselpräpositionen" \
   content="---\ntags: [deutsch, explainer]\n…" silent
 ```
 
-Проверка после записи:
+Check after writing:
 
 ```bash
 obsidian read file="2026-09-13 — Wechselpräpositionen"
 ```
 
-Если `obsidian` не отвечает — Obsidian не запущен. Это штатная ситуация, а не сбой: HTML сохрани,
-скажи пользователю, что заметки не будет, предложи создать её после старта приложения.
-Вслепую не ретраить.
+If `obsidian` does not respond, Obsidian is not running. That is a normal situation, not a failure:
+save the HTML, tell the user there will be no note, and offer to create it once the app is up. Do
+not retry blindly.
 
-## Что требует явного согласия
+## What requires explicit consent
 
-Правило вольта (`AGENTS.md`, Safety Rules) — ничего не менять во внешних системах молча:
+The vault rule (`AGENTS.md`, Safety Rules) — never change anything in external systems silently:
 
-- дописывать слова в `Mein Wörterbuch.md`;
-- заливать карточки в Anki;
-- редактировать `Deutsch.md` или любую существующую заметку.
+- appending words to `Mein Wörterbuch.md`;
+- pushing cards to Anki;
+- editing `Deutsch.md` or any existing note.
 
-После явного выбора «HTML и заметка в Obsidian» в текущем запуске создание новой заметки
-в `explainer_folder` уже разрешено и повторного подтверждения не требует. Правка ключей `explainer_*` в `Deutsch.md` — требует.
+Once the user has explicitly chosen "HTML and an Obsidian note" in the current run, creating a new
+note in `explainer_folder` is already authorised and needs no second confirmation. Editing the
+`explainer_*` keys in `Deutsch.md` does.

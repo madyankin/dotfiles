@@ -89,7 +89,7 @@ def validate(d):
         spent+=cap('hinweis',f['hinweis'],f'figur {f["id"]}.hinweis')+cap('beobachtung',f.get('beobachtung',''),f'figur {f["id"]}.beobachtung')
     blocks=max(1,sum(1 for a in d['analyse'] if a.get('titel')))
     budget=BLOCK_BUDGET*blocks
-    require(spent<=budget,f'{spent} explanatory words for {blocks} block(s), budget {budget} — drop in order: details, дословно, stuetzen, intuition paragraphs')
+    require(spent<=budget,f'{spent} explanatory words for {blocks} block(s), budget {budget} — drop in order: details, wort, stuetzen, intuition paragraphs')
     d['meta']['woerter']=spent
     return d
 

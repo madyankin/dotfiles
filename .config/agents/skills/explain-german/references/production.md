@@ -1,74 +1,80 @@
-# Создание и проверка объяснений
+# Building and verifying explainers
 
-## PDF и выбранные страницы
+## PDFs and selected pages
 
-Используй доступный Python с pypdf; при необходимости рендера — pypdfium2/Pillow или инструменты PDF-скилла.
+Use the available Python with pypdf; for rendering, pypdfium2/Pillow or the PDF skill's tools.
 
 ```sh
 python scripts/inspect_pdf.py INPUT.pdf --out work/ingest
 python scripts/inspect_pdf.py INPUT.pdf --out work/ingest --render 4 5 9 --rotate 90
 ```
 
-Номера `--render` начинаются с 1 и относятся к PDF, не учебнику. Пустой текст — повод
-посмотреть скан, а не считать страницу пустой. Даже непустой текст проверь на обрезанные колонки.
-Посмотри изображения и заполни `printed_pages` в page-map.json вручную. Один разворот PDF
-может содержать две печатные страницы. Не приравнивай PDF labels к печатным номерам без проверки.
-Переписывай разборчивое дословно; не угадывай рукопись. При группах пользователя покажи краткую
-карту состава файлов. Уже явную группировку не пересогласовывай.
+`--render` numbers start at 1 and refer to the PDF, not the textbook. Empty text is a reason to
+look at the scan, not to call the page blank. Even non-empty text should be checked for truncated
+columns. Look at the images and fill `printed_pages` in page-map.json by hand — one PDF spread can
+hold two printed pages. Never equate PDF labels with printed numbers without checking. Transcribe
+what is legible verbatim; do not guess handwriting. When the user has grouped the material, show a
+short map of the file composition. Do not renegotiate a grouping that is already explicit.
 
-## Содержимое и сборка
+## Content and build
 
-Один DATA JSON на HTML. Основной маршрут — от несущей конструкции к деталям.
-Добавь `leitbeispiel`; перенеси его в `analyse` с `anker: true`. Каждой фигуре дай `id` и `aria`,
-а в соответствующем шаге разбора укажи `figure_id`. Каждая фигура монтируется ровно один раз.
-Для большого материала — несколько блоков (`analyse[].titel`); каждый блок получает свои
-450 слов бюджета. Длинные однотипные упражнения сжимай до правила + одного примера, ключи — в `solutions`.
-В `reference` храни сворачиваемые словари и таблицы; в `solutions` — ключи упражнений.
-Указывай в `analyse` происхождение и страницу: цитата, восстановленный ответ или новый пример.
-В meta добавь `requested_pages`, `pages`, `page_map`, если пользователь выбирал страницы.
+One DATA JSON per HTML. The main route runs from the load-bearing structure outwards to the details.
+Add `leitbeispiel` and carry it into `analyse` with `anker: true`. Give every figure an `id` and an
+`aria`, and reference it from the matching analysis step via `figure_id`. Each figure is mounted
+exactly once. For large material use several blocks (`analyse[].titel`); each block gets its own
+450-word budget. Compress long, repetitive exercises to the rule plus one example, with the keys in
+`solutions`. Keep collapsible glossaries and tables in `reference`, exercise keys in `solutions`.
+Record provenance and page in `analyse`: a quotation, a reconstructed answer, or a new example. Add
+`requested_pages`, `pages` and `page_map` to meta when the user selected pages.
 
 ```sh
 python scripts/build.py work/part-1.json work/part-2.json --out outputs
 ```
 
-Сборщик проверяет базовую схему, пять вопросов, варианты ответов, набор жетонов, уникальность
-имён, соответствие заявленных/охваченных страниц, наличие мнемоник, минимум фигур по режиму
-и **бюджет слов**. Отказ вида `analyse[3].warum: 71 words, limit 45` — это не баг сборщика:
-сокращай названное поле по порядку из `explainer-spec.md`, не обходи проверку разбиением
-на фиктивные блоки. Фактический расход пишется в `meta.woerter`. Страницы без явной группировки можно опустить.
-Он создаёт HTML из текущего шаблона и ZIP для нескольких файлов. Скрипт не записывает в Obsidian
-и не отправляет в Anki. Если выбран Obsidian, создай полную Markdown-версию по obsidian-note.md,
-включая словесное объяснение схем и приложения, и запиши её через CLI. Не заменяй выбранную
-пользователем заметку встроенной ссылкой на скачивание. Не обещай существование заметки до записи.
-Сохраняй относительные ссылки между HTML, если добавляешь их; ZIP должен содержать их цели.
+The builder checks the basic schema, the five questions, the answer options, the token set, name
+uniqueness, agreement between declared and covered pages, the presence of mnemonics, the per-mode
+figure minimum, and **the word budget**. A refusal like `analyse[3].warum: 71 words, limit 45` is
+not a builder bug: shorten the named field following the order in `explainer-spec.md` — do not work
+around the check by splitting into fictitious blocks. Actual usage is written to `meta.woerter`.
+Pages may be omitted when there is no explicit grouping.
 
-## Визуализация как часть объяснения
+It produces HTML from the current template, plus a ZIP when there are several files. The script does
+not write to Obsidian and does not push to Anki. If Obsidian was chosen, build the full Markdown
+version per `obsidian-note.md` — including the prose explanation of the diagrams and the appendices
+— and write it through the CLI. Do not substitute an inline download link for the note the user
+asked for, and do not claim a note exists before it has been written. Preserve relative links
+between HTML files if you add them; the ZIP must contain their targets.
 
-Покажи изменение одного параметра: что меняется на схеме и что остаётся прежним.
-Выбирай минимум одну подходящую объясняющую схему на HTML, кроме случаев, когда у материала
-нет осмысленной пространственной, временной или смысловой связи. Квиз и раскрывающийся
-словарь сами по себе не заменяют такую схему.
+## Visualisation as part of the explanation
 
-- Времена: `zeitstrahl`, где виден прошлый момент отсчёта и предшествующее событие.
-- Dativ/Akkusativ: `valenz`, глагол и роли участников со стрелками.
-- Порядок дополнений: `feldermodell`, одинаковые поля для исходного предложения и замены местоимениями.
-- Состав слова: `wortbau`; смысловые связи слов: `wortnetz`.
+Show what changing one parameter does: what moves on the diagram and what stays put. Choose at least
+one fitting explanatory diagram per HTML, unless the material genuinely has no meaningful spatial,
+temporal or semantic relation. A quiz and a collapsible glossary do not substitute for such a
+diagram.
 
-Все примеры предвычислены. SVG/CSS и управление работают без сети и имеют текстовые подписи.
-Если диаграмма раскрывает новое различие, объясни его до вопроса в квизе.
+- Tenses: `zeitstrahl`, showing the past reference point and the preceding event.
+- Dativ/Akkusativ: `valenz`, the verb and its participant roles with arrows.
+- Object order: `feldermodell`, the same fields for the original sentence and for the pronoun
+  substitution.
+- Word composition: `wortbau`; semantic relations between words: `wortnetz`.
 
-## Три независимые проверки
+Every example is precomputed. SVG/CSS and the controls work without a network and carry text
+labels. If a diagram reveals a new distinction, explain it before the quiz asks about it.
 
-1. **Содержание:** сверить печатные страницы и охват заданий; проверить падежи, формы, переводы,
-   регистр и отличие новых примеров от цитат. Пять вопросов проверяют основные умения, не весь справочник.
-2. **Функциональность:** после сборки запусти единый verifier:
-   `python scripts/verify.py outputs/a.html outputs/b.html`. Он прогоняет схему, рендерер,
-   все пять правильных ответов, управляющие элементы фигур, встраивание схем в разбор,
-   связи квиза со схемами, отсутствие внешних зависимостей и явных заглушек. Он не проверяет
-   реальную верстку браузера.
-3. **Внешний вид:** если разрешён браузерный инструмент, проверь узкий и широкий экран,
-   подписи SVG, горизонтальную прокрутку таблиц, раскрытие приложений и управляющие элементы.
-   Не обходи запрет браузерного инструмента через другой URL/сервер. Если просмотр недоступен,
-   честно сообщи, что визуальная проверка не выполнена; не называй DOM-тест проверкой внешнего вида.
+## Three independent checks
 
-Выдай ссылки на каждый HTML и общий ZIP сразу. Укажи фактический статус заметок и проверок.
+1. **Content:** verify printed pages and exercise coverage; check cases, forms, translations,
+   register, and that new examples are distinguishable from quotations. The five questions test the
+   core skills, not the whole reference section.
+2. **Function:** after building, run the unified verifier:
+   `python scripts/verify.py outputs/a.html outputs/b.html`. It exercises the schema, the renderer,
+   all five correct answers, the figure controls, the embedding of diagrams into the analysis, the
+   links between quiz and diagrams, the absence of external dependencies, and obvious placeholders.
+   It does not check real browser layout.
+3. **Appearance:** if a browser tool is permitted, check narrow and wide screens, SVG labels,
+   horizontal scrolling of tables, appendix expansion and the controls. Do not circumvent a ban on
+   the browser tool via another URL or server. If no preview is available, say honestly that the
+   visual check was not performed; never call a DOM test an appearance check.
+
+Deliver links to each HTML and the combined ZIP immediately. State the actual status of the notes
+and the checks.
