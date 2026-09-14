@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Template, not a plist: launchd does not expand $HOME, so a literal path here
+  would bake an absolute username into a public repo. scripts/cron.sh renders
+  @HOME@ before loading it.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>name.madyankin.dotfiles.sync</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>@HOME@/.config/yadm/scripts/commit-and-push.sh</string>
+  </array>
+
+  <!-- Every 2 hours. Unlike cron, a run missed while asleep fires once on wake. -->
+  <key>StartInterval</key>
+  <integer>7200</integer>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>@HOME@/.local/state/dot/sync.log</string>
+  <key>StandardErrorPath</key>
+  <string>@HOME@/.local/state/dot/sync.log</string>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>

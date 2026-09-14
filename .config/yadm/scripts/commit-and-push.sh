@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# Periodic dotfiles sync, driven by cron (see .config/yadm/crontab).
+# Periodic dotfiles sync. Scheduled by scripts/cron.sh: a launchd user agent
+# on macOS (.config/yadm/launchd/), the tracked crontab on Linux.
 #
 # Deliberately NOT `set -e`: `yadm commit` exits 1 on an empty index, which
 # used to kill the script before it ever reached `yadm pull`. A machine with
@@ -35,6 +36,12 @@ SCOPED=(
   .config/nvim
   .config/goose/recipes
   .config/zsh
+  .config/tmux
+  .config/ghostty
+  .config/bat
+  .config/btop
+  .config/htop
+  .config/mise
 )
 present=()
 for d in "${SCOPED[@]}"; do

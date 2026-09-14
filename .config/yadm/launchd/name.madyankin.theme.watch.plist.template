@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Opt-in. Needed ONLY for Terminal.app, which has no light/dark awareness:
+  every other target either switches itself or is rendered in ANSI index space.
+  Install with `theme.sh install-agent`, remove with `uninstall-agent`.
+
+  Deliberately NOT WatchPaths on .GlobalPreferences.plist — the obvious
+  approach, and unreliable: cfprefsd coalesces writes, so it fires late or not
+  at all. A 2s poll in a KeepAlive job costs nothing measurable.
+
+  Template, not a plist: launchd does not expand $HOME.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>name.madyankin.theme.watch</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>@HOME@/.config/yadm/scripts/theme.sh</string>
+    <string>watch</string>
+  </array>
+
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>@HOME@/.local/state/dot/theme-watch.log</string>
+  <key>StandardErrorPath</key>
+  <string>@HOME@/.local/state/dot/theme-watch.log</string>
+
+  <key>ProcessType</key>
+  <string>Background</string>
+</dict>
+</plist>
