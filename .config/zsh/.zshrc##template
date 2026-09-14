@@ -1,0 +1,39 @@
+# Interactive shell init. Rendered by `yadm alt` from .zshrc##template.
+#
+# Environment and PATH live in ~/.zshenv, which zsh sources first and which
+# sets ZDOTDIR to this directory. Do NOT source ~/.zshenv from here: zsh has
+# already read it, and re-sourcing re-prepends PATH after `typeset -U path`
+# has deduplicated it.
+
+# Powerlevel10k instant prompt. Must stay near the top; anything that may
+# print or prompt has to go above it.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+for _mod in plugins options aliases functions; do
+  [[ -r "$ZDOTDIR/$_mod.zsh" ]] && source "$ZDOTDIR/$_mod.zsh"
+done
+unset _mod
+
+{% if yadm.os == "Darwin" %}
+# --- macOS ---
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+alias clean-derived-data="rm -rf ~/Library/Developer/Xcode/DerivedData"
+{% endif %}
+{% if yadm.os == "Linux" %}
+# --- Linux ---
+export MANPAGER="sh -c 'col -bx | batcat -l man -p'"
+alias bat="batcat"
+{% endif %}
+
+# --- External sources ---
+[[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
+[[ -f ~/.iterm2_shell_integration.zsh ]] && source ~/.iterm2_shell_integration.zsh
+[[ -f "$ZDOTDIR/.p10k.zsh" ]] && source "$ZDOTDIR/.p10k.zsh"
+
+# Machine-specific, untracked. Anything with a path or token belongs here.
+[[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
+
+# --- mise ---
+eval "$(mise activate zsh)"

@@ -83,3 +83,14 @@ __pycache__/
 
 # Tool-managed shell init
 /.zprofile
+
+# Machine-specific shell config (paths, tokens)
+.config/zsh/local.zsh
+
+# zsh runtime state. ZDOTDIR relocates these into .config/zsh, which the sync
+# script stages with `add -A` — without these rules shell history would be
+# committed and pushed.
+.config/zsh/.zsh_history
+.config/zsh/.zsh_sessions/
+.config/zsh/.zcompdump
+.config/zsh/.zcompdump-*

@@ -1,3 +1,10 @@
+# ~/.zshenv — sourced by every zsh, before anything else.
+#
+# Must live at $HOME: zsh reads it first and only then honours ZDOTDIR.
+# Everything else lives in $ZDOTDIR (.config/zsh).
+
+export ZDOTDIR="$HOME/.config/zsh"
+
 # --- PATH ---
 export PATH="$HOME/.bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
