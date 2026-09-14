@@ -1,0 +1,9 @@
+# Download-source overrides, bundleid<TAB>owner/repo (or a direct URL).
+#
+# workflows.txt's source column comes from the workflow's own `webaddress`
+# plist key, which is very often the author's HOMEPAGE rather than a
+# repository — so the installer cannot find a release there. These fix that.
+de.chris-grieser.atop	chrisgrieser/alfred-atop
+de.chris-grieser.homebrew	chrisgrieser/alfred-homebrew
+de.chris-grieser.shimmering-obsidian	chrisgrieser/shimmering-obsidian
+de.samuelraub.prettyjson	samuelraub/pretty-json-alfred-workflow

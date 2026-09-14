@@ -21,6 +21,7 @@ ALFRED_DIR="$HOME/.config/yadm/alfred"
 BUNDLE="$ALFRED_DIR/Alfred.alfredpreferences"
 WORKFLOWS="$BUNDLE/workflows"
 LIST="$ALFRED_DIR/workflows.txt"
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 plist() {  # plist <key> <info.plist>
   /usr/libexec/PlistBuddy -c "Print :$1" "$2" 2>/dev/null
@@ -131,25 +132,72 @@ installed_bundleids() {
 # GitHub-hosted workflows can be fetched outright; anything else we can only
 # open in a browser, so say so rather than pretending it was installed.
 install_one() {  # install_one <bundleid> <name> <source>
-  local id="$1" name="$2" src="$3" repo url tmp
+  local id="$1" name="$2" src="$3" repo url tmp dest got
 
-  if [[ "$src" =~ github\.com/([^/]+)/([^/]+) ]]; then
-    repo="${BASH_REMATCH[1]}/${BASH_REMATCH[2]%/}"
-    url="$(curl -fsSL "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null \
-           | grep -o '"browser_download_url": *"[^"]*\.alfredworkflow"' \
-           | head -1 | sed 's/.*": *"//;s/"$//')"
-    if [[ -n "$url" ]]; then
-      tmp="$(mktemp -d)/${name//\//-}.alfredworkflow"
-      if curl -fsSL -o "$tmp" "$url"; then
-        open "$tmp"        # Alfred takes over and imports it
-        echo "  ↓ $name — downloaded, Alfred is importing it"
-        return 0
-      fi
-    fi
+  # A .alfredworkflow is a ZIP, and Alfred loads workflows from plain
+  # directories under Alfred.alfredpreferences/workflows/. So unzip it into
+  # place instead of handing the file to Alfred.
+  #
+  # `open "$tmp"` was never unattended: Alfred shows an import sheet that has
+  # to be clicked per workflow, and opening several at once fails outright with
+  # "Unable to import workflow — please close the sheet you are currently
+  # editing". UI-scripting that sheet would need Accessibility permission and
+  # careful serialisation for no benefit.
+  #
+  # Trade-off worth knowing: the import sheet strips hotkeys and snippet
+  # triggers "for predictability", and lets you set the workflow's own
+  # configuration. Unzipping keeps the author's defaults, hotkeys included.
+
+  # An override wins over the manifest's source column, which comes from the
+  # workflow's own `webaddress` plist key and is usually the author's homepage
+  # rather than a repository.
+  local override
+  override="$(awk -F'\t' -v id="$id" '$1 == id { print $2; exit }' \
+              "$ALFRED_DIR/workflows.sources" 2>/dev/null)"
+  [[ -n "$override" ]] && src="$override"
+
+  url="$(/usr/bin/python3 "$SCRIPTS_DIR/alfred-resolve-download.py" "$src" 2>/dev/null)"
+  if [[ -z "$url" ]]; then
+    echo "  ! $name — no .alfredworkflow found for '$src'; opening it instead"
+    echo "    add '$id<TAB>owner/repo' to alfred/workflows.sources to fix this"
+    open "$src"
+    return 0
   fi
 
-  echo "  ! $name — no downloadable release found; opening $src"
-  open "$src"
+  tmp="$(mktemp -d)/wf.alfredworkflow"
+  if ! curl -fsSL -o "$tmp" "$url"; then
+    echo "  ✗ $name — download failed"
+    rm -rf "${tmp%/*}"
+    return 1
+  fi
+
+  dest="$WORKFLOWS/user.workflow.$(uuidgen)"
+  mkdir -p "$dest"
+  if ! unzip -qq -o "$tmp" -d "$dest" 2>/dev/null; then
+    echo "  ✗ $name — not a readable zip"
+    rm -rf "$dest" "${tmp%/*}"
+    return 1
+  fi
+  rm -rf "${tmp%/*}"
+
+  if [[ ! -f "$dest/info.plist" ]]; then
+    echo "  ✗ $name — no info.plist in the archive"
+    rm -rf "$dest"
+    return 1
+  fi
+
+  # Verify we installed what the manifest asked for, so a renamed release or a
+  # wrong URL cannot quietly install something else.
+  got="$(plist bundleid "$dest/info.plist")"
+  if [[ -n "$id" && -n "$got" && "$got" != "$id" ]]; then
+    echo "  ✗ $name — archive is '$got', manifest says '$id'; not installing"
+    rm -rf "$dest"
+    return 1
+  fi
+
+  echo "  ✓ $name — unzipped to ${dest##*/}"
+  ALFRED_NEEDS_RELAUNCH=1
+  return 0
 }
 
 install_workflows() {
@@ -170,7 +218,22 @@ install_workflows() {
     install_one "$id" "$name" "$src"
   done < "$LIST"
 
-  [[ $missing -eq 0 ]] && echo "  ✓ all listed workflows already installed"
+  if [[ $missing -eq 0 ]]; then
+    echo "  ✓ all listed workflows already installed"
+    return 0
+  fi
+
+  # Once, at the end — not per workflow. Alfred indexes the workflows folder at
+  # launch, so a directory dropped in while it is running is not picked up
+  # until it restarts.
+  if [[ -n "${ALFRED_NEEDS_RELAUNCH:-}" ]]; then
+    echo "→ Relaunching Alfred so it indexes the new workflows..."
+    osascript -e 'quit app id "com.runningwithcrayons.Alfred"' >/dev/null 2>&1 || true
+    sleep 2
+    open -b com.runningwithcrayons.Alfred >/dev/null 2>&1 \
+      && echo "  ✓ Alfred relaunched" \
+      || echo "  ! could not relaunch Alfred — start it by hand"
+  fi
 }
 
 # --- Report drift -------------------------------------------------------------
