@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# dot:summary=pick a dot subcommand with fzf (works over ssh and in tmux)
+#
+# Generated from the same bin/dot-* files that define the CLI, so the menu
+# structurally cannot drift from the commands. This is the half of Omarchy's
+# Super+Space that is worth having on macOS: Alfred already fronts apps and
+# files, and Control Center already owns wifi/bluetooth/audio/power.
+set -uo pipefail
+
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+DOT_BIN="${DOT_BIN:-$DOT_ROOT/bin}"
+export DOT_ROOT DOT_BIN
+source "$DOT_ROOT/lib/common.sh"
+
+have fzf || { err "fzf not installed"; exit 1; }
+
+pick="$("$DOT_BIN/dot" commands \
+  | sed 's/^  dot //' \
+  | fzf --prompt='dot > ' \
+        --height=40% --reverse --border \
+        --header='enter to run · esc to cancel' \
+        --with-nth=1.. )" || exit 0
+
+[[ -z "$pick" ]] && exit 0
+
+# The listing is "<subcommand words>   <summary>"; keep only the command part,
+# which is everything before the run of spaces that pads the summary column.
+cmd="$(printf '%s' "$pick" | sed 's/  \{2,\}.*$//')"
+[[ -z "$cmd" ]] && exit 0
+
+log "dot $cmd"
+# shellcheck disable=SC2086
+exec "$DOT_BIN/dot" $cmd

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=cycle or set this theme wallpaper
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/theme.sh" background "$@"

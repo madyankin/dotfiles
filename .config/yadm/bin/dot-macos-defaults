@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=apply the macOS defaults write set
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/macos.sh"

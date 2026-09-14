@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=relink the shared agents/skills tree
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/agents.sh"

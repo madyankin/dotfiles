@@ -1,0 +1,7 @@
+# Top-level formulae deliberately left unmanaged: one-offs and build leftovers
+# that a rebuilt machine does not need. One name per line.
+#
+# A check that warns forever trains you to ignore it, so anything genuinely
+# not worth manifesting belongs here rather than in a Brewfile.
+ragel        # build-time dep left behind by something compiled from source
+youtubedr    # one-off downloader; yt-dlp is the manifested one

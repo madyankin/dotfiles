@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# dot:summary=local session and token counts per agent, per day
+#
+# Reports PRESENCE AND COUNTS ONLY. No key, token value, subscription or
+# account identifier is ever printed — the pre_commit hook exists for a reason
+# and this output can end up in a paste.
+set -uo pipefail
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+
+DAYS="${1:-7}"
+PY=/usr/bin/python3
+
+header "agent sessions, last $DAYS day(s)"
+
+# Claude Code keeps one JSONL transcript per session under ~/.claude/projects.
+if [[ -d "$HOME/.claude/projects" ]]; then
+  "$PY" - "$DAYS" <<'PYEOF'
+import json, os, pathlib, sys, time, collections
+days = int(sys.argv[1])
+cutoff = time.time() - days * 86400
+root = pathlib.Path.home()/".claude/projects"
+by_day = collections.Counter()
+tok_in = collections.Counter()
+tok_out = collections.Counter()
+models = collections.Counter()
+for f in root.rglob("*.jsonl"):
+    try:
+        st = f.stat()
+    except OSError:
+        continue
+    if st.st_mtime < cutoff:
+        continue
+    day = time.strftime("%Y-%m-%d", time.localtime(st.st_mtime))
+    by_day[day] += 1
+    try:
+        with f.open() as fh:
+            for line in fh:
+                if '"usage"' not in line:
+                    continue
+                try:
+                    d = json.loads(line)
+                except Exception:
+                    continue
+                msg = d.get("message") or {}
+                u = msg.get("usage") or {}
+                if not u:
+                    continue
+                models[msg.get("model") or "?"] += 1
+                tok_in[day] += (u.get("input_tokens") or 0) + (u.get("cache_read_input_tokens") or 0)
+                tok_out[day] += u.get("output_tokens") or 0
+    except OSError:
+        continue
+if not by_day:
+    print("  ! claude: no sessions in window")
+else:
+    print("  claude")
+    for day in sorted(by_day):
+        print("    %s  %3d session(s)  in %9d  out %8d"
+              % (day, by_day[day], tok_in[day], tok_out[day]))
+    if models:
+        print("    models: " + ", ".join("%s x%d" % (m, n) for m, n in models.most_common(5)))
+PYEOF
+else
+  warn "claude: no ~/.claude/projects"
+fi
+
+# Codex and opencode keep their own session dirs; count files only, since
+# their formats change between releases.
+for pair in "codex:$HOME/.codex/sessions" "opencode:$HOME/.local/share/opencode/storage" "goose:$HOME/.local/share/goose/sessions"; do
+  name="${pair%%:*}"; dir="${pair#*:}"
+  if [[ -d "$dir" ]]; then
+    n="$(find "$dir" -type f -mtime -"$DAYS" 2>/dev/null | wc -l | tr -d ' ')"
+    ok "$name: $n session file(s) touched in the last $DAYS day(s)"
+  else
+    warn "$name: no session directory"
+  fi
+done
+
+header "auth presence (never values)"
+for pair in "ANTHROPIC_API_KEY:claude" "OPENAI_API_KEY:codex" "GEMINI_API_KEY:gemini"; do
+  var="${pair%%:*}"; who="${pair#*:}"
+  if [[ -n "${!var:-}" ]]; then ok "$who: $var is set"; else note "$who: $var not set (interactive login or keychain)"; fi
+done

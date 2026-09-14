@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# dot:summary=show or switch the active theme
+set -uo pipefail
+T="${DOT_ROOT:-$HOME/.config/yadm}/scripts/theme.sh"
+if [[ $# -eq 0 ]]; then exec "$T" list; fi
+case "$1" in
+  list|current|render|set|background|doctor|capture-htop|watch|install-agent|uninstall-agent)
+    exec "$T" "$@" ;;
+  *) exec "$T" set "$@" ;;
+esac

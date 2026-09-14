@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# dot:summary=check the machine against the config, report drift
+#
+# Convergence, not migrations. Every setup script in this repo converges to a
+# desired state; a doctor is the read-only half of that idea. It is also the
+# only thing that catches DRIFT — a crontab commented out by hand, an app
+# uninstalled from under its config, a shim war between two version managers —
+# none of which a run-once migration runner would ever notice.
+set -uo pipefail
+
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+export DOT_ROOT
+# shellcheck source=/dev/null
+source "$DOT_ROOT/lib/common.sh"
+
+FIX=""
+ONLY=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --fix)  FIX=1; shift ;;
+    --only) ONLY="$2"; shift 2 ;;
+    -h|--help)
+      cat <<'EOT'
+dot doctor [--fix] [--only <name>]
+
+  --fix    offer the destructive one-shots a check suggests (asks first)
+  --only   run just the check whose filename contains <name>
+EOT
+      exit 0 ;;
+    *) err "unknown option: $1"; exit 2 ;;
+  esac
+done
+
+fail=0
+warned=0
+
+for check in "$DOT_ROOT"/doctor.d/*.sh; do
+  [[ -x "$check" ]] || continue
+  name="$(basename "$check" .sh)"
+  [[ -n "$ONLY" && "$name" != *"$ONLY"* ]] && continue
+  desc="$(sed -n 's/^# dot:check=//p' "$check" | head -1)"
+  header "${name#*-}${desc:+ — $desc}"
+  # Each check is its own process but reuses the helpers, hence the source.
+  ( source "$DOT_ROOT/lib/common.sh"; source "$check" )
+  rc=$?
+  [[ $rc -ne 0 ]] && fail=$((fail+1))
+done
+
+header "summary"
+if [[ $fail -eq 0 ]]; then
+  ok "no failing checks"
+else
+  err "$fail check group(s) reported a failure"
+fi
+
+if [[ -n "$FIX" ]]; then
+  header "fixes"
+  # Destructive one-shots live here rather than in a migrations runner: the
+  # detector stops firing once the fix is applied, which is what makes this
+  # idempotent without any state file.
+  if [[ -d "$HOME/.asdf" ]] && have mise; then
+    warn "~/.asdf still present while mise owns runtimes"
+    confirm "move ~/.asdf aside and uninstall the formula?" && {
+      run brew uninstall asdf
+      run mv "$HOME/.asdf" "$HOME/.asdf.removed"
+    }
+  fi
+  if [[ -d "$HOME/.fzf" ]] && brew list --formula 2>/dev/null | grep -qx fzf; then
+    warn "~/.fzf git clone still present while fzf comes from Homebrew"
+    confirm "move ~/.fzf and ~/.fzf.zsh aside?" && {
+      run mv "$HOME/.fzf" "$HOME/.fzf.removed"
+      [[ -f "$HOME/.fzf.zsh" ]] && run mv "$HOME/.fzf.zsh" "$HOME/.fzf.zsh.removed"
+    }
+  fi
+  if ! launchctl print "gui/$UID/name.madyankin.dotfiles.sync" >/dev/null 2>&1; then
+    warn "the periodic sync agent is not loaded"
+    note "it commits and pushes your dotfiles every 2 hours"
+    confirm "load it now?" && run "$DOT_ROOT/scripts/cron.sh"
+  fi
+  ok "nothing else to offer"
+fi
+
+exit $(( fail > 0 ))

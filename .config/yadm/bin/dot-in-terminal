@@ -1,0 +1,33 @@
+#!/bin/zsh -f
+# dot:summary=run a dot subcommand in a fresh terminal, then stay (used by Alfred)
+#
+# Ghostty is handed THIS SCRIPT as the program to exec (`-e <script> <args>`),
+# never a shell string.
+#
+# Why: `--initial-command="shell:…"` wraps the string as
+#     login -flp <user> /bin/bash --noprofile --norc -c exec -l <string>
+# and that prepended `exec -l` replaces the shell with the first command, so a
+# trailing `; exec /bin/zsh -l` never runs and anything that is not a bare
+# program name fails outright. With `-e` plus argv there is no shell, no
+# quoting, and no prepended exec — this script owns its own lifetime.
+emulate -L zsh
+setopt no_unset
+
+DOT="$HOME/.local/bin/dot"
+[[ -x "$DOT" ]] || DOT="$HOME/.config/yadm/bin/dot"
+
+print -r -- "\$ dot $*"
+print -r -- ""
+# NOT `status=$?` — `status` is a read-only special parameter in zsh (an alias
+# for $?), and assigning to it aborts the script, which is why the window
+# closed instantly on the first attempt.
+"$DOT" "$@"
+local rc=$?
+print -r -- ""
+if (( rc != 0 )); then
+  print -r -- "(exited $rc)"
+fi
+
+# Hand over to a real interactive login shell in the same window, so the output
+# stays readable and you can keep working where the command left you.
+exec /bin/zsh -l

@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# dot:summary=launch the default coding agent (dot agent set|prompt|usage)
+#
+# Omarchy ships lazy launchers for ten agents plus a default-agent setting and
+# a usage panel. This is the same three ideas against the agents actually
+# installed here. It deliberately does NOT define c/cx/cy: `ca` and `cy`
+# already mean something in aliases.zsh.
+set -uo pipefail
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+
+DEFAULT_FILE="$DOT_ROOT/agents/default"
+
+agent_cmd() {  # name -> command line
+  case "$1" in
+    claude)   echo "claude" ;;
+    codex)    echo "codex" ;;
+    goose)    echo "goose session" ;;
+    opencode) echo "opencode" ;;
+    gemini)   echo "gemini" ;;
+    cursor)   echo "cursor-agent" ;;
+    pi)       echo "pi" ;;
+    *)        return 1 ;;
+  esac
+}
+
+KNOWN="claude codex goose opencode gemini cursor pi"
+
+default_agent() {
+  [[ -f "$DEFAULT_FILE" ]] && head -1 "$DEFAULT_FILE" || echo claude
+}
+
+case "${1:-run}" in
+  run)
+    a="$(default_agent)"
+    cmd="$(agent_cmd "$a")" || { err "unknown default agent: $a"; exit 1; }
+    # shellcheck disable=SC2086
+    exec $cmd
+    ;;
+  list)
+    cur="$(default_agent)"
+    for a in $KNOWN; do
+      c="$(agent_cmd "$a")"
+      bin="${c%% *}"
+      if have "$bin"; then state="installed"; else state="-"; fi
+      if [[ "$a" == "$cur" ]]; then mark="*"; else mark=" "; fi
+      printf '%s %-9s %-11s %s\n' "$mark" "$a" "$state" "$(command -v "$bin" 2>/dev/null)"
+    done
+    ;;
+  *)
+    err "usage: dot agent [run|list] | dot agent set <name> | dot agent prompt <text> | dot agent usage"
+    exit 2 ;;
+esac

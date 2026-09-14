@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# dot:summary=run the default agent once on a task, in the current directory
+#
+# This is the shape the Alfred query box wants: one keyword, free text, done.
+set -uo pipefail
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+
+task="$*"
+if [[ -z "$task" ]]; then err 'usage: dot agent prompt "<task>"'; exit 2; fi
+
+a="$(head -1 "$DOT_ROOT/agents/default" 2>/dev/null || echo claude)"
+case "$a" in
+  claude)   exec claude -p "$task" ;;
+  codex)    exec codex exec "$task" ;;
+  gemini)   exec gemini -p "$task" ;;
+  opencode) exec opencode run "$task" ;;
+  goose)    exec goose run -t "$task" ;;
+  cursor)   exec cursor-agent -p "$task" ;;
+  pi)       exec pi "$task" ;;
+  *) err "no one-shot invocation known for agent: $a"; exit 1 ;;
+esac

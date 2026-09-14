@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=commit and push the dotfiles now
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/commit-and-push.sh"

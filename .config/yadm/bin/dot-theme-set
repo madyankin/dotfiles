@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=switch theme and render
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/theme.sh" set "$@"

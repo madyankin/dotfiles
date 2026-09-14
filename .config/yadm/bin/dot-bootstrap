@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=re-run the full machine bootstrap
+set -uo pipefail
+exec "$HOME/.config/yadm/bootstrap"

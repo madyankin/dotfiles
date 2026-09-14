@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=record installed VS Code extensions
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/editors.sh" save

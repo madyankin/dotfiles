@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=symlink VS Code settings into place
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/editors.sh" link

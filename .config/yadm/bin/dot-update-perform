@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# dot:summary=run the update steps (called by dot update; use that instead)
+set -uo pipefail
+
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+export DOT_ROOT
+source "$DOT_ROOT/lib/common.sh"
+
+ONLY=""
+SKIP=""
+PRUNE=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) DOT_DRY_RUN=1; export DOT_DRY_RUN; shift ;;
+    --only) ONLY="$ONLY $2"; shift 2 ;;
+    --skip) SKIP="$SKIP $2"; shift 2 ;;
+    --prune) PRUNE=1; export DOT_PRUNE=1; shift ;;
+    *) err "unknown option: $1"; exit 2 ;;
+  esac
+done
+
+wanted() {  # step name
+  local n="$1"
+  if [[ -n "$ONLY" ]]; then
+    case " $ONLY " in *" $n "*) return 0 ;; *) return 1 ;; esac
+  fi
+  case " $SKIP " in *" $n "*) return 1 ;; esac
+  return 0
+}
+
+failed=0
+for step in "$DOT_ROOT"/update.d/*.sh; do
+  [[ -x "$step" ]] || continue
+  base="$(basename "$step" .sh)"
+  name="${base#*-}"
+  wanted "$name" || continue
+  desc="$(sed -n 's/^# dot:step=//p' "$step" | head -1)"
+  header "${name}${desc:+ — $desc}"
+  ( source "$DOT_ROOT/lib/common.sh"; source "$step" ) || { err "$name failed"; failed=$((failed+1)); }
+done
+
+header "summary"
+if [[ $failed -eq 0 ]]; then
+  ok "all steps completed"
+else
+  err "$failed step(s) failed"
+fi
+exit $(( failed > 0 ))

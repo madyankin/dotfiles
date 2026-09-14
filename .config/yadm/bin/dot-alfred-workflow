@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=regenerate the dot Alfred workflow from the CLI
+set -uo pipefail
+exec /usr/bin/python3 "${DOT_ROOT:-$HOME/.config/yadm}/scripts/alfred-dot-workflow.py" "$@"

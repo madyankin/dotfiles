@@ -1,0 +1,6 @@
+# Config directories that are deliberately tracked without the app installed
+# on this machine. One name per line.
+#
+# aerospace: the window-manager decision is explicitly deferred. The toml is
+# good config and stays tracked; Amethyst + Rectangle are what run here today.
+aerospace

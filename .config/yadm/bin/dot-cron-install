@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=install the periodic sync scheduler
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/cron.sh"

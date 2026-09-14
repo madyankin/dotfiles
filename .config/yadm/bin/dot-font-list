@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# dot:summary=installed monospace font families (* = current)
+set -uo pipefail
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+
+cur="$(grep '^FONT_FAMILY=' "$DOT_ROOT/themes/font.sh" 2>/dev/null | cut -d= -f2- | tr -d '"')"
+
+if ! fonts="$(/usr/bin/python3 "$DOT_ROOT/scripts/list-fonts.py")" || [[ -z "$fonts" ]]; then
+  warn "could not enumerate font families; showing the Homebrew font casks instead"
+  note "cask names are NOT family names — check the family in Font Book before using one"
+  brew list --cask 2>/dev/null </dev/null | grep '^font-' | sed 's/^/    /'
+  exit 0
+fi
+
+while IFS= read -r f; do
+  [[ -z "$f" ]] && continue
+  if [[ "$f" == "$cur" ]]; then printf '* %s\n' "$f"; else printf '  %s\n' "$f"; fi
+done <<<"$fonts"

@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+# dot:summary=update everything: brew, mas, mise, nvim, tpm, zplug, dotfiles
+#
+# Three things happen here and then control is handed over:
+#   1. record what is installed now, so "what changed?" is answerable later;
+#   2. pull the dotfiles;
+#   3. exec the perform half as a FRESH PROCESS.
+#
+# (3) is the whole reason this is split in two. If the pull changed a step
+# script, the already-parsed copy in memory is stale — Omarchy re-execs for the
+# same reason.
+set -uo pipefail
+
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+DOT_BIN="${DOT_BIN:-$DOT_ROOT/bin}"
+export DOT_ROOT DOT_BIN
+source "$DOT_ROOT/lib/common.sh"
+
+ARGS=()
+SKIP_PULL=""
+SHOW_LOG=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) DOT_DRY_RUN=1; export DOT_DRY_RUN; ARGS+=("$1"); shift ;;
+    -y|--yes)  DOT_YES=1; export DOT_YES; shift ;;
+    --no-pull) SKIP_PULL=1; shift ;;
+    --log)     SHOW_LOG=1; shift ;;
+    --only|--skip) ARGS+=("$1" "$2"); shift 2 ;;
+    --prune)   ARGS+=("$1"); shift ;;
+    -h|--help)
+      cat <<'EOT'
+dot update [options]
+
+  --dry-run          print every step's plan, change nothing
+  --only <step>      run just that step (brew mas mise npm nvim tmux zplug editors alfred)
+  --skip <step>      everything except that step
+  --prune            also run `brew cleanup`
+  --no-pull          do not `yadm pull` first
+  -y, --yes          do not ask
+  --log              show the most recent run's state snapshot and exit
+EOT
+      exit 0 ;;
+    *) err "unknown option: $1"; exit 2 ;;
+  esac
+done
+
+STATE="$(state_dir)/updates"
+
+if [[ -n "$SHOW_LOG" ]]; then
+  last="$(ls -1d "$STATE"/* 2>/dev/null | tail -1)"
+  [[ -z "$last" ]] && { warn "no recorded runs"; exit 0; }
+  log "last run: $(basename "$last")"
+  for f in "$last"/*; do
+    header "$(basename "$f")"
+    head -40 "$f"
+  done
+  exit 0
+fi
+
+# --- 1. snapshot -------------------------------------------------------------
+#
+# Omarchy snapshots a btrfs subvolume before updating. macOS has no selective
+# equivalent (tmutil localsnapshot is whole-volume and Recovery-only), and Arq
+# already covers real backups. What a snapshot is actually a proxy for is
+# "what changed, and what do I pin back to" — which is three files.
+if [[ -z "${DOT_DRY_RUN:-}" ]]; then
+  snap="$STATE/$(date -u +%Y%m%dT%H%M%SZ)"
+  mkdir -p "$snap"
+  have brew && brew bundle dump --file=- > "$snap/Brewfile.dump" 2>/dev/null
+  have mise && mise ls > "$snap/mise-ls.txt" 2>/dev/null
+  have npm  && npm ls -g --depth=0 > "$snap/npm-global.txt" 2>/dev/null
+  [[ -f "$HOME/.config/nvim/lazy-lock.json" ]] && cp "$HOME/.config/nvim/lazy-lock.json" "$snap/"
+  ok "state recorded: ${snap/#$HOME/~}"
+fi
+
+# --- 2. pull -----------------------------------------------------------------
+if [[ -z "$SKIP_PULL" ]]; then
+  header "dotfiles"
+  if [[ -n "${DOT_DRY_RUN:-}" ]]; then
+    printf '  would run: yadm pull --rebase --autostash\n'
+  else
+    (cd "$HOME" && yadm pull --rebase --autostash) && ok "dotfiles up to date" \
+      || warn "yadm pull failed — continuing with the local copy"
+  fi
+fi
+
+# --- 3. hand over to a fresh process ----------------------------------------
+exec "$DOT_BIN/dot-update-perform" ${ARGS[@]+"${ARGS[@]}"}

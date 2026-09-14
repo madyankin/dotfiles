@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# dot:summary=choose the default coding agent
+set -uo pipefail
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+DEFAULT_FILE="$DOT_ROOT/agents/default"
+
+name="${1:-}"
+if [[ -z "$name" ]]; then
+  err "usage: dot agent set <claude|codex|goose|opencode|gemini|cursor|pi>"
+  exit 2
+fi
+case "$name" in
+  claude|codex|goose|opencode|gemini|cursor|pi) ;;
+  *) err "unknown agent: $name"; exit 1 ;;
+esac
+mkdir -p "$(dirname "$DEFAULT_FILE")"
+printf '%s\n' "$name" > "$DEFAULT_FILE"
+ok "default agent: $name"

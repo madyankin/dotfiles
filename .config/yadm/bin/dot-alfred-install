@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=reinstall Alfred workflows from the manifest
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/alfred.sh" install

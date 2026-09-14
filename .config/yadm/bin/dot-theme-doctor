@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=report palette vs app drift
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/theme.sh" doctor

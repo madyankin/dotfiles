@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=reconcile VS Code extensions with the manifest
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/editors.sh" sync

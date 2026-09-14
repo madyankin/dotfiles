@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# dot:summary=save then reinstall Alfred workflows
+set -uo pipefail
+exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/alfred.sh" sync

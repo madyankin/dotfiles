@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+#
+# Entry point for the dotfiles. `dot <group> <verb>` resolves by longest prefix
+# to an executable bin/dot-<group>-<verb>, so adding a subcommand is adding a
+# file and there is nothing central to edit.
+#
+# The dispatch convention is stolen from Omarchy's bin/omarchy; the
+# implementation is not — that one is built on `declare -A`, which macOS's
+# bash 3.2 does not have.
+set -uo pipefail
+
+# Resolve this script through symlinks WITHOUT readlink -f: BSD readlink only
+# gained -f in macOS 12.3, ~/.local/bin/dot is a symlink, and coreutils'
+# greadlink is in no manifest.
+self="${BASH_SOURCE[0]}"
+while [[ -L "$self" ]]; do
+  target="$(readlink "$self")"
+  case "$target" in
+    /*) self="$target" ;;
+    *)  self="$(cd -P "$(dirname "$self")" && pwd)/$target" ;;
+  esac
+done
+DOT_BIN="$(cd -P "$(dirname "$self")" && pwd)"
+DOT_ROOT="$(cd -P "$DOT_BIN/.." && pwd)"
+export DOT_ROOT DOT_BIN
+
+# shellcheck source=/dev/null
+source "$DOT_ROOT/lib/common.sh"
+
+summary_of() {
+  sed -n 's/^# dot:summary=//p' "$1" 2>/dev/null | head -1
+}
+
+list_commands() {
+  local f name
+  for f in "$DOT_BIN"/dot-*; do
+    [[ -x "$f" ]] || continue
+    name="$(basename "$f")"
+    name="${name#dot-}"
+    name="$(printf '%s' "$name" | tr '-' ' ')"
+    printf '%s\t%s\n' "$name" "$(summary_of "$f")"
+  done
+}
+
+cmd_commands() {
+  if [[ "${1:-}" == "--json" ]]; then
+    # Consumed by the Alfred Script Filter and by `dot menu`.
+    list_commands | "${DOT_JQ:-jq}" -R -s 'split("\n")
+      | map(select(length > 0) | split("\t"))
+      | { items: map({ title: .[0], subtitle: (.[1] // ""), arg: .[0] }) }'
+  else
+    list_commands | awk -F'\t' '{ printf "  dot %-26s %s\n", $1, $2 }'
+  fi
+}
+
+usage() {
+  cat <<EOT
+dot — dotfiles control surface
+
+usage: dot <command> [args]
+
+EOT
+  cmd_commands
+  cat <<'EOT'
+
+  dot commands [--json]      list the above (--json feeds Alfred)
+  dot help                   this text
+
+Subcommands are files in .config/yadm/bin/. Add one and it appears here.
+EOT
+}
+
+# dot a b c -> dot-a-b-c, else dot-a-b, else dot-a, with the rest as argv.
+try_dispatch() {
+  local n=$# cand i a
+  while [[ "$n" -gt 0 ]]; do
+    cand="dot"
+    i=1
+    for a in "$@"; do
+      [[ "$i" -gt "$n" ]] && break
+      cand="$cand-$a"
+      i=$((i+1))
+    done
+    if [[ -x "$DOT_BIN/$cand" ]]; then
+      shift "$n"
+      exec "$DOT_BIN/$cand" "$@"
+    fi
+    n=$((n-1))
+  done
+  return 1
+}
+
+case "${1:-}" in
+  ""|help|-h|--help) usage; exit 0 ;;
+  commands) shift; cmd_commands "$@"; exit 0 ;;
+esac
+
+if ! try_dispatch "$@"; then
+  err "unknown command: $*"
+  echo ""
+  usage
+  exit 2
+fi

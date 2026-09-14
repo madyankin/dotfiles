@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# dot:summary=set the monospace family everywhere, then re-render
+#
+# Omarchy's Style > Font sets one family for the terminal, the bar and
+# anything else that asks. Here the render pass fans it out to Ghostty, the
+# iTerm2 profile, VS Code and Zed.
+set -uo pipefail
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+
+FONT_FILE="$DOT_ROOT/themes/font.sh"
+family="${1:-}"
+size="${2:-}"
+
+if [[ -z "$family" ]]; then
+  err 'usage: dot font set "<family>" [size]'
+  note 'list candidates with: dot font list'
+  exit 2
+fi
+
+/usr/bin/python3 - "$FONT_FILE" "$family" "$size" <<'PY'
+import pathlib, re, sys
+path, family, size = sys.argv[1], sys.argv[2], sys.argv[3]
+p = pathlib.Path(path)
+s = p.read_text()
+s = re.sub(r'^FONT_FAMILY=.*$', 'FONT_FAMILY="%s"' % family, s, flags=re.M)
+if size:
+    s = re.sub(r'^FONT_SIZE=.*$', 'FONT_SIZE=%s' % size, s, flags=re.M)
+p.write_text(s)
+PY
+
+ok "font family: $family${size:+ at ${size}pt}"
+exec "$DOT_ROOT/scripts/theme.sh" render
