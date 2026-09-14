@@ -65,6 +65,11 @@
 [delta]
   navigate = true
   side-by-side = true
+  # Explicit, though it is the default: delta asks the terminal for its
+  # background per invocation, so `git diff` follows a light/dark flip without
+  # a reload. syntax-theme is deliberately unset — setting it (or BAT_THEME,
+  # which delta also reads) pins it to one mode forever.
+  detect-dark-light = auto
 
 [url "ssh://git@github.com"]
 	insteadOf = https://github.com
