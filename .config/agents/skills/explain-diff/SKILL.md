@@ -1,5 +1,5 @@
 ---
-name: explain-diff-obsidian
+name: explain-diff
 description: Build a rich HTML explainer of a code change, diff, branch, or pull request — interactive charts, node-link graphs, stepped traces, and a five-question quiz — and file it into the Obsidian vault with a markdown stub and Anki cards. Use when the user asks to explain, understand, or write up a diff/PR/branch/commit, or asks for an explainer note in their vault.
 ---
 

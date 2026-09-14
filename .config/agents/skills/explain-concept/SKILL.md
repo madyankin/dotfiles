@@ -1,11 +1,11 @@
 ---
-name: explain-concept-obsidian
+name: explain-concept
 description: Build a rich HTML explainer of an academic or technical concept — math, algorithms, operating systems, networks, physics — with interactive charts, stepped diagrams, parameter sliders, and a five-question quiz, filed into the Obsidian vault with a markdown stub and Anki cards. Use when the user asks to learn, understand, or write a note about a concept, theorem, algorithm, or mechanism.
 ---
 
 # Explain Concept → Obsidian
 
-Turn one concept into a document that teaches it. Same deliverable as `explain-diff-obsidian`,
+Turn one concept into a document that teaches it. Same deliverable as `explain-diff`,
 different subject matter: instead of a diff, the source is books, papers, existing vault notes,
 and the web.
 
@@ -452,7 +452,7 @@ that is the whole maintenance story for this section.
 
 Match the user's request language — asked in Russian, write the page and the stub in Russian,
 and match the naming style of the target folder's existing notes. **When the invocation
-carries no natural language at all** (`/explain-concept-obsidian union-find` is a bare term,
+carries no natural language at all** (`/explain-concept union-find` is a bare term,
 not a sentence), fall back to the language of the target folder's existing notes — Russian for
 `3 Resources/Algorithms/`. A lone English page in a Russian folder is a wart; do not create it
 on a technicality. Notation, code, identifiers,

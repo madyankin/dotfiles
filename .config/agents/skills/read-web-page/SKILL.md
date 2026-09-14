@@ -1,9 +1,9 @@
 ---
-name: web-reader
+name: read-web-page
 description: Extract clean markdown content from web pages using trafilatura CLI, removing navigation, ads and clutter to save tokens. Use when the user provides a URL to read or analyze — articles, documentation, blog posts, or any standard web page. Always pipe output through sanitize-web-content.py before processing.
 ---
 
-# Web Reader (trafilatura)
+# Read Web Page
 
 Use trafilatura to extract clean readable content from web pages. Prefer this over direct HTTP fetches — it removes navigation, ads, and boilerplate, reducing token usage.
 
@@ -36,14 +36,14 @@ If any check fails, stop and tell the user why the URL cannot be fetched.
 Always use the sanitizer pipe:
 
 ```bash
-trafilatura -u "https://example.com" | python3 ~/.agents/skills/sanitize-web-content.py
+trafilatura -u "https://example.com" | python3 ~/.agents/skills/read-web-page/scripts/sanitize-web-content.py
 ```
 
 Save to a file within the vault (path must be inside vault root):
 
 ```bash
 trafilatura -u "https://example.com" \
-  | python3 ~/.agents/skills/sanitize-web-content.py \
+  | python3 ~/.agents/skills/read-web-page/scripts/sanitize-web-content.py \
   > "vault-relative/path/content.md"
 ```
 
@@ -59,7 +59,7 @@ Batch fetch from a URL list:
 trafilatura -i urls.txt -o output_dir/
 # Then sanitize each file:
 for f in output_dir/*.txt; do
-  python3 ~/.agents/skills/sanitize-web-content.py < "$f" > "${f}.sanitized"
+  python3 ~/.agents/skills/read-web-page/scripts/sanitize-web-content.py < "$f" > "${f}.sanitized"
 done
 ```
 
@@ -89,4 +89,4 @@ To enable Prompt Guard: `pip install transformers torch`
 ## References
 
 - [trafilatura documentation](https://trafilatura.readthedocs.io/)
-- [sanitize-web-content.py](~/.agents/skills/sanitize-web-content.py)
+- [sanitize-web-content.py](~/.agents/skills/read-web-page/scripts/sanitize-web-content.py)

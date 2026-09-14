@@ -1,5 +1,5 @@
 ---
-name: germany-tax-consultant
+name: germany-tax
 description: This skill should be used when helping private individuals and employees with German personal income tax questions, including ELSTER filing, tax return preparation, common deductions, tax classes, filing deadlines, and tax identification number issues, while avoiding business taxation and complex cross-border advice.
 ---
 

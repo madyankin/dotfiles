@@ -1,5 +1,5 @@
 ---
-name: security-testing
+name: security-test
 description: Assist with penetration testing and security research on web applications. Analyze endpoints for vulnerabilities, test authentication/authorization, identify injection flaws, and generate security findings. Use when pentesting, security auditing, reviewing API security, or when user mentions security testing, vulnerabilities, or OWASP.
 ---
 
@@ -14,8 +14,8 @@ A Dockerized Kali Linux environment is available for penetration testing with pr
 ### Quick Start
 
 ```bash
-# Navigate to the skill directory
-cd ~/.config/agents/skills/security-testing
+# Navigate to this skill's directory (wherever the skill is installed)
+cd "$(dirname "$SKILL_PATH")"   # or cd to the directory holding this SKILL.md
 
 # Start Kali container
 docker compose up -d

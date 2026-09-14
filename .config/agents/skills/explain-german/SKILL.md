@@ -1,5 +1,5 @@
 ---
-name: deutsch-explainer
+name: explain-german
 description: Build an interactive German learning explainer with Russian explanations, a carried-through anchor example, inline interactive figures, and a five-question quiz. HTML is the primary deliverable; an Obsidian note is optional by explicit choice on each run.
 ---
 
@@ -61,7 +61,7 @@ Read before generating:
 0. **Choose delivery.** Ask HTML only / HTML + Obsidian as described above; continue independent reading while awaiting the answer.
 1. **Ingest.** Whatever came in — text, topic, word list, photo, screenshot, URL, a log of the user's own mistakes.
    - Image → `Read` (vision) and transcribe the German **verbatim**, including the user's handwriting if present.
-   - URL → `trafilatura` skill for clean extraction; fall back to `WebFetch`.
+   - URL → `read-web-page` skill for clean extraction; fall back to `WebFetch`.
    - PDF → follow `references/production.md`: inspect text layers, render scans, map PDF indices to printed pages.
    - Everything else → use as-is.
    - Echo the extracted German back to the user in a short block before generating, so OCR slips get caught early. For a long text, echo the first few lines and the word count.

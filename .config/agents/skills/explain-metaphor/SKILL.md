@@ -1,5 +1,5 @@
 ---
-name: explain-with-metaphor
+name: explain-metaphor
 description: Explain a difficult concept through a concrete, memorable everyday metaphor while preserving the important mechanics and limits of the original. Use when the user asks for an analogy, intuitive explanation, plain-language mental model, comparison between concepts, or help making technical material stick.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: discover-wikipedia-rabbit-holes
+name: discover-wikipedia
 description: Curate a small, surprising Wikipedia reading list that mixes a user's established interests with adjacent and unfamiliar subjects. Use for daily or recurring Wikipedia recommendations, intellectual rabbit holes, anti-filter-bubble reading, or a themed learning trail with discussion prompts.
 ---
 
