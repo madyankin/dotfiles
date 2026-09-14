@@ -167,6 +167,24 @@ link_bundle() {
     echo "    and would overwrite this change."
     exit 1
   fi
+  # The authoritative setting lives in Application Support, not in the defaults
+  # domain — Alfred rewrites the defaults key from this file on launch, so
+  # writing only the default silently reverts.
+  local prefs="$HOME/Library/Application Support/Alfred/prefs.json"
+  if [[ ! -f "$prefs" ]]; then
+    echo "  ✗ $prefs not found — launch Alfred once first" >&2
+    exit 1
+  fi
+
+  python3 -c '
+import json, sys
+prefs, folder, bundle = sys.argv[1], sys.argv[2], sys.argv[3]
+d = json.load(open(prefs))
+d["current"] = bundle
+d.setdefault("syncfolders", {})["5"] = folder
+json.dump(d, open(prefs, "w"), indent=2)
+' "$prefs" "$ALFRED_DIR" "$BUNDLE" || { echo "  ✗ failed to update $prefs" >&2; exit 1; }
+
   defaults write com.runningwithcrayons.Alfred-Preferences syncfolder -string "$ALFRED_DIR"
   echo "  ✓ Alfred sync folder set to $ALFRED_DIR"
   echo "    Start Alfred to pick it up."
