@@ -423,7 +423,7 @@ which owns the Anki connection and the card-quality rules.
 > With the MCP as the single source of cards, a `:::` line means every card exists twice.
 > Use `→` in the record section.
 
-## Словарь: terms in Russian output
+## Glossary: terms in Russian output
 
 Russian pages and stubs use Russian words. A transliterated English term is not a technical
 term, it is an untranslated one, and it reads as sloppy in a note the user will keep for years.
@@ -519,7 +519,7 @@ What the harness cannot judge, and you still must:
 - 2026-09-13 — a stepper must show the step, not highlight it: `Viz.proof` gained `show(fig, i)`
   and the `mk-sub` / `mk-gone` / `mk-new` rewrite markers, plus a table of step kinds and what
   each draws. Shipped `Hl`, a dependency-free syntax highlighter for every listing. Added the
-  «Словарь» section (волт → хранилище/заметки/Obsidian), the rule that page code is exposition
+  the glossary section (волт → хранилище/заметки/Obsidian), the rule that page code is exposition
   and gets named intermediates instead of nested calls, and the rule that any source with a
   stable address is a hyperlink. `verify.js` now separates network *loading* (banned) from
   prose links (required), and fails on unhighlighted listings, bare `arXiv:`/`doi:`/`RFC N`,
