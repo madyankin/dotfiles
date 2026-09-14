@@ -44,16 +44,6 @@ install_goose() {
   fi
 }
 
-install_opencode() {
-  if ! brew list --formula opencode &>/dev/null 2>&1; then
-    brew install opencode
-    echo "  ✓ opencode installed"
-  else
-    echo "  ✓ opencode already installed"
-  fi
-  selected_agents+=(opencode)
-}
-
 is_selected() {
   local agent="$1"
   for s in "${selected_agents[@]}"; do
@@ -77,33 +67,46 @@ remove_unselected() {
     rm -f ~/.cursor/skills ~/.cursor/agents
     echo "  ✓ cursor removed"
   fi
-  # opencode: uninstall formula (skills are loaded from ~/.agents)
-  if ! is_selected opencode && brew list --formula opencode &>/dev/null 2>&1; then
-    brew uninstall opencode
-    rm -f ~/.opencode/skills ~/.opencode/agents
-    echo "  ✓ opencode removed"
-  fi
   # goose uses ~/.config/goose/ (not symlinked), so nothing to unlink
+}
+
+# Create one symlink idempotently.
+#
+# Targets stay RELATIVE on purpose: ~/.agents is itself tracked in this repo,
+# so an absolute target would commit this machine's username and break the
+# checkout on any other machine.
+#
+# The real defect behind .config/agents/agents/agents and
+# .config/agents/skills/skills was the missing guard below, not relativeness:
+# `ln -sfn` against a name that already resolves to a directory drops the new
+# link *inside* that directory. Refusing any non-symlink target closes that.
+link() {  # link <target-relative-to-linkname-dir> <linkname>
+  local target="$1" name="$2"
+
+  if [[ -L "$name" ]]; then
+    [[ "$(readlink "$name")" == "$target" ]] && return 0   # already correct
+    rm -f "$name"
+  elif [[ -e "$name" ]]; then
+    echo "  ! $name exists and is not a symlink — skipped"
+    return 1
+  fi
+
+  ln -s "$target" "$name"
 }
 
 link_configs() {
   echo "→ Linking agent configs..."
-  if is_selected opencode; then
-    if [[ ! -e ~/.agents || -L ~/.agents ]]; then
-      ln -sfn .config/agents ~/.agents
-      echo "  ✓ ~/.agents linked"
-    else
-      echo "  ✓ ~/.agents exists (skipped)"
-    fi
-  fi
+
+  # ~/.agents is tracked in the dotfiles repo and .config/goose/skills/*
+  # resolve through it, so it is created unconditionally — not gated on any
+  # one agent being selected.
+  link ".config/agents" "$HOME/.agents" && echo "  ✓ ~/.agents"
+
   for agent in "${selected_agents[@]}"; do
-    if [[ "$agent" == "opencode" ]]; then
-      continue
-    fi
-    mkdir -p ~/."$agent"
-    ln -sfn ../.config/agents/skills ~/."$agent/skills"
-    ln -sfn ../.config/agents/agents ~/."$agent/agents"
-    echo "  ✓ ~/.$agent linked"
+    mkdir -p "$HOME/.$agent"
+    link "../.config/agents/skills" "$HOME/.$agent/skills"
+    link "../.config/agents/agents" "$HOME/.$agent/agents"
+    echo "  ✓ ~/.$agent"
   done
 }
 
@@ -117,7 +120,6 @@ echo "  [1] Claude  (Anthropic)"
 echo "  [2] Codex   (OpenAI)"
 echo "  [3] Cursor  (Cursor)"
 echo "  [4] Goose   (Block)"
-echo "  [5] OpenCode (SST)"
 echo "  [a] All"
 echo "  [q] Skip"
 echo ""
@@ -129,13 +131,11 @@ for choice in "${choices[@]}"; do
     2) install_codex ;;
     3) install_cursor ;;
     4) install_goose ;;
-    5) install_opencode ;;
     a|A)
       install_claude
       install_codex
       install_cursor
       install_goose
-      install_opencode
       break
       ;;
     q|Q)
