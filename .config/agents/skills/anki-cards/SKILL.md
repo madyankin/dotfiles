@@ -9,7 +9,7 @@ Turn content (conversation, docs, code, a topic) into well-formed Anki cards and
 
 ## Setup
 
-The `anki` MCP server (anki-mcp, https://ankimcp.ai) runs at `http://127.0.0.1:3141/`. It is registered in both Claude Code (user scope, tools prefixed `mcp__anki__`) and Codex (`~/.codex/config.toml`). In Claude Code, load the tools with `ToolSearch("anki")`.
+The `anki` MCP server (anki-mcp, https://ankimcp.ai) runs at `http://127.0.0.1:3141/`. Register it with whichever agent you use; in Claude Code its tools are prefixed `mcp__anki__` and load via `ToolSearch("anki")`.
 
 Key tools: `list_decks`, `model_names`, `model_field_names`, `add_note`, `add_notes` (batch, one deck+model), `find_notes` (Anki query syntax), `update_note_fields`, `create_deck`, `sync`. GUI tools (`gui_*`) only when the user explicitly asks to open Anki windows.
 

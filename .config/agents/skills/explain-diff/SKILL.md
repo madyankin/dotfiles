@@ -20,21 +20,21 @@ send code to others until you can pass the quiz on it.*
 ## Output location
 
 ```
-<vault>/3 Resources/Explanations/YYYY-MM-DD <slug>.html
-<vault>/3 Resources/Explanations/YYYY-MM-DD <slug>.md
+<explainer_folder>/YYYY-MM-DD <slug>.html
+<explainer_folder>/YYYY-MM-DD <slug>.md
 ```
 
 Date prefix keeps the folder time-sorted. `<slug>` is short, kebab-case, English, derived
 from what changed (`bidder-ttl-cache`, not `pr-4821`). Create the folder if missing.
 
-Find the vault: `$OBSIDIAN_VAULT` if set, otherwise the `path` of the vault in
-`~/Library/Application Support/obsidian/obsidian.json`:
+Nothing about the vault is hardcoded here. Resolve the vault and read
+`explainer_folder` from the `Explainers` config note as described in
+`obsidian-cli/references/vault-resolution.md`.
 
-```bash
-VAULT="${OBSIDIAN_VAULT:-$(python3 -c 'import json,os;d=json.load(open(os.path.expanduser("~/Library/Application Support/obsidian/obsidian.json")));print(next(iter(d["vaults"].values()))["path"])')}"
-```
+**No vault, no config note, or Obsidian not running → write the HTML only**, where the
+user asked or to the current directory, and say where it landed. Never invent a path.
 
-The path contains spaces and lives in iCloud — quote it everywhere.
+Vault paths contain spaces and may live in iCloud — quote them everywhere.
 
 ## Workflow
 
@@ -146,10 +146,12 @@ The page lives in the vault but Obsidian is not a browser:
 ## Flashcards → Anki
 
 After the files are written, offer to turn the quiz and takeaways into Anki cards. Card
-creation is **not** this skill's job — invoke the `anki-cards` skill, which owns the Anki MCP
-(`http://127.0.0.1:3141/`, tools prefixed `mcp__anki__`) and the card-quality rules.
+creation is **not** this skill's job — invoke the `anki-cards` skill, which owns the Anki
+connection and the card-quality rules.
 
-- Deck: `Explanations::Code`. Create it if missing (`create_deck` supports `Parent::Child`).
+- Deck: `<explainer_anki_deck>::Code`, from the `Explainers` config note. Create it if
+  missing (`create_deck` supports `Parent::Child`). No `explainer_anki_deck` → build the
+  cards, offer them, and skip the push.
 - Tag every card with the explainer slug plus the repo, e.g. `bidder-ttl-cache`, `dsp-core`,
   so a later run can find them with `find_notes`.
 - 5–10 cards drawn from the quiz and the takeaways.
@@ -157,8 +159,8 @@ creation is **not** this skill's job — invoke the `anki-cards` skill, which ow
   the deck in the stub's `anki-deck` frontmatter.
 
 > [!warning] Never write `:::` lines into the stub.
-> The `flashcards-obsidian` plugin is installed and syncs any `:::` line it finds to Anki.
-> With the MCP as the single source of cards, a `:::` line means every card exists twice.
+> If the `flashcards-obsidian` plugin is in use, it syncs any `:::` line it finds to Anki,
+> so with `anki-cards` as the single source a `:::` line means every card exists twice.
 > Use `→` in the record section.
 
 ## Language

@@ -19,18 +19,16 @@ request to pick a concept first.
 
 ## Output location
 
-Topic folder under `3 Resources/`, chosen by subject:
+Subject folder from the `explainer_subjects` map in the `Explainers` config note; anything
+unmatched goes in `explainer_folder`. Both are resolved per
+`obsidian-cli/references/vault-resolution.md` — no folder name is hardcoded here.
 
-| Subject | Folder |
-|---|---|
-| Algorithms, data structures, complexity | `3 Resources/Algorithms/` |
-| OS, networks, systems, languages | `3 Resources/Software Development/` |
-| Anything with no existing folder | create `3 Resources/<Subject>/` |
-| Genuinely unclassifiable | `3 Resources/Explanations/` |
+If `explainer_subjects` names a subject that has no folder yet, create it. If the map is
+absent entirely, put everything in `explainer_folder`.
 
 Filename is the concept, no date prefix — these are evergreen notes, unlike diff explainers.
-Match the naming language of the folder's existing notes (`3 Resources/Algorithms/` is
-Russian-titled).
+Match the naming language of the destination folder's existing notes: a lone English page in
+a Russian-titled folder is a wart.
 
 **If a note with that exact name already exists**, you are not allowed to overwrite it and not
 allowed to write a near-duplicate beside it. Pick one, in this order:
@@ -46,14 +44,12 @@ allowed to write a near-duplicate beside it. Pick one, in this order:
 
 Say which of the three you picked and why, before writing anything.
 
-Find the vault: `$OBSIDIAN_VAULT` if set, otherwise the `path` of the vault in
-`~/Library/Application Support/obsidian/obsidian.json`:
+Resolve the vault and the config note per `obsidian-cli/references/vault-resolution.md`.
 
-```bash
-VAULT="${OBSIDIAN_VAULT:-$(python3 -c 'import json,os;d=json.load(open(os.path.expanduser("~/Library/Application Support/obsidian/obsidian.json")));print(next(iter(d["vaults"].values()))["path"])')}"
-```
+**No vault, no config note, or Obsidian not running → write the HTML only**, where the user
+asked or to the current directory, and say where it landed. Never invent a path.
 
-The path contains spaces and lives in iCloud — quote it everywhere.
+Vault paths contain spaces and may live in iCloud — quote them everywhere.
 
 ## Workflow
 
@@ -61,8 +57,8 @@ The path contains spaces and lives in iCloud — quote it everywhere.
    `rg -il "<term>" "$VAULT"`. If a note on the concept already exists, say so and propose
    extending it instead of writing a near-duplicate. Never silently create the second copy.
 2. **Gather sources, in this order of preference:** existing vault notes → books under
-   `~/Documents/03 Resources/Books/` → the web. Record what you used in the stub's `sources`
-   frontmatter. Prefer a source the user already owns over a blog post.
+   `explainer_sources`, when that key is set → the web. Record what you used in the stub's
+   `sources` frontmatter. Prefer a source the user already owns over a blog post.
 
    **Verify chapter and page numbers against the file, never from memory.** `pdftotext` is
    installed; dump once and grep the table of contents and the statement itself:
@@ -370,7 +366,7 @@ Rules:
 
 - **Link text is the title**, or the identifier — never a naked URL, and never "here".
 - **A book the user owns is not a link.** It is a file on their disk; cite chapter, section,
-  and page instead, and say the book is in `~/Documents/03 Resources/Books/`.
+  and page instead, and name the `explainer_sources` location it came from.
 - **Do not invent a URL.** An arXiv ID or DOI maps to its address mechanically and that is
   safe; anything else you have not actually seen stays unlinked, and you say so.
 - The page's no-external-resources rule is about **loading** — scripts, styles, fonts, images,
@@ -409,12 +405,12 @@ Rules:
 
 After the files are written, offer to turn the quiz, the formal statement, and the takeaways
 into Anki cards. Card creation is **not** this skill's job — invoke the `anki-cards` skill,
-which owns the Anki MCP (`http://127.0.0.1:3141/`, tools prefixed `mcp__anki__`) and the
-card-quality rules.
+which owns the Anki connection and the card-quality rules.
 
-- Deck: `Explanations::<Subject>` — `Explanations::Algorithms`, `Explanations::OS`,
-  `Explanations::Math`, `Explanations::Physics`. Create it if missing (`create_deck` supports
-  `Parent::Child`).
+- Deck: `<explainer_anki_deck>::<Subject>`, from the `Explainers` config note — subject taken
+  from the same classification used for the output folder. Create it if missing (`create_deck`
+  supports `Parent::Child`). No `explainer_anki_deck` → build the cards, offer them, and skip
+  the push.
 - Tag every card with a concept slug plus the subject, so a later run can find them with
   `find_notes` and extend rather than duplicate.
 - 5–12 cards. Definitions and statements are good cloze candidates; "why does X hold" and
@@ -423,7 +419,7 @@ card-quality rules.
   the deck in the stub's `anki-deck` frontmatter.
 
 > [!warning] Never write `:::` lines into the stub.
-> The `flashcards-obsidian` plugin is installed and syncs any `:::` line it finds to Anki.
+> If the `flashcards-obsidian` plugin is in use, it syncs any `:::` line it finds to Anki.
 > With the MCP as the single source of cards, a `:::` line means every card exists twice.
 > Use `→` in the record section.
 
@@ -453,9 +449,8 @@ that is the whole maintenance story for this section.
 Match the user's request language — asked in Russian, write the page and the stub in Russian,
 and match the naming style of the target folder's existing notes. **When the invocation
 carries no natural language at all** (`/explain-concept union-find` is a bare term,
-not a sentence), fall back to the language of the target folder's existing notes — Russian for
-`3 Resources/Algorithms/`. A lone English page in a Russian folder is a wart; do not create it
-on a technicality. Notation, code, identifiers,
+not a sentence), fall back to the language of the target folder's existing notes. A lone
+English page in a Russian-titled folder is a wart; do not create it on a technicality. Notation, code, identifiers,
 and established technical terms stay as they are conventionally written.
 
 ## Validation checklist

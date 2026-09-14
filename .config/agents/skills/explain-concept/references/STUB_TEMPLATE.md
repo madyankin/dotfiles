@@ -1,7 +1,7 @@
 # Markdown stub template
 
 The stub is what Obsidian indexes: search, graph, backlinks, and mobile read this file, not
-the HTML. It is also the note that will sit in `3 Resources/` for years, so it must stand on
+the HTML. It is also the note that will sit in the vault for years, so it must stand on
 its own — summary, takeaways, and the key formulas, not just a link.
 
 Unlike the HTML page, the stub is ordinary Markdown, so real LaTeX works here
@@ -82,8 +82,8 @@ anki-deck: Explanations::«Subject»
 - **One Mermaid diagram** carrying the single structural idea, so the note teaches something
   on mobile without opening the page. Obsidian renders Mermaid natively. Keep it under ~10
   nodes; it is a summary, not a second copy of the page's figures.
-- **Title and headings match the folder's language.** `3 Resources/Algorithms/` is
-  Russian-titled; a lone English note there is a wart.
+- **Title and headings match the folder's language.** Where the destination folder is
+  Russian-titled, a lone English note there is a wart.
 
 ## Example (filled)
 
