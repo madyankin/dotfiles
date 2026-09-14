@@ -28,6 +28,7 @@
     "enabled": true
   },
   "title_bar": {
+    "show_branch_status_icon": false,
     "show_branch_name": true,
     "show_onboarding_banner": true,
     "show_project_items": true,
@@ -37,12 +38,13 @@
     "font_size": 14.0
   },
   "project_panel": {
+    "button": true,
     "dock": "left",
     "auto_reveal_entries": false
   },
   "base_keymap": "VSCode",
   "status_bar": {
-    "experimental.show": false
+    "experimental.show": true
   },
   "tab_bar": {
     "show_tab_bar_buttons": true,
@@ -64,7 +66,7 @@
     "Courier New",
     "monospace"
   ],
-  "buffer_font_family": "JetBrains Mono",
+  "buffer_font_family": "JetBrainsMono Nerd Font Mono",
   "indent_guides": {
     "enabled": false
   },

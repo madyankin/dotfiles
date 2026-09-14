@@ -111,6 +111,7 @@ dot theme doctor
 dot background next
 dot font list
 dot font set "JetBrainsMono Nerd Font Mono" 15
+dot theme render --only fonts        # just the font fan-out
 ```
 
 Authoring a theme: `themes/README.md`. Short version — copy a directory, edit

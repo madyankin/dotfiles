@@ -296,6 +296,53 @@ def btop_config(theme_mode_default):
     ])
 
 
+
+# ------------------------------------------------------------------- fonts --
+
+def apply_fonts(font, written):
+    """Patch the font family/size into VS Code's and Zed's settings.
+
+    These two are hand-maintained JSONC files, not generated ones, so the
+    values are rewritten in place with a targeted regex — json.load would
+    choke on the comments and json.dump would strip them.
+
+    This exists because font.sh claims to be the single source for the
+    monospace family. It was not: only Ghostty, the iTerm2 profile and
+    Terminal.app were fed from it, while these two quietly kept whatever was
+    typed into them years ago.
+    """
+    family = font.get("FONT_FAMILY")
+    size = font.get("FONT_SIZE")
+    if not family:
+        return
+
+    targets = [
+        # path, [(regex, replacement)]
+        (YADM / "editors/settings.json", [
+            (r'("editor\.fontFamily"\s*:\s*")[^"]*(")',
+             lambda m: m.group(1) + family + ", Menlo, Monaco, monospace" + m.group(2)),
+            (r'("editor\.fontSize"\s*:\s*)[0-9.]+', lambda m: m.group(1) + str(size)),
+            (r'("terminal\.integrated\.fontSize"\s*:\s*)[0-9.]+',
+             lambda m: m.group(1) + str(size)),
+        ]),
+        (HOME / ".config/zed/settings.json", [
+            (r'("buffer_font_family"\s*:\s*")[^"]*(")',
+             lambda m: m.group(1) + family + m.group(2)),
+            (r'("buffer_font_size"\s*:\s*)[0-9.]+', lambda m: m.group(1) + str(size)),
+        ]),
+    ]
+
+    for path, subs in targets:
+        if not path.exists():
+            continue
+        text = original = path.read_text()
+        for pattern, repl in subs:
+            text = re.sub(pattern, repl, text)
+        if text != original:
+            write(path, text, written)
+        else:
+            written.append(("=", path))
+
 # ---------------------------------------------------------------------- main --
 
 def current_mode():
@@ -314,7 +361,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("theme")
     ap.add_argument("--skip", action="append", default=[],
-                    help="group to skip: terminal shell tui editors launcher native")
+                    help="group to skip: terminal shell tui editors native fonts")
     ap.add_argument("--only", action="append", default=[])
     ap.add_argument("--quiet", action="store_true")
     args = ap.parse_args()
@@ -387,6 +434,9 @@ def main():
               iterm_dynamic_profile(pal["light"], pal["dark"], font, meta), written)
 
     # ---- small config files that select rather than colour
+    if wanted("fonts"):
+        apply_fonts(font, written)
+
     if wanted("tui"):
         write("~/.config/bat/config", bat_config(meta), written)
         write("~/.config/btop/btop.conf", btop_config(current_mode()), written)
