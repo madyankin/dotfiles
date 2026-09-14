@@ -45,8 +45,8 @@ save_workflows() {
   require_bundle
   echo "→ Saving workflow list..."
 
-  local tmp own=0 third=0
-  tmp="$(mktemp)"
+  local tmp merged own=0 third=0
+  tmp="$(mktemp)"; merged="$(mktemp)"
   : > "$tmp"
 
   for d in "$WORKFLOWS"/*/; do
@@ -63,15 +63,50 @@ save_workflows() {
     third=$((third+1))
   done
 
-  # Sort the body only, so the header stays at the top.
+  # UNION with whatever is already recorded, never an overwrite.
+  #
+  # This used to be `> "$LIST"` from the local install set alone, which made
+  # the file a per-machine inventory masquerading as shared state: each
+  # machine's sync deleted the other's entries, and one did exactly that in
+  # commit 360783f (-37 lines). The list means "workflows I want on any
+  # machine", which is also what `install` needs it to mean.
+  #
+  # Removing one therefore needs workflows.ignore — see below.
+  # Conflict markers are filtered out defensively: this file is written by a
+  # script and merged by the unattended sync, so a rebase can leave <<<<<<<
+  # lines in it — and once committed they look like data. That has happened.
+  { grep -v '^#' "$LIST" 2>/dev/null \
+      | grep -vE '^(<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|)' \
+      | grep -v '^[[:space:]]*$'; cat "$tmp"; } \
+    | awk -F'\t' 'NF >= 2' \
+    | sort -t$'\t' -k1,1 -k3,3V \
+    | awk -F'\t' '{ line[$1] = $0 } END { for (b in line) print line[b] }' \
+    > "$merged"
+
+  # Drop anything deliberately unwanted.
+  local ignore="$ALFRED_DIR/workflows.ignore"
+  if [[ -f "$ignore" ]]; then
+    grep -v '^#' "$ignore" | grep -v '^[[:space:]]*$' > "$tmp.ig" 2>/dev/null || : > "$tmp.ig"
+    if [[ -s "$tmp.ig" ]]; then
+      grep -vF -f "$tmp.ig" "$merged" > "$tmp.keep" && mv "$tmp.keep" "$merged"
+    fi
+    rm -f "$tmp.ig"
+  fi
+
   {
     echo "# Third-party Alfred workflows, reinstalled by \`alfred.sh install\`."
     echo "# Own workflows are tracked in git instead and are not listed here."
+    echo "#"
+    echo "# This is a UNION across machines, not this machine's inventory: an"
+    echo "# entry is never dropped just because it is not installed here."
+    echo "# To remove one for good, add its bundleid to workflows.ignore."
     echo "# bundleid<TAB>name<TAB>version<TAB>source"
-    sort -t'	' -k2,2 "$tmp"
+    sort -t$'\t' -k2,2 "$merged"
   } > "$LIST"
-  rm -f "$tmp"
-  echo "  ✓ $third third-party workflows listed"
+  rm -f "$tmp" "$merged"
+
+  local total; total="$(grep -vc '^#' "$LIST")"
+  echo "  ✓ $third installed here, $total listed across all machines"
   echo "  ✓ $own own workflow(s) tracked in git directly"
 
   # An own workflow that git is not tracking would be lost on a rebuild.

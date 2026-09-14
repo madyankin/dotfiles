@@ -1,0 +1,6 @@
+# Workflow bundleids that must never be listed or reinstalled, one per line.
+#
+# Needed because workflows.txt is a UNION across machines now: without this,
+# removing a workflow here would just be re-added by the next machine that
+# still has it installed.
+com.alfredapp.vitor.openai
