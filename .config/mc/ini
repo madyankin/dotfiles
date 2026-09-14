@@ -87,7 +87,7 @@ skin=default
 
 [Layout]
 output_lines=0
-left_panel_size=67
+left_panel_size=92
 top_panel_size=0
 message_visible=true
 keybar_visible=true
@@ -137,7 +137,7 @@ quick_search_mode=2
 select_flags=6
 
 [Panelize]
-Modified git files=git ls-files --modified
-Find *.orig after patching=find . -name \\*.orig -print
-Find SUID and SGID programs=find . \\( \\( -perm -04000 -a -perm /011 \\) -o \\( -perm -02000 -a -perm /01 \\) \\) -print
 Find rejects after patching=find . -name \\*.rej -print
+Find SUID and SGID programs=find . \\( \\( -perm -04000 -a -perm /011 \\) -o \\( -perm -02000 -a -perm /01 \\) \\) -print
+Find *.orig after patching=find . -name \\*.orig -print
+Modified git files=git ls-files --modified
