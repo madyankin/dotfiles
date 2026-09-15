@@ -1,4 +1,36 @@
 #!/usr/bin/env bash
-# dot:summary=regenerate the dot Alfred workflow from the CLI
+# dot:summary=regenerate the dot Alfred workflow and make Alfred index it
+#
+# The relaunch is not optional. Alfred indexes the workflows folder at LAUNCH:
+# a directory written or changed while it is running is invisible until it
+# restarts, with no error and no hint — the keyword simply falls through to a
+# web search. Leaving that as a manual step means the workflow silently does
+# not exist.
 set -uo pipefail
-exec /usr/bin/python3 "${DOT_ROOT:-$HOME/.config/yadm}/scripts/alfred-dot-workflow.py" "$@"
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+
+/usr/bin/python3 "$DOT_ROOT/scripts/alfred-dot-workflow.py" "$@" || exit 1
+
+if ! pgrep -x Alfred >/dev/null 2>&1; then
+  ok "Alfred is not running; it will index the workflow on next launch"
+  exit 0
+fi
+
+log "Relaunching Alfred so it indexes the workflow"
+osascript -e 'quit app id "com.runningwithcrayons.Alfred"' >/dev/null 2>&1 || true
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  pgrep -x Alfred >/dev/null 2>&1 || break
+  sleep 0.5
+done
+open -b com.runningwithcrayons.Alfred >/dev/null 2>&1 || {
+  err "could not relaunch Alfred — start it by hand"
+  exit 1
+}
+sleep 2
+if pgrep -x Alfred >/dev/null 2>&1; then
+  ok "Alfred relaunched"
+else
+  err "Alfred did not come back — start it by hand"
+  exit 1
+fi

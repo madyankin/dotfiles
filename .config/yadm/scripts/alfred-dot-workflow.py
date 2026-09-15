@@ -22,11 +22,21 @@ Stdlib only; /usr/bin/python3 (3.9).
 
 import pathlib
 import plistlib
+import re
 import sys
 
 HOME = pathlib.Path.home()
+# The directory name must be user.workflow.<UUID>, and Alfred parses that UUID
+# strictly: an invalid one makes it ignore the whole directory — no error, no
+# hint, the keywords simply do not exist. The first version of this spelled
+# "DOTFILES" in leetspeak, and `L` is not a hex digit.
+WF_UUID = "D07F11E5-0000-4000-8000-000000000001"
+assert re.fullmatch(r"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}"
+                    r"-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}", WF_UUID), \
+    "workflow directory UUID is malformed: %r" % WF_UUID
+
 WF_DIR = (HOME / ".config/yadm/alfred/Alfred.alfredpreferences/workflows"
-          / "user.workflow.D07F1LE5-0000-4000-8000-000000000001")
+          / ("user.workflow.%s" % WF_UUID))
 BUNDLE_ID = "name.madyankin.dot"
 
 DOT = "$HOME/.local/bin/dot"
