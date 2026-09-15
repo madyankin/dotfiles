@@ -9,10 +9,11 @@ file makes it appear in Alfred with no edit anywhere.
 
 Three filters, chosen because they are the three things Omarchy's menu is
 actually used for:
-  dot    <- every subcommand, run in Ghostty
-  theme  <- the Style menu: theme, background, font
-  agent  <- Omarchy's "launch the agent into a task", which is exactly the
-            shape Alfred's query box wants
+  dot     <- every subcommand, run in Ghostty
+  theme   <- the Style menu: theme, background, font
+  agent   <- a task handed to the default coding agent, which is exactly the
+             shape Alfred's query box wants
+  manual  <- a section of MANUAL.md, listed from its own headings
 
 Stdlib only; /usr/bin/python3 (3.9).
 """
@@ -47,6 +48,10 @@ T="$HOME/.config/yadm/scripts/theme.sh"
       | map(select(length > 0) | split("\t"))
       | { items: map({ title: .[0], subtitle: .[1], arg: .[0] }) }'
 '''
+
+# Sections come straight from the manual's own headings, so the keyword lists
+# whatever the document contains.
+FILTER_MANUAL = PRELUDE + f'{DOT} manual --sections-json\n'
 
 FILTER_AGENT = PRELUDE + r'''
 Q="$1"
@@ -95,6 +100,16 @@ ACTION_TERMINAL = (
     '/usr/bin/open -na Ghostty --args --window-save-state=never '
     '--wait-after-command=true '
     '-e "$HOME/.config/yadm/bin/dot-in-terminal" {query}\n'
+)
+
+# The manual is read, not run, so it opens in a terminal like the rest — but
+# `dot manual <section>` takes the section title as ONE argument, hence the
+# quotes that the other action deliberately does not have.
+ACTION_MANUAL = (
+    'export PATH="/opt/homebrew/bin:/usr/bin:/bin:$PATH"\n'
+    '/usr/bin/open -na Ghostty --args --window-save-state=never '
+    '--wait-after-command=true '
+    '-e "$HOME/.config/yadm/bin/dot-in-terminal" manual "{query}"\n'
 )
 
 # Theme changes are silent and instant; no terminal needed.
@@ -156,6 +171,8 @@ UIDS = {
     "a_theme": "A1000000-0000-4000-8000-000000000004",
     "f_agent": "A1000000-0000-4000-8000-000000000005",
     "a_agent": "A1000000-0000-4000-8000-000000000006",
+    "f_manual": "A1000000-0000-4000-8000-000000000007",
+    "a_manual": "A1000000-0000-4000-8000-000000000008",
 }
 
 
@@ -170,6 +187,10 @@ def build():
         script_filter(UIDS["f_agent"], "agent", "{query}",
                       "run the default coding agent on a task", FILTER_AGENT),
         script_action(UIDS["a_agent"], ACTION_TERMINAL),
+        script_filter(UIDS["f_manual"], "manual", "{query}",
+                      "read a section of the dotfiles manual", FILTER_MANUAL,
+                      has_arg=False),
+        script_action(UIDS["a_manual"], ACTION_MANUAL),
     ]
 
     def conn(src, dst):
@@ -180,11 +201,13 @@ def build():
         UIDS["f_dot"]: conn(UIDS["f_dot"], UIDS["a_dot"]),
         UIDS["f_theme"]: conn(UIDS["f_theme"], UIDS["a_theme"]),
         UIDS["f_agent"]: conn(UIDS["f_agent"], UIDS["a_agent"]),
+        UIDS["f_manual"]: conn(UIDS["f_manual"], UIDS["a_manual"]),
     }
 
     # Laid out in a column so the graph is readable if it is ever opened.
     uidata = {}
-    for i, key in enumerate(["f_dot", "a_dot", "f_theme", "a_theme", "f_agent", "a_agent"]):
+    for i, key in enumerate(["f_dot", "a_dot", "f_theme", "a_theme",
+                             "f_agent", "a_agent", "f_manual", "a_manual"]):
         uidata[UIDS[key]] = {"xpos": 40 if key.startswith("f_") else 340,
                              "ypos": 40 + (i // 2) * 140}
 

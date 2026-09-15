@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# dot:summary=read the dotfiles manual (dot manual [section])
+#
+# With no argument: the whole document, paged. With one: the matching
+# section only, so `dot manual themes` answers a question rather than
+# dumping 450 lines.
+#
+# Rendered with bat when available (markdown highlighting + paging) and less
+# otherwise. glow would be nicer but is not a dependency here.
+set -uo pipefail
+
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+
+MANUAL="$DOT_ROOT/MANUAL.md"
+[[ -f "$MANUAL" ]] || { err "no $MANUAL"; exit 1; }
+
+sections() {  # "## Title" and "### Title" lines, without the hashes
+  grep -nE '^#{2,3} ' "$MANUAL" | sed 's/^\([0-9]*\):#\{2,3\} /\1\t/'
+}
+
+render() {  # read from stdin
+  if have bat; then
+    bat --language=md --style=plain --paging=always
+  else
+    less -R
+  fi
+}
+
+case "${1:-}" in
+  "")
+    render < "$MANUAL"
+    ;;
+  -l|--list|list)
+    sections | awk -F'\t' '{ printf "  %s\n", $2 }'
+    ;;
+  --sections-json)
+    # For the Alfred Script Filter.
+    sections | "${DOT_JQ:-jq}" -R -s 'split("\n")
+      | map(select(length > 0) | split("\t"))
+      | { items: map({ title: .[1], subtitle: ("line " + .[0]), arg: .[1] }) }'
+    ;;
+  *)
+    query="$*"
+    # Start at the matching heading, stop at the next heading of the same or
+    # higher level. `--` guards a query that begins with a dash.
+    line="$(sections | awk -F'\t' -v q="$query" 'BEGIN{IGNORECASE=1} index(tolower($2), tolower(q)) { print $1; exit }')"
+    if [[ -z "$line" ]]; then
+      err "no section matching '$query'"
+      echo "  sections:"
+      sections | awk -F'\t' '{ printf "    %s\n", $2 }'
+      exit 1
+    fi
+    level="$(sed -n "${line}p" "$MANUAL" | grep -oE '^#+' | tr -d '\n' | wc -c | tr -d ' ')"
+    awk -v start="$line" -v lvl="$level" '
+      NR == start { inside = 1; print; next }
+      inside && /^#+ / {
+        match($0, /^#+/)
+        if (RLENGTH <= lvl) exit
+      }
+      inside { print }
+    ' "$MANUAL" | render
+    ;;
+esac

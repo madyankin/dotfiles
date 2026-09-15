@@ -1,356 +1,451 @@
-# Using these dotfiles
+# Dotfiles manual
 
-Day-to-day operation. The root `README.md` covers installing on a new machine,
-what is deliberately untracked, and the footguns; this covers what you actually
-type.
+How this machine is operated. The root `README.md` covers installing from
+scratch, what is deliberately untracked, and the repository's own hazards.
+This is the reference for everything you type afterwards.
 
-Everything goes through one command:
+Read it in a terminal with `dot manual`, or by keyword `manual` in Alfred.
 
-```bash
-dot                 # grouped help — every subcommand with a one-line summary
-dot commands        # the same list, flat
-dot menu            # pick one with fzf, in the terminal you are already in
-```
+## Contents
 
-`dot` lives at `~/.config/yadm/bin/dot` and is on `PATH` as `~/.local/bin/dot`.
-Subcommands are **files** in `bin/`: drop in `bin/dot-foo`, give it a
-`# dot:summary=` comment, and it appears in the help, in `dot menu` and in
-Alfred with nothing else to edit.
+- [The `dot` command](#the-dot-command) — one entry point, files as subcommands
+- [Daily operations](#daily-operations) — converge, doctor, update, sync
+- [Themes](#themes) — one palette, every app, light and dark
+- [Terminal](#terminal) — Ghostty, and the settings with non-obvious reasons
+- [Shell](#shell) — load order, and the rules that bite
+- [Runtimes](#runtimes) — mise
+- [Packages](#packages) — groups and scoped removal
+- [Agents](#agents) — default agent, one-shot prompts, usage
+- [Alfred](#alfred) — the generated workflow
+- [Layout](#layout) — where everything lives
+- [Recovery](#recovery)
 
 ---
 
-## Every day
+## The `dot` command
 
-| Command | What it does |
+```bash
+dot                 # grouped help: every subcommand with a one-line summary
+dot commands        # the same list, flat; --json feeds Alfred
+dot menu            # pick one with fzf, in the terminal you are already in
+dot manual          # this document
+```
+
+`dot` lives at `~/.config/yadm/bin/dot`, on `PATH` as `~/.local/bin/dot`
+through a relative symlink.
+
+Subcommands are **files**. `dot a b c` resolves by longest prefix to an
+executable `bin/dot-a-b-c`, else `bin/dot-a-b`, else `bin/dot-a`, passing the
+rest as argv. Adding one is adding a file with a `# dot:summary=` comment: it
+appears in the help, in `dot menu` and in Alfred with nothing central to edit.
+
+Everything in `bin/`, `lib/`, `scripts/`, `doctor.d/` and `update.d/` is bash
+3.2 — no associative arrays, no `${arr[-1]}`, no `mapfile`. `functions.zsh` is
+the one intentional zsh file.
+
+---
+
+## Daily operations
+
+| Command | Use it when |
 |---|---|
-| `dot converge` | Make this machine match the pulled config. **Run this on any other machine after a pull** |
-| `dot doctor` | Check the machine against the config. Run it when something feels off |
-| `dot update` | brew, mas, mise, npm, nvim, tpm, zplug, and a `yadm pull` |
-| `dot sync` | Commit and push the dotfiles now (also aliased `sync-dotfiles`) |
-| `dot theme set <name>` | Switch the whole palette |
-| `dot install` | The software wizard |
+| `dot converge` | This machine has pulled config it has not applied |
+| `dot doctor` | Something feels off |
+| `dot update` | Updating brew, mas, mise, npm, nvim, tpm, zplug |
+| `dot sync` | You want the dotfiles committed and pushed now |
+| `dot install` | Adding or removing managed software |
+| `dot theme set <name>` | Changing the palette |
 
-### `dot doctor`
+### converge
 
-Nine groups of checks, ~9 seconds. It exists because **every problem this repo
-has actually had was drift, not a missing migration**: a crontab commented out
-by hand, an app uninstalled from under its config, two version managers
-fighting over the same shims. A run-once migration runner notices none of that;
-a doctor notices all of it, every time.
+`yadm pull` moves **tracked** files only. Everything generated or linked is
+gitignored, because it is an output — so a machine that has only pulled is
+missing all of it:
 
-```bash
-dot doctor                  # everything
-dot doctor --only runtimes  # one group (substring match on the filename)
-dot doctor --fix            # offer the destructive one-shots, asking first
-```
-
-Checks live in `doctor.d/NN-name.sh`, one concern per file. Two allowlists stop
-a permanently-warning check from training you to ignore it:
-
-- `doctor.d/orphans.allow` — config directories kept without the app installed
-  here. `aerospace` is in it: the window-manager decision is deferred, the toml
-  is good, and Amethyst + Rectangle are what actually run.
-- `doctor.d/packages.allow` — top-level formulae deliberately unmanaged.
-
-### `dot update`
-
-```bash
-dot update                  # the lot
-dot update --dry-run        # print every step's plan, change nothing
-dot update --only nvim      # one step
-dot update --skip brew
-dot update --prune          # also brew cleanup
-dot update --log            # what the last run found installed
-```
-
-Steps are `update.d/NN-name.sh`. Notes on the ones with sharp edges:
-
-- **brew** deliberately does not pass `--greedy`. It would fight the apps that
-  ship their own updaters (1Password, Chrome, Zed, Obsidian).
-- **nvim** rewrites the *tracked* `lazy-lock.json`. That is the point: the next
-  sync commits the new pins and the other machine gets the same plugin versions.
-- **npm** installs each manifested package at `@latest` individually. A blanket
-  `npm -g update` under a shimmed node is how a whole toolchain gets bricked.
-- Before anything runs, `~/.local/state/dot/updates/<timestamp>/` records a
-  `brew bundle dump`, `mise ls`, `npm ls -g` and `lazy-lock.json`. macOS has no
-  selective snapshot worth using, and Arq owns real backups; this answers the
-  question a snapshot is a proxy for — *what changed, and what do I pin back to*.
-
-### `dot converge` — the step a second machine needs
-
-`yadm pull` moves only **tracked** files. Everything generated or linked is
-gitignored, because it is an output — so a machine that has only ever pulled
-has none of it:
-
-- `~/.local/bin/dot` (so `dot` is not even on PATH there)
-- the `yadm alt` output, **including `.config/zsh/.zshrc`** — which means none
-  of the shell changes take effect, the most confusing symptom of the lot
+- `~/.local/bin/dot`, so `dot` is not on `PATH`
+- the `yadm alt` output, **including `.config/zsh/.zshrc`** — the shell keeps
+  running its previous configuration, which is the most confusing symptom
 - every colour file: Ghostty's themes and `icon.conf`, `tmux/theme.conf`,
   `p10k-colors.zsh`, `fzf-colors.zsh`, the nvim colorschemes, btop, htop, the
   mc skins, the iTerm2 dynamic profile, the VS Code theme extension
 - the agent and editor symlinks
 
 ```bash
-~/.config/yadm/bin/dot converge     # full path: dot is not on PATH yet
-dot converge                        # afterwards
+~/.config/yadm/bin/dot converge   # full path, when dot is not on PATH yet
+dot converge                      # afterwards
 ```
 
-It is the **idempotent subset of bootstrap** — no macOS defaults, no install
-wizard, no scheduler — so it is safe to run unattended, and the sync now runs
-it after every pull. It writes nothing when already in sync.
+It is the idempotent subset of bootstrap — `yadm alt`, the CLI symlink, agent
+and editor links, the iTerm2 prefs pointer, a full theme render. No macOS
+defaults, no install wizard, no scheduler, so it is safe unattended: the sync
+runs it after every pull, and it writes nothing when already in sync.
 
-What it deliberately does *not* do, because these need decisions or downloads:
+Three things it leaves alone, because they need a decision or a download:
 
 ```bash
-dot install          # new packages from the Brewfiles (ghostty, fastfetch, …)
-dot update           # mise runtimes, plugins
-dot cron install     # opt in to the periodic sync on that machine
+dot install          # packages named in the Brewfiles
+dot update           # mise runtimes, editor and shell plugins
+dot cron install     # opt this machine into the periodic sync
 ```
 
-### Sync
+### doctor
 
-> **Do not run `dot sync` with work in progress.** It stages and commits
-> everything in scope with a generic `chore(sync)` message — that is its job.
-> Commit anything you want a real message on first.
-
-`scripts/commit-and-push.sh` every two hours, now scheduled by a **launchd user
-agent**, not cron. macOS cron runs outside the GUI session, so `yadm push` there
-has no `SSH_AUTH_SOCK` and no keychain, and `/usr/sbin/cron` needs Full Disk
-Access — which is the likely reason the crontab entry had been commented out by
-hand. A `gui/$UID` agent has both, and a `StartInterval` missed while asleep
-fires once on wake.
+Ten groups of checks, a few seconds. The design choice behind it: this
+configuration converges rather than migrating. Every setup script drives the
+machine toward a desired state instead of applying a one-way delta, and a
+doctor is the read-only half of that idea — it catches **drift**, which a
+run-once migration runner cannot see at all.
 
 ```bash
-dot cron install                                          # load it
-launchctl print gui/$UID/name.madyankin.dotfiles.sync     # is it armed
-launchctl kickstart -p gui/$UID/name.madyankin.dotfiles.sync   # run it now
+dot doctor                  # everything
+dot doctor --only runtimes  # one group; substring match on the filename
+dot doctor --fix            # offer the destructive one-shots, asking first
+```
+
+Checks are `doctor.d/NN-name.sh`, one concern per file, each exiting non-zero
+on failure. Two allowlists keep a permanently-warning check from training you
+to ignore it:
+
+- `doctor.d/orphans.allow` — config directories kept without the app installed
+  on this machine. Normal in a two-machine setup.
+- `doctor.d/packages.allow` — top-level formulae deliberately unmanaged.
+
+### update
+
+```bash
+dot update                  # everything
+dot update --dry-run        # print each step's plan, change nothing
+dot update --only nvim
+dot update --skip brew
+dot update --prune          # also brew cleanup
+dot update --log            # what the last run found installed
+```
+
+Steps are `update.d/NN-name.sh`. The ones with sharp edges:
+
+- **brew** does not pass `--greedy`; it fights apps that ship their own
+  updaters (1Password, Chrome, Zed, Obsidian).
+- **nvim** rewrites the *tracked* `lazy-lock.json`, so the next sync ships the
+  same plugin versions to the other machine.
+- **npm** installs each manifested package at `@latest` individually. A blanket
+  `npm -g update` under a shimmed node can break a whole toolchain at once.
+
+Before any step runs, `~/.local/state/dot/updates/<timestamp>/` records a
+`brew bundle dump`, `mise ls`, `npm ls -g` and `lazy-lock.json` — enough to
+answer *what changed, and what do I pin back to*. macOS has no selective
+snapshot worth relying on; Arq owns real backups.
+
+`dot update` pulls, then re-execs the step runner as a fresh process, so a pull
+that changed the steps runs the new ones.
+
+### sync
+
+> `dot sync` stages and commits everything in scope under a generic
+> `chore(sync)` message. Commit anything that deserves a real message first.
+
+`scripts/commit-and-push.sh` runs every two hours from a **launchd user
+agent**. It has to be launchd rather than cron: macOS cron runs outside the GUI
+session, so `yadm push` there has no `SSH_AUTH_SOCK` and no keychain, and
+`/usr/sbin/cron` needs Full Disk Access. A `gui/$UID` agent has both, and a
+`StartInterval` missed while asleep fires once on wake.
+
+```bash
+dot cron install                                             # load it
+launchctl print gui/$UID/name.madyankin.dotfiles.sync        # armed?
+launchctl kickstart -p gui/$UID/name.madyankin.dotfiles.sync # run now
 tail -f ~/.local/state/dot/sync.log
 ```
 
-The plist is rendered from `launchd/*.plist.template` because **launchd does not
-expand `$HOME`** — a literal plist would bake an absolute username into a public
-repo.
+Plists are rendered from `launchd/*.plist.template`, because **launchd does not
+expand `$HOME`** and a literal plist would commit an absolute username to a
+public repository.
+
+Staging is two-part, because the work tree is `$HOME`: `yadm add -u` for
+tracked files anywhere, plus a scoped `add -A` over the directories where new
+dotfiles legitimately appear. The Alfred workflows directory is excluded from
+`add -u` and re-added with `--ignore-removal`: a workflow missing there means
+*not installed on this machine*, not *deleted*.
 
 ---
 
 ## Themes
 
-One palette per theme drives the terminal, tmux, the prompt, fzf, btop, htop,
-mc, nvim, VS Code, Zed, the iTerm2 profile, Terminal.app and Ghostty's app icon.
+One palette drives the terminal, tmux, the prompt, fzf, btop, htop, mc, nvim,
+VS Code, Zed, the iTerm2 profile, Terminal.app and Ghostty's app icon.
 
 ```bash
-dot theme list
+dot theme list                      # * marks active
 dot theme set one
 dot theme render                    # regenerate without switching
 dot theme render --skip editors     # keep hand-tuned nvim/VS Code/Zed themes
+dot theme render --only fonts
 dot theme doctor
 dot background next
 dot font list
 dot font set "JetBrainsMono Nerd Font Mono" 15
-dot theme render --only fonts        # just the font fan-out
 ```
 
-Authoring a theme: `themes/README.md`. Short version — copy a directory, edit
-the hex values, `dot theme set <name>`.
+Authoring: `themes/README.md`. In short — copy a theme directory, edit the hex
+values, `dot theme set <name>`.
 
-### How light/dark works, and why there is no daemon
+### Light and dark, without a daemon
 
-**Both modes are always generated, and each app's own detection picks one.**
-Ghostty, nvim, VS Code, Zed and iTerm2 all switch themselves. tmux, the p10k
-prompt, fzf and `ls` are rendered in **ANSI indices 0–15 only, never hex** — the
-terminal swaps its own palette when macOS flips, so those repaint in
-already-open shells on the next redraw.
+**Both modes are always generated, and each application's own detection picks
+one.** Ghostty, nvim, VS Code, Zed and iTerm2 all switch themselves.
 
-Consequence worth knowing: if you put a hex colour where an ANSI index belongs,
-that thing stops following the system. `dot theme doctor` checks the prompt for
-exactly this.
+tmux, the prompt, fzf and `ls` are rendered in **ANSI indices 0–15 only, never
+hex**. The terminal swaps its own palette when macOS flips appearance, so those
+repaint in already-open shells on the next redraw. The constraint follows: a
+hex colour where an ANSI index belongs stops that tool following the system.
+`dot theme doctor` checks the prompt for it.
 
 Two exceptions:
 
-- **htop and mc** rewrite their own config on exit, so they are selected per
-  launch by wrapper functions in `functions.zsh` via `HTOPRC` and `MC_SKIN`.
-  That is also why htop's layout lives in the tracked `htoprc.base` and the
-  generated files absorb the churn. Promote a layout change back with
-  `theme.sh capture-htop`.
-- **Terminal.app** has no light/dark awareness at all. It is the only thing that
+- **htop and mc** rewrite their own config on exit, so generating those files
+  directly would fight the application. Wrapper functions in `functions.zsh`
+  select a generated file per launch through `HTOPRC` and `MC_SKIN`. htop's
+  layout therefore lives in the tracked `htoprc.base`, and the generated copies
+  absorb the churn; promote a layout change back with `theme.sh capture-htop`.
+- **Terminal.app** has no light/dark awareness, so it is the only target that
   needs a push, and it is opt-in:
 
   ```bash
-  dot theme install-agent     # 2s poll, sets Terminal.app's default profile
+  dot theme install-agent      # 2s poll; sets Terminal.app's default profile
   dot theme uninstall-agent
   ```
 
-  Already-open Terminal.app windows never retheme; only new ones.
+  Only new Terminal.app windows pick up a change.
 
-### Two apps need a nudge after a palette edit
+Two applications need a nudge after a palette edit: Ghostty caches its theme
+file (`Cmd+Shift+,`), and Neovim needs `:source $MYVIMRC` or a restart.
+`theme.sh` prints this after every render.
 
-Ghostty caches its theme file — `Cmd+Shift+,`. Neovim — `:source $MYVIMRC` or
-reopen. `theme.sh` prints this reminder after every render.
+**Alfred is not themed.** It uses the imported *Alfred macOS Ventura* theme,
+bound to both the light and dark slots, with Alfred's own `nativedarkmode`
+doing the adaptation.
 
-### Alfred is deliberately not themed
+---
 
-It stays on the imported **Alfred macOS Ventura** theme, bound to both the light
-and dark slots, with Alfred's own `nativedarkmode` doing the adaptation. A
-launcher tinted to editor colours looked wrong next to everything else.
+## Terminal
+
+Ghostty is the daily driver; iTerm2 stays installed as a fallback with its own
+tracked plist. `~/.config/ghostty/config` is tracked, its theme files and
+`icon.conf` are generated.
+
+Four settings exist for reasons worth knowing:
+
+- `term = xterm-256color` — Ghostty's own `xterm-ghostty` terminfo is absent on
+  remote hosts, which breaks `ssh` and `clear` confusingly.
+- `shell-integration-features = no-cursor` — with the `cursor` feature enabled
+  the shell forces a bar at the prompt *regardless of `cursor-style`*, so the
+  configured cursor would only appear mid-command.
+- `adjust-underline-thickness` — there is no underline-cursor thickness option;
+  the underline cursor uses the font's underline metric, so this also thickens
+  genuinely underlined text. These adjustments are **deltas**: `200%` means
+  three times the original. Integers and percentages only — `1px` is invalid
+  and is dropped silently.
+- `macos-titlebar-style = hidden` — costs the traffic lights, which Ghostty
+  always hides in this mode. `Cmd+W` closes; drag the terminal body to move.
+
+---
+
+## Shell
+
+zsh with `ZDOTDIR=~/.config/zsh`, powerlevel10k, and oh-my-zsh libraries and
+plugins sourced directly. Interactive startup is ~0.17s.
+
+zplug is installed and owns **cloning and updating** the plugin repositories,
+but is not in the startup path: sourcing the twelve files it clones costs a
+fraction of loading the framework. `dot update` runs `zplug update`.
+
+`plugins.zsh` has a **load-bearing order**:
+
+1. `fpath` — every directory holding `_completion` files
+2. `compinit` — it scans `fpath`; anything added afterwards is invisible
+3. plugins — they call `compdef`, which needs `compinit` already run
+4. syntax highlighting **last** — it wraps the ZLE widgets the others redefine
+
+`lib/functions.zsh` and `lib/git.zsh` are sourced explicitly and before the
+plugins: they define `take`, `mkcd`, `omz_urlencode`, `git_current_branch` and
+`parse_git_dirty`, which git aliases such as `ggpush` and `gpsup` call at
+runtime.
+
+Editing `plugins.zsh` invalidates a marker keyed to its mtime, so exactly one
+subsequent shell re-verifies the clones. That shell is slow; the rest are not.
+
+### Rules that bite
+
+- **`$ZDOTDIR/.zshenv` exists and sources `~/.zshenv`.** `~/.zshenv` exports
+  `ZDOTDIR`, and once that is in the environment every *nested* zsh — a tmux
+  pane, `zsh -c` from a script — reads `$ZDOTDIR/.zshenv` and never looks at
+  `~/.zshenv` again. Without the shim those shells silently keep whatever
+  `PATH` they inherited. This is not the same thing as sourcing `~/.zshenv`
+  from `.zshrc`, which remains wrong.
+- **`~/.zshenv` is parsed by bash**, because `commit-and-push.sh` sources it —
+  and bash parses the entire file even inside an `if [ -n "$ZSH_VERSION" ]`
+  branch it never takes. zsh-only syntax there is a bash *parse error*, which
+  is why the `PATH`-pruning glob hides behind `eval '…'`. The file ends in `:`
+  so sourcing it from bash returns 0.
+- **`./bin` is not on `PATH`**, deliberately: it would put the `bin/` of
+  whatever repository you are standing in ahead of your own commands,
+  including repositories cloned by agents. direnv's `PATH_add bin` is the
+  opt-in per project; direnv is hooked after mise.
+- `PATH` is built in a single assignment, highest priority first, and entries
+  whose directory does not exist are pruned.
+
+---
+
+## Runtimes
+
+**mise owns the runtimes.** Pins live in the tracked
+`~/.config/mise/config.toml`, where the key is `node` — not asdf's `nodejs`,
+which mise ignores silently.
+
+Agent CLIs (codex, gemini-cli, pi, agent-browser) are mise **`npm:` backend**
+tools rather than npm globals. An npm global belongs to one node version and
+disappears the moment a project pins another, which `~/Code/.tool-versions`
+does.
+
+Ruby comes from Homebrew, not mise — a mise ruby means a source build. Gems go
+to `GEM_HOME=~/.gem`, not `/opt/homebrew/lib/ruby/gems/<X.Y.0>/bin`, which
+breaks on every ruby upgrade.
+
+`mise activate` output is **not cacheable**: it bakes the current `PATH` into
+`__MISE_ORIG_PATH`, so a cached copy restores a stale `PATH` into every future
+shell.
+
+---
+
+## Packages
+
+Groups `essentials`, `dev`, `work`, `personal`, `goose`, one
+`packages/Brewfile.<group>` each.
+
+```bash
+dot install              # wizard, pre-filled from what is installed
+dot install --dry-run
+```
+
+**Removal is scoped.** A package is uninstalled only when it appears in some
+group's manifest *and* is absent from the current selection. It is the only
+thing standing between a wizard run and half the machine, so do not weaken it.
+
+Manifest names must be **canonical**: `install.sh` compares against
+`brew list --formula`, which prints canonical names, so an alias such as
+`delta` or `mc` never matches and reports itself missing forever. `dot doctor`
+checks for this, and reports drift in both directions — using `brew leaves`
+for the installed side, since `brew list --formula` is mostly transitive
+dependencies that have no business in a manifest.
 
 ---
 
 ## Agents
 
 ```bash
-dot agent              # launch the default one
-dot agent list         # * marks the default
+dot agent                               # launch the default
+dot agent list                          # * marks the default
 dot agent set codex
 dot agent prompt "review this diff"     # one-shot, in the current directory
-dot agent usage        # sessions and tokens per agent per day
+dot agent usage                         # sessions and tokens per agent per day
 ```
 
-`dot agent usage` reports counts only — never a key, token value or account
-identifier. That output ends up in pastes.
+`dot agent usage` prints counts only — never a key, token value or account
+identifier, because that output ends up in pastes.
 
-Your own aliases are untouched: `ca` is `claude --enable-auto-mode`, `cy` is
-`claude --dangerously-skip-permissions`. Omarchy's `c`/`cx`/`cy` were **not**
-ported precisely because `cy` already means something here.
+Shell aliases are separate and unaffected: `ca` is `claude --enable-auto-mode`,
+`cy` is `claude --dangerously-skip-permissions`.
 
 ---
 
 ## Alfred
 
 Keyword `dot` lists every subcommand and runs it in Ghostty. `theme` is the
-style menu. `agent <your task>` hands the task to the default agent.
+style menu, `agent <task>` hands a task to the default agent, and `manual`
+opens this document.
 
-The workflow is **generated** by `scripts/alfred-dot-workflow.py`, not
-hand-built in Alfred's UI — an `info.plist` edited through the GUI is
-unreviewable and drifts from the CLI within a month. The Script Filters call
-`dot commands --json`, so they list whatever exists.
-
-```bash
-dot alfred workflow    # regenerate; Alfred picks it up on relaunch
-```
-
-Each Alfred launch opens a **new Ghostty instance**, not a window in the running
-one: `open` discards `--args` without `-n`. Use `dot menu` when that matters.
-
-The terminal action hands Ghostty `bin/dot-in-terminal` as a program to exec,
-with the subcommand as plain argv. It must not use
-`--initial-command="shell:…"`: Ghostty wraps that as
-`login -flp <user> /bin/bash --noprofile --norc -c exec -l <string>`, and the
-prepended `exec -l` replaces the shell with the first command — so a trailing
-`; exec /bin/zsh -l` never runs and the window dies as soon as the command
-finishes.
-
----
-
-## Packages
-
-Groups: `essentials`, `dev`, `work`, `personal`, `goose`. One
-`packages/Brewfile.<group>` each.
+The workflow is **generated** by `scripts/alfred-dot-workflow.py`. A workflow
+`info.plist` edited through Alfred's UI is an unreviewable blob that drifts
+from the CLI; these Script Filters call `dot commands --json`, so they list
+whatever exists.
 
 ```bash
-dot install              # wizard
-dot install --dry-run
+dot alfred workflow    # regenerate; Alfred indexes it on relaunch
 ```
 
-Removal stays scoped — a package is uninstalled only when it appears in some
-manifest *and* is absent from the current selection. It is the only thing
-stopping a wizard run from clearing half the machine, so do not weaken it.
+Two mechanics to preserve:
 
-`dot doctor` reports drift in both directions. The installed→manifest side uses
-`brew leaves` (top-level, ~46) rather than `brew list --formula` (~179, mostly
-transitive dependencies that have no business in a manifest).
+- The terminal action hands Ghostty `bin/dot-in-terminal` as a program to
+  **exec**, with the subcommand as plain argv. It must not use
+  `--initial-command="shell:…"`, which Ghostty wraps as
+  `login -flp <user> /bin/bash --noprofile --norc -c exec -l <string>` — that
+  prepended `exec -l` replaces the shell with the first command, so a trailing
+  `; exec /bin/zsh -l` never runs and the window closes immediately.
+- Each launch opens a **new Ghostty instance**, since `open` discards `--args`
+  without `-n`. `dot menu` is the in-place alternative.
 
----
+### Workflows
 
-## Runtimes
+`alfred/workflows.txt` is a **union across machines**, not this machine's
+inventory: an entry is never dropped because it is not installed here, which
+is what `alfred.sh install` needs it to mean.
 
-**mise owns everything; asdf is gone.** Pins live in the tracked
-`~/.config/mise/config.toml`. The key is `node`, not `nodejs` — the old
-`~/.tool-versions` used the asdf spelling, which mise ignores, which is why
-every runtime reported `(missing)` while asdf's shims quietly won.
+```bash
+dot alfred save        # record installed workflows into the union
+dot alfred install     # install everything listed that is missing here
+dot alfred sync        # both
+```
 
-Agent CLIs (codex, gemini-cli, pi, agent-browser) are mise **`npm:` backend**
-tools, not `npm install -g`. A global installed under node 24 vanishes the
-moment a project pins node 22, and `~/Code/.tool-versions` does exactly that.
+`install` downloads and **unzips** into the workflows directory — a
+`.alfredworkflow` is a ZIP, and Alfred loads plain directories. Alfred's import
+sheet needs a click per workflow and refuses several at once, so it is avoided
+entirely; the trade-off is that unzipping keeps the author's hotkeys, which the
+import sheet would strip.
 
-Ruby stays on Homebrew, not mise — a mise ruby means a source build. Gems go to
-`GEM_HOME=~/.gem` rather than `/opt/homebrew/lib/ruby/gems/<X.Y.0>/bin`, which
-silently breaks on every ruby upgrade.
+Two supporting files:
 
-`mise activate` output is **not cacheable**: it bakes the current `PATH` into
-`__MISE_ORIG_PATH`, so a cached copy would restore a stale PATH into every
-future shell.
-
----
-
-## Shell
-
-~0.17s interactive startup, down from 0.65s. The win was taking zplug out of
-the startup path: the framework cost 0.58s cold / 0.14s warm, while sourcing the
-same 12 files it clones costs 0.07s. zplug is still installed and still owns
-cloning and updating.
-
-`plugins.zsh` has a load order that is **load-bearing**: fpath → compinit →
-plugins (they call `compdef`) → syntax highlighting last (it wraps the ZLE
-widgets everything else redefines). Adding an fpath entry after compinit makes
-it invisible.
-
-Editing `plugins.zsh` invalidates a marker keyed to its mtime, so the next
-single shell re-verifies the clones. That one shell is slow; the rest are not.
-
-### Two shell footguns added since the README was written
-
-- **`$ZDOTDIR/.zshenv` now exists and sources `~/.zshenv`.** This is not a
-  contradiction of "never source `~/.zshenv` from `.zshrc`" — different file,
-  different problem. `~/.zshenv` exports `ZDOTDIR`, and once that is in the
-  environment every *nested* zsh (a tmux pane, `zsh -c` from a script) reads
-  `$ZDOTDIR/.zshenv` and never looks at `~/.zshenv` again. Without the shim
-  those shells silently keep whatever PATH they inherited.
-- **`~/.zshenv` is parsed by bash** (`commit-and-push.sh` sources it), and bash
-  parses the whole file even inside an `if [ -n "$ZSH_VERSION" ]` branch it never
-  takes. So zsh-only syntax there is a bash *parse error*; the PATH-pruning glob
-  is hidden behind `eval '…'` for that reason. The file ends in `:` so sourcing
-  it from bash still returns 0.
-
-`./bin` is no longer on `PATH`. It put the `bin/` of whatever repo you were
-standing in ahead of your own commands, including repos cloned by agents. Use
-direnv's `PATH_add bin` per project; direnv is hooked now.
+- `alfred/workflows.ignore` — bundleids never to list or install. Necessary
+  because a union cannot forget: without it, a workflow removed here is
+  re-added by the next machine that still has it.
+- `alfred/workflows.sources` — per-bundleid download overrides. The source
+  column comes from the workflow's own `webaddress` key, which is usually the
+  author's homepage rather than a repository.
 
 ---
 
-## Terminal
+## Layout
 
-Ghostty is the daily driver, iTerm2 remains installed as a fallback with its own
-tracked plist.
+```
+~/.config/yadm/
+  bin/                 dot and its subcommands
+  lib/common.sh        logging, run(), confirm()
+  scripts/             theme.sh, install.sh, alfred.sh, commit-and-push.sh, …
+  doctor.d/            one check per file  (+ *.allow)
+  update.d/            one update step per file
+  themes/              palettes, meta, templates  (see themes/README.md)
+  packages/            Brewfile.<group>
+  launchd/             *.plist.template  (@HOME@ is substituted)
+  editors/             VS Code settings, keybindings, extension list
+  alfred/              preference bundle, workflows.txt/.ignore/.sources
+  hooks/pre_commit     refuses to commit credentials
+  MANUAL.md            this file
+```
 
-`~/.config/ghostty/config` is tracked. Its theme files and `icon.conf` are
-generated and gitignored. Three settings are there for non-obvious reasons:
-
-- `term = xterm-256color` — Ghostty's own `xterm-ghostty` terminfo is absent on
-  every remote host, which breaks `ssh` and `clear` confusingly.
-- `shell-integration-features = no-cursor` — with the `cursor` feature on, the
-  shell forces a bar at the prompt "regardless of this configuration", so
-  `cursor-style` would only apply mid-command.
-- `adjust-underline-thickness` — there is no underline-cursor-specific thickness
-  option; the underline cursor uses the font's underline metric, so this also
-  thickens genuinely underlined text. These adjustments are **deltas**: `200%`
-  means three times the original, and `1px` is invalid syntax that Ghostty drops
-  silently.
-
-`macos-titlebar-style = hidden` costs the traffic lights — Ghostty always hides
-them in that mode. `Cmd+W` to close, drag the terminal body to move.
+Generated and gitignored: `.config/zsh/.zshrc`, `.config/yadm/bootstrap`, every
+colour file, `~/.local/bin/dot`, the rendered LaunchAgents.
 
 ---
 
-## When something breaks
+## Recovery
 
 ```bash
 dot doctor                      # start here
 dot doctor --fix                # if it offers something
-dot theme render                # colours look wrong
+dot converge                    # config pulled but not applied
+dot theme render                # colours wrong or missing
 yadm status --short             # what is uncommitted
 ```
 
-Not tracked and recoverable only by hand: see the README's table. Nothing in
-`~/.ssh`, `~/.gnupg`, `~/.aws` or `~/.npmrc` is in this repo, and the
-`pre_commit` hook refuses to commit anything credential-shaped — which matters
-because the sync commits unattended.
+Nothing in `~/.ssh`, `~/.gnupg`, `~/.aws` or `~/.npmrc` is in this repository;
+the root README lists what must be recreated by hand. The `pre_commit` hook
+refuses anything credential-shaped, which matters because the sync commits
+unattended to a public repository.
