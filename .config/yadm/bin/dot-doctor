@@ -55,29 +55,60 @@ fi
 
 if [[ -n "$FIX" ]]; then
   header "fixes"
-  # Destructive one-shots live here rather than in a migrations runner: the
-  # detector stops firing once the fix is applied, which is what makes this
-  # idempotent without any state file.
+  # Offered as a multi-select rather than a chain of y/N prompts: you see
+  # every available fix at once and choose, instead of answering questions
+  # one at a time without knowing what comes next.
+  #
+  # These are the destructive one-shots a convergence step cannot do. They
+  # need no state file: once applied, the detector stops firing.
+  offers=""
+  add_offer() { offers="${offers}$1"$'\n'; }
+
   if [[ -d "$HOME/.asdf" ]] && have mise; then
-    warn "~/.asdf still present while mise owns runtimes"
-    confirm "move ~/.asdf aside and uninstall the formula?" && {
-      run brew uninstall asdf
-      run mv "$HOME/.asdf" "$HOME/.asdf.removed"
-    }
+    add_offer "remove-asdf	uninstall the asdf formula and move ~/.asdf aside"
   fi
-  if [[ -d "$HOME/.fzf" ]] && brew list --formula 2>/dev/null | grep -qx fzf; then
-    warn "~/.fzf git clone still present while fzf comes from Homebrew"
-    confirm "move ~/.fzf and ~/.fzf.zsh aside?" && {
-      run mv "$HOME/.fzf" "$HOME/.fzf.removed"
-      [[ -f "$HOME/.fzf.zsh" ]] && run mv "$HOME/.fzf.zsh" "$HOME/.fzf.zsh.removed"
-    }
+  if [[ -d "$HOME/.fzf" ]] && brew list --formula 2>/dev/null </dev/null | grep -qx fzf; then
+    add_offer "remove-fzf-clone	move the ~/.fzf git clone aside (fzf comes from Homebrew)"
   fi
   if ! launchctl print "gui/$UID/name.madyankin.dotfiles.sync" >/dev/null 2>&1; then
-    warn "the periodic sync agent is not loaded"
-    note "it commits and pushes your dotfiles every 2 hours"
-    confirm "load it now?" && run "$DOT_ROOT/scripts/cron.sh"
+    add_offer "install-sync	load the launchd agent that commits and pushes every 2h"
   fi
-  ok "nothing else to offer"
+  if [[ "$(yadm -C "$HOME" stash list 2>/dev/null | wc -l | tr -d ' ')" != "0" ]]; then
+    add_offer "show-stash	show what the leftover autostash contains (does not drop it)"
+  fi
+
+  offers="$(printf '%s' "$offers" | grep -v '^$' || true)"
+  if [[ -z "$offers" ]]; then
+    ok "nothing to offer"
+  else
+    chosen="$(printf '%s\n' "$offers" | awk -F'\t' '{printf "%-18s %s\n", $1, $2}' \
+              | pick_many "fixes to apply")"
+    if [[ -z "$chosen" ]]; then
+      ok "no fixes applied"
+    else
+      while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+        case "${line%% *}" in
+          remove-asdf)
+            run brew uninstall asdf
+            run mv "$HOME/.asdf" "$HOME/.asdf.removed"
+            ;;
+          remove-fzf-clone)
+            run mv "$HOME/.fzf" "$HOME/.fzf.removed"
+            [[ -f "$HOME/.fzf.zsh" ]] && run mv "$HOME/.fzf.zsh" "$HOME/.fzf.zsh.removed"
+            ;;
+          install-sync)
+            note "this commits and pushes your dotfiles unattended every 2 hours"
+            run "$DOT_ROOT/scripts/cron.sh"
+            ;;
+          show-stash)
+            yadm -C "$HOME" stash show --stat 'stash@{0}' | sed 's/^/    /'
+            note "drop it yourself with: yadm stash drop"
+            ;;
+        esac
+      done <<<"$chosen"
+    fi
+  fi
 fi
 
 exit $(( fail > 0 ))

@@ -322,9 +322,28 @@ Groups `essentials`, `dev`, `work`, `personal`, `goose`, one
 `packages/Brewfile.<group>` each.
 
 ```bash
-dot install              # wizard, pre-filled from what is installed
-dot install --dry-run
+dot install              # live fzf picker over every package
+dot install --dry-run    # print the plan, change nothing
+dot install --classic    # the numeric-menu fallback
 ```
+
+The picker is one flat searchable list of all ~95 packages across every group.
+**space** toggles a package and the list redraws with the new checkbox;
+**enter** applies; **esc** cancels. The preview pane shows the resulting plan —
+what would be installed and removed — and refreshes on every toggle, so the
+consequences are visible while you choose.
+
+A package that is installed and named by a manifest but missing from the
+selection is **adopted** before the picker opens. Otherwise it would appear as
+a proposed removal purely because the selection file predates the manifest
+entry. Deselecting it in the picker still removes it.
+
+fzf backs every "which one?" prompt for the same reason — `dot theme set`,
+`dot font set` and `dot agent set` all open a picker when called with no
+argument, and `dot doctor --fix` offers its fixes as a multi-select rather than
+a chain of y/N questions. With no controlling terminal every one of them
+reports and exits instead of prompting: fzf does not fail without a tty, it
+hangs.
 
 **Removal is scoped.** A package is uninstalled only when it appears in some
 group's manifest *and* is absent from the current selection. It is the only

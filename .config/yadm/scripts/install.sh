@@ -20,8 +20,19 @@ STATE="$PKG_DIR/.selection"          # untracked, machine-specific
 
 PKG_GROUPS="essentials dev work personal goose"
 
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+
 DRY_RUN=false
-[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
+MODE=interactive
+case "${1:-}" in
+  --dry-run)      DRY_RUN=true ;;
+  --list-for-fzf) MODE=list ;;
+  --toggle)       MODE=toggle ;;
+  --plan-preview) MODE=preview ;;
+  --classic)      MODE=classic ;;
+  "")             ;;
+  *) echo "usage: install.sh [--dry-run|--classic]" >&2; exit 2 ;;
+esac
 
 # ---------------------------------------------------------------- manifests --
 
@@ -313,6 +324,116 @@ ensure_mas_login() {
   read -rp "  Press Enter after signing in..."
 }
 
+# --------------------------------------------------------------- fzf picker ---
+
+# One flat, searchable, live-toggling list of every package in every group.
+#
+# The previous menu was a printf table driven by typed commands — `e 2` to
+# expand a group, then a package number to toggle, redrawn each time. With five
+# groups and ~95 packages that means counting rows and typing numbers with no
+# search, which is unusable at this size.
+#
+# fzf is already a dependency and already backs `dot menu`, so no new one is
+# needed. The list is rendered by this same script (--list-for-fzf) and fzf
+# reloads it after each toggle, which is what makes the checkboxes live.
+
+# group<TAB>name<TAB>pretty — fzf shows field 3 onward and passes 1 and 2 back.
+list_for_fzf() {
+  local g kind name id box inst
+  for g in $PKG_GROUPS; do
+    while IFS=$'\t' read -r kind name id; do
+      [[ -z "$kind" ]] && continue
+      is_pkg_selected "$g" "$name" && box="[x]" || box="[ ]"
+      is_installed "$kind" "$name" "$id" && inst="✓" || inst="·"
+      printf '%s\t%s\t%s %s %-34s %-6s %-11s %s\n' \
+        "$g" "$name" "$box" "$inst" "$name" "$kind" "$g" "$(group_desc "$g")"
+    done <<<"$(group_packages "$g")"
+  done
+}
+
+toggle_pkg() {  # toggle_pkg <group> <name>
+  local g="$1" pkg="$2" cur
+  [[ -z "$g" || -z "$pkg" ]] && return 0
+  cur="$(sel_get "$g")"
+  # An <All> group has to be expanded to a literal list before one member can
+  # be removed from it, or the removal has nothing to subtract from.
+  [[ "$cur" == "All" ]] && cur="$(group_packages "$g" | cut -f2 | paste -sd, -)"
+  if is_pkg_selected "$g" "$pkg"; then
+    cur="$(tr ',' '\n' <<<"$cur" | grep -vx "$pkg" | paste -sd, -)"
+  else
+    cur="${cur:+$cur,}$pkg"
+  fi
+  sel_set "$g" "$cur"
+}
+
+# Shown in fzf's preview pane and refreshed on every toggle, so the
+# consequences of the selection are visible while you make it.
+plan_preview() {
+  local p ins rem
+  p="$(plan)"
+  ins="$(grep -c '^INSTALL' <<<"$p")"; rem="$(grep -c '^REMOVE' <<<"$p")"
+  [[ -z "$p" ]] && { ins=0; rem=0; }
+  printf 'plan: %s to install, %s to remove\n\n' "$ins" "$rem"
+  if [[ "$ins" != "0" ]]; then
+    echo "install:"
+    grep '^INSTALL' <<<"$p" | cut -f2,3 | awk -F'\t' '{printf "  + %-28s %s\n", $2, $1}'
+    echo ""
+  fi
+  if [[ "$rem" != "0" ]]; then
+    echo "remove:"
+    grep '^REMOVE' <<<"$p" | cut -f2,3 | awk -F'\t' '{printf "  - %-28s %s\n", $2, $1}'
+    echo ""
+    echo "(only packages a manifest claims are ever removed)"
+  fi
+}
+
+# A package that is INSTALLED and named by a manifest but missing from the
+# selection would otherwise show up as a proposed REMOVAL — because the
+# selection file predates the manifest entry, not because anything was
+# deselected. Adopting those first means the picker never opens holding a
+# removal you did not ask for. Deselecting one in the picker still removes it.
+adopt_installed() {
+  local g kind name id adopted=""
+  for g in $PKG_GROUPS; do
+    while IFS=$'\t' read -r kind name id; do
+      [[ -z "$kind" ]] && continue
+      is_installed "$kind" "$name" "$id" || continue
+      is_pkg_selected "$g" "$name" && continue
+      toggle_pkg "$g" "$name"
+      adopted="${adopted:+$adopted }$name"
+    done <<<"$(group_packages "$g")"
+  done
+  if [[ -n "$adopted" ]]; then
+    echo "  ! adopted into the selection (installed and manifested, but the"
+    echo "    selection predated the manifest entry):"
+    printf '%s\n' "$adopted" | fold -s -w 64 | sed 's/^/      /'
+    echo ""
+  fi
+}
+
+pick_with_fzf() {
+  local out
+  # fzf hangs rather than failing when there is no controlling terminal, so a
+  # piped or scheduled invocation must not reach it.
+  if [[ ! -e /dev/tty ]] || ! ( exec 3<>/dev/tty ) 2>/dev/null; then
+    echo "  no terminal — showing the plan instead of the picker"
+    show_plan
+    return 1
+  fi
+  out="$(list_for_fzf | fzf \
+    --delimiter='\t' --with-nth=3.. --ansi \
+    --height=100% --layout=reverse --border \
+    --prompt='packages > ' \
+    --header=$'space toggle · enter apply · esc cancel · type to filter\n' \
+    --preview="$SELF --plan-preview" \
+    --preview-window='right,50%,border-left' \
+    --bind="space:execute-silent($SELF --toggle {1} {2})+reload($SELF --list-for-fzf)+refresh-preview" \
+    --bind='ctrl-/:toggle-preview' \
+    --expect=enter)" || return 1
+  [[ -z "$out" ]] && return 1
+  return 0
+}
+
 # -------------------------------------------------------------------- main ---
 
 command -v brew >/dev/null 2>&1 || {
@@ -323,15 +444,45 @@ command -v brew >/dev/null 2>&1 || {
 load_installed
 seed_state
 
+case "$MODE" in
+  list)    list_for_fzf; exit 0 ;;
+  toggle)  toggle_pkg "${2:-}" "${3:-}"; exit 0 ;;
+  preview) plan_preview; exit 0 ;;
+esac
+
 if $DRY_RUN; then
   show_menu
   show_plan
   exit 0
 fi
 
+HAVE_TTY=false
+if [[ -e /dev/tty ]] && ( exec 3<>/dev/tty ) 2>/dev/null; then HAVE_TTY=true; fi
+
+# With no controlling terminal there is nothing to prompt: report and stop.
+# This is the branch a scheduled or piped invocation takes, and it used to
+# fall into the classic loop below, which spins forever on EOF.
+if ! $HAVE_TTY; then
+  echo "  No terminal — reporting instead of prompting."
+  show_menu
+  show_plan
+  exit 0
+fi
+
+# fzf drives the selection unless it is missing or --classic was asked for.
+if [[ "$MODE" == interactive ]] && command -v fzf >/dev/null 2>&1; then
+  adopt_installed
+  if pick_with_fzf; then
+    apply
+  else
+    echo "  Nothing applied."
+  fi
+  exit 0
+fi
+
 while true; do
   show_menu
-  read -rp "  > " cmd arg
+  read -rp "  > " cmd arg || { echo; echo "  Nothing applied."; exit 0; }
   case "$cmd" in
     q|Q) echo "  Nothing applied."; exit 0 ;;
     a|A) apply ;;
@@ -342,7 +493,7 @@ while true; do
       [[ -z "$g" ]] && { echo "  No such group."; continue; }
       while true; do
         show_group "$g"
-        read -rp "     > " gc garg
+        read -rp "     > " gc garg || break
         case "$gc" in
           b|B) break ;;
           all) sel_set "$g" "All" ;;

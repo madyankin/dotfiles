@@ -1,4 +1,19 @@
 #!/usr/bin/env bash
-# dot:summary=switch theme and render
+# dot:summary=switch theme and render (no argument opens a picker)
 set -uo pipefail
-exec "${DOT_ROOT:-$HOME/.config/yadm}/scripts/theme.sh" set "$@"
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+T="$DOT_ROOT/scripts/theme.sh"
+
+if [[ $# -gt 0 ]]; then
+  exec "$T" set "$@"
+fi
+
+# Preview the palette rather than just the name — the whole point of choosing
+# a theme is the colours.
+theme="$("$T" list | sed 's/^[*] //;s/^  //' \
+  | pick_one theme "bat --style=plain --language=sh --color=always \
+      '$DOT_ROOT/themes/{}/palette.dark.sh' 2>/dev/null \
+      || cat '$DOT_ROOT/themes/{}/palette.dark.sh'")"
+[[ -z "$theme" ]] && { echo "  nothing selected"; exit 0; }
+exec "$T" set "$theme"

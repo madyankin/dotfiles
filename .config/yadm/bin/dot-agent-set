@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dot:summary=choose the default coding agent
+# dot:summary=choose the default coding agent (no argument opens a picker)
 set -uo pipefail
 DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
 source "$DOT_ROOT/lib/common.sh"
@@ -7,8 +7,11 @@ DEFAULT_FILE="$DOT_ROOT/agents/default"
 
 name="${1:-}"
 if [[ -z "$name" ]]; then
-  err "usage: dot agent set <claude|codex|goose|opencode|gemini|cursor|pi>"
-  exit 2
+  # Only offer agents that are actually installed; the list marks the rest.
+  name="$("$DOT_ROOT/bin/dot-agent" list \
+    | awk '$2 == "installed" { print $1 }' \
+    | sed 's/^[*] //' | pick_one agent)"
+  [[ -z "$name" ]] && { echo "  nothing selected"; exit 0; }
 fi
 case "$name" in
   claude|codex|goose|opencode|gemini|cursor|pi) ;;
