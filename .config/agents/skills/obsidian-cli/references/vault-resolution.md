@@ -53,9 +53,31 @@ skill must work without it:
 - no `explainer_sources` → skip that source tier entirely
 - no `explainer_anki_deck` → build the cards, offer them, do not push
 
-## 3. Degrade, never guess
+## 3. No config note? Discover the folder from what is already filed
 
-No vault, no config note, or Obsidian not running → **produce the HTML only**.
-Write it where the user asked or to the current directory, say where it landed
-and why there is no note. Never stall waiting for Obsidian, and never fall back
-to a guessed path.
+A vault that has run one of these skills before carries the answer in its own
+notes. Look for the pairs they leave — a `.md` whose tags contain `explanation`,
+next to an `.html` of the same name — before giving up:
+
+```bash
+grep -rl --include='*.md' -e '^  - explanation$' -e 'tags:.*explanation' "$VAULT" \
+  | grep -v '/.obsidian/' \
+  | while read -r f; do [ -e "${f%.md}.html" ] && dirname "$f"; done | sort | uniq -c | sort -rn
+```
+
+Every hit is a folder a previous run chose. Pick the one whose existing notes are
+closest **in subject** to what you are about to write — not the one with the most
+notes, and not the first line of output. Then **open one sibling note there** and
+copy three things from it: frontmatter shape, title language, and whether it
+carries `anki-deck`.
+
+Say which folder you picked and which sibling you matched, before writing
+anything. Offer once to create the config note, so the next run reads it instead
+of rediscovering this.
+
+## 4. Degrade, never guess
+
+No vault, Obsidian not running, or no config note **and** no filed pair to copy →
+**produce the HTML only**. Write it where the user asked or to the current
+directory, say where it landed and why there is no note. Never stall waiting for
+Obsidian, and never fall back to an invented path.

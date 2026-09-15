@@ -19,16 +19,22 @@ request to pick a concept first.
 
 ## Output location
 
-Subject folder from the `explainer_subjects` map in the `Explainers` config note; anything
-unmatched goes in `explainer_folder`. Both are resolved per
-`obsidian-cli/references/vault-resolution.md` — no folder name is hardcoded here.
+**Resolve the destination before anything else, and never ask the user where it goes.** Three
+tiers, in order, all defined in `obsidian-cli/references/vault-resolution.md` — no folder name
+is hardcoded here:
 
-If `explainer_subjects` names a subject that has no folder yet, create it. If the map is
-absent entirely, put everything in `explainer_folder`.
+1. `explainer_subjects` in the `Explainers` config note, falling back to `explainer_folder`.
+   A named subject with no folder yet: create it.
+2. No config note → **discover** the folder from the pairs earlier runs filed; the `grep` is in
+   that reference. Pick the folder closest in subject, open one sibling note, copy its
+   frontmatter shape and its `anki-deck` presence.
+3. Neither → HTML only, where the user asked, and say so.
+
+Say which tier you used and which sibling you matched, before writing anything. Resolving this
+late is what turns one decision into two rounds of questions: the destination decides the
+frontmatter shape and feeds the language rule below.
 
 Filename is the concept, no date prefix — these are evergreen notes, unlike diff explainers.
-Match the naming language of the destination folder's existing notes: a lone English page in
-a Russian-titled folder is a wart.
 
 **If a note with that exact name already exists**, you are not allowed to overwrite it and not
 allowed to write a near-duplicate beside it. Pick one, in this order:
@@ -43,11 +49,6 @@ allowed to write a near-duplicate beside it. Pick one, in this order:
    (`Сжатие пути в Union-find`), not for its parent.
 
 Say which of the three you picked and why, before writing anything.
-
-Resolve the vault and the config note per `obsidian-cli/references/vault-resolution.md`.
-
-**No vault, no config note, or Obsidian not running → write the HTML only**, where the user
-asked or to the current directory, and say where it landed. Never invent a path.
 
 Vault paths contain spaces and may live in iCloud — quote them everywhere.
 
@@ -81,13 +82,26 @@ Vault paths contain spaces and may live in iCloud — quote them everywhere.
 5. **Build the narrative before the HTML:** where the concept comes from and what problem it
    solves → the smallest useful mental model → the formal statement → why it is true →
    what it costs → where people get it wrong.
-6. **Write the `.html`** from `references/HTML_TEMPLATE.md`.
-7. **Write the `.md` stub** from `references/STUB_TEMPLATE.md`.
-8. **Run `node references/verify.js "<file>.html"`** and fix until it prints PASS, then walk
+6. **Compute the worked example before writing a sentence about it.** Any number the prose
+   quotes that the page also computes must come from *running* the code, never from what you
+   expect it to print. Put the generator and the analysis in a throwaway script under the
+   scratchpad, run it with `node`, read the output, then write the prose around what it
+   actually said — and paste that same code into the page, so the two cannot drift.
+
+   Two traps that each cost a round trip when you meet them the first time:
+
+   - **One RNG stream across several examples couples them.** Retuning example 2 silently
+     redraws 3, 4 and 5. Seed per unit — `rng(SEED + i * 7919)` — so each is tunable alone.
+   - **A statistic that pairs two random samples must pair them as drawn.** Sorting each first
+     turns the comparison into a quantile-against-quantile one, which saturates at 0 or 1 and
+     looks like a plausible result rather than a bug.
+7. **Write the `.html`** from `references/HTML_TEMPLATE.md`.
+8. **Write the `.md` stub** from `references/STUB_TEMPLATE.md`.
+9. **Run `node references/verify.js "<file>.html"`** and fix until it prints PASS, then walk
    the rest of the checklist below.
-9. **Hand off**: both paths, a `file://` URL for the browser, one line on where the quiz is
-   interactive, what you verified against a source versus inferred, and an offer to push Anki
-   cards.
+10. **Hand off**: both paths, a `file://` URL for the browser, one line on where the quiz is
+    interactive, what you verified against a source versus inferred, and an offer to push Anki
+    cards.
 
 ## Page structure
 
@@ -339,8 +353,11 @@ never disagree.
 
 Budget: one figure per mechanism, and reuse a family rather than inventing a new one per
 section. If two sections would carry the same figure, they are one section or one of them
-needs a different state of it. Eight figures on a deep algorithm is right; eight on a
-definition means most of them are decoration.
+needs a different state of it. **There is no ceiling on the count** — a subject with twelve
+mechanisms earns twelve figures, and trimming to hit a number costs the reader a mechanism.
+The test is never "how many", it is "does this one carry a mechanism the prose cannot".
+A definition with eight figures has seven decorations; that is the failure the budget guards
+against, not length.
 
 Beyond the mandatory set: scatter for data with spread (never a line through points that
 aren't a function), bar charts for per-operation cost across a sequence, `.flow` for a linear
@@ -425,33 +442,38 @@ which owns the Anki connection and the card-quality rules.
 
 ## Glossary: terms in Russian output
 
-Russian pages and stubs use Russian words. A transliterated English term is not a technical
-term, it is an untranslated one, and it reads as sloppy in a note the user will keep for years.
+A transliterated English term is not a technical term, it is an untranslated one, and it reads
+as sloppy in a note kept for years. **If a normal Russian word exists, use it**; transliterate
+only when there is genuinely nothing, and "shorter in English" does not count.
 
 | Never write | Write instead |
 |---|---|
-| волт, вольт | **хранилище**, **заметки**, or **Obsidian** — pick by what the sentence is about: the storage, its contents, or the app |
+| волт, вольт | **хранилище**, **заметки**, or **Obsidian** — by what the sentence is about: the storage, its contents, or the app |
 
-The rule behind the table, for terms it does not list yet: **if a normal Russian word exists,
-use it.** Transliterate only when there is genuinely nothing — and a word that merely feels
-shorter in English does not count.
+The opposite mistake is just as bad: notation, identifiers, code, file names, product names
+(Obsidian, Anki, Swift) and terms the field itself writes in English or in transliteration
+(`union-find`, `find`, `хеш-таблица`, `кеш`) stay as conventionally written.
 
-What stays as conventionally written, and must not be translated: notation, identifiers, code,
-file names, product names (Obsidian, Anki, Swift), and established technical terms that the
-field itself writes in English or in transliteration (`union-find`, `find`, `хеш-таблица`,
-`кеш`). Translating those is the opposite mistake and just as bad.
-
-`verify.js` fails on the entries in the table. When the user corrects a word, add a row —
-that is the whole maintenance story for this section.
+`verify.js` fails on the table's entries. Add a row when the user corrects a word — that is the
+whole maintenance story here.
 
 ## Language
 
-Match the user's request language — asked in Russian, write the page and the stub in Russian,
-and match the naming style of the target folder's existing notes. **When the invocation
-carries no natural language at all** (`/explain-concept union-find` is a bare term,
-not a sentence), fall back to the language of the target folder's existing notes. A lone
-English page in a Russian-titled folder is a wart; do not create it on a technicality. Notation, code, identifiers,
-and established technical terms stay as they are conventionally written.
+Two branches, and **never a question to the user** — this is decided by rule, and asking about
+it wastes a round on something the rule already answers. Name the branch you took in the
+handoff.
+
+| The invocation | Language of page and stub |
+|---|---|
+| Carries a sentence in some natural language | **That language wins**, whatever the destination folder holds. An English request lands an English note in a Russian folder, and that is correct. |
+| Carries no natural language (`/explain-concept union-find`, a bare term or a bare URL) | The language of the destination folder's existing notes. |
+
+The destination folder is resolved first (see Output location), so the second branch always has
+an answer by the time you need it. A mixed-language vault is normal and is not a reason to
+override branch one.
+
+The filename follows the same branch as the body. Notation, code, identifiers, and established
+technical terms stay as they are conventionally written in either case.
 
 ## Validation checklist
 
@@ -524,3 +546,13 @@ What the harness cannot judge, and you still must:
   stable address is a hyperlink. `verify.js` now separates network *loading* (banned) from
   prose links (required), and fails on unhighlighted listings, bare `arXiv:`/`doi:`/`RFC N`,
   banned words, and proof steppers that only move a highlight.
+- 2026-09-15 — retro after the decision-grade-experiments run, which burned two question rounds
+  on where the note goes and in what language. Destination now resolves in three tiers with a
+  discovery grep over already-filed pairs (in `obsidian-cli/references/vault-resolution.md`,
+  shared by all three explainers), and it resolves *first*, because it feeds the language rule.
+  Language is a two-branch table and is never asked about; the "lone English page in a
+  Russian folder is a wart" line is gone from both `SKILL.md` and `STUB_TEMPLATE.md` — it read
+  as an override of the request-language rule and caused the second round. `verify.js` now
+  implements `insertAdjacentHTML`, which `HTML_TEMPLATE.md` had been telling runs to call
+  since the stepper example shipped. New workflow step: compute the worked example in a
+  throwaway script and write the prose around what it printed. The figure count has no ceiling.

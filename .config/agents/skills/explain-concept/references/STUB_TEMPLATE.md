@@ -20,7 +20,7 @@ subject: «algorithms | os | math | physics | networks | …»
 sources:
   - «Book, chapter/section»
   - «Lecture or paper»
-anki-deck: Explanations::«Subject»
+anki-deck: Explanations::«Subject»   # only when a deck is configured — drop the line otherwise
 ---
 
 > [!tip] «Открыть explainer» → [[«Concept name».html|«Concept name»]]
@@ -82,8 +82,9 @@ anki-deck: Explanations::«Subject»
 - **One Mermaid diagram** carrying the single structural idea, so the note teaches something
   on mobile without opening the page. Obsidian renders Mermaid natively. Keep it under ~10
   nodes; it is a summary, not a second copy of the page's figures.
-- **Title and headings match the folder's language.** Where the destination folder is
-  Russian-titled, a lone English note there is a wart.
+- **Title and headings are in the same language as the page**, decided by the Language table in
+  `SKILL.md` and nothing else. A folder holding both languages is normal; do not translate the
+  stub to match its neighbours.
 
 ## Example (filled)
 

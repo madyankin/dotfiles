@@ -26,3 +26,4 @@ python = "3.13"
 [settings]
 # Keep .tool-versions in project repos working (e.g. ~/Code/.tool-versions).
 legacy_version_file = true
+idiomatic_version_file_enable_tools = ["node"]

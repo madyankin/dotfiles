@@ -52,6 +52,17 @@ El.prototype.removeAttribute = function (k) { delete this.attrs[k]; };
 El.prototype.appendChild = function (c) { c.parent = this; this.children.push(c); return c; };
 El.prototype.prepend = function (c) { c.parent = this; this.children.unshift(c); return c; };
 El.prototype.insertBefore = function (c) { return this.prepend(c); };
+// HTML_TEMPLATE's stepper example uses this to hang a caption off a figure it just drew.
+// The string is not parsed — it is held on a wrapper, same as an innerHTML assignment —
+// which is enough for the harness: the point is that the call must not throw.
+El.prototype.insertAdjacentHTML = function (where, html) {
+  var wrap = new El("div");
+  wrap._html = String(html);
+  if (where === "afterbegin") return this.prepend(wrap);
+  if (where === "beforebegin" && this.parent) return this.parent.prepend(wrap);
+  if (where === "afterend" && this.parent) return this.parent.appendChild(wrap);
+  return this.appendChild(wrap);                                   // beforeend, the default
+};
 El.prototype.remove = function () {
   if (!this.parent) return;
   var i = this.parent.children.indexOf(this);

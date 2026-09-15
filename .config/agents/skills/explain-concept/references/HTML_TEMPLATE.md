@@ -614,6 +614,10 @@ Hl.all();
 - Each `pre` rule still carries `white-space: pre` (or `pre-wrap`).
 - No `http://`, `https://`, `src="./`, or `@import` outside prose links.
 - No bare `$…$` anywhere — math is `.math` / `.eq` / `.frac` markup with Unicode symbols.
+- **Money is written `USD`, never `$`.** The check is a bare-dollar regex over everything
+  outside `<script>`; it cannot tell `$10k` from LaTeX and fails the page either way. Inside a
+  script the sign is fine, because scripts are stripped before the check runs.
+- Every `aria` string is a sentence of at least 25 characters. "chart" and "the tree" fail.
 - Five entries in `QUIZ`, correct-answer positions spread across the four slots after
   shuffling, each `why[]` covering every wrong option.
 - Stepper deleted if unused; if used, `STEPS` filled and the counter reads `1 / n` on load.
