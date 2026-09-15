@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# dot:summary=make this machine match the pulled config (links, alt, themes)
+#
+# `yadm pull` only moves TRACKED files. Everything that is generated or linked
+# is therefore absent on a machine that has only ever pulled: the dot symlink,
+# the yadm alt output (.zshrc!), and every colour file the theme engine writes —
+# all of which are gitignored on purpose, because they are outputs.
+#
+# So a second machine pulls the commits and sees none of the changes. This is
+# the step that closes that gap, and it is deliberately the IDEMPOTENT subset
+# of bootstrap: no macOS defaults, no install wizard, no scheduler. Safe to run
+# unattended, which is why the sync calls it after every pull.
+set -uo pipefail
+
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+export DOT_ROOT
+source "$DOT_ROOT/lib/common.sh"
+
+QUIET=""
+[[ "${1:-}" == "--quiet" ]] && QUIET=1
+
+say() { [[ -z "$QUIET" ]] && "$@"; }
+
+step() {  # step <label> <command...>
+  local label="$1"; shift
+  if [[ -n "$QUIET" ]]; then
+    "$@" >/dev/null 2>&1 && return 0
+    err "converge: $label failed"
+    return 1
+  fi
+  header "$label"
+  "$@" || { err "$label failed"; return 1; }
+}
+
+failed=0
+
+# 1. Regenerate the yadm alt output FIRST. .config/zsh/.zshrc is generated from
+#    .zshrc##template and is gitignored, so without this the machine keeps an
+#    old .zshrc and none of the shell changes take effect — the single most
+#    confusing symptom of this whole gap.
+step "yadm alt" yadm alt || failed=$((failed+1))
+
+# 2. `dot` on PATH.
+step "CLI symlink" "$DOT_ROOT/scripts/bin.sh" || failed=$((failed+1))
+
+# 3. Shared agent/skill tree and the editor settings symlinks.
+step "Agent links" "$DOT_ROOT/scripts/agents.sh" || failed=$((failed+1))
+step "Editor links" "$DOT_ROOT/scripts/editors.sh" link || failed=$((failed+1))
+
+# 4. iTerm2's custom prefs folder pointer.
+[[ -x "$DOT_ROOT/scripts/iterm.sh" ]] && { step "iTerm2 prefs" "$DOT_ROOT/scripts/iterm.sh" || failed=$((failed+1)); }
+
+# 5. Every generated colour file. --no-reload because this runs unattended:
+#    importing Terminal.app profiles or relaunching Alfred behind your back
+#    while you are working is not acceptable.
+step "Theme render" "$DOT_ROOT/scripts/theme.sh" render --no-reload || failed=$((failed+1))
+
+if [[ -z "$QUIET" ]]; then
+  header "summary"
+  if [[ $failed -eq 0 ]]; then
+    ok "machine matches the config"
+    note "packages and runtimes are NOT touched — run 'dot install' and 'dot update' for those"
+    note "the periodic sync is opt-in per machine — 'dot cron install'"
+  else
+    err "$failed step(s) failed"
+  fi
+fi
+exit $(( failed > 0 ))

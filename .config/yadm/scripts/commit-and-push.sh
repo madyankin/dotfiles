@@ -22,6 +22,15 @@ cd "$HOME" || exit 1
 # Sync down before staging, so a rebase never lands on a dirty index.
 yadm pull --rebase --autostash >/dev/null 2>&1 || exit 1
 
+# A pull moves only TRACKED files. Everything generated or linked — the yadm
+# alt output (.config/zsh/.zshrc included), the `dot` symlink, every colour
+# file — is gitignored because it is an output, so a machine that only ever
+# pulls sees none of the changes. Converge is the idempotent subset of
+# bootstrap that closes that gap; it writes nothing when already in sync.
+if [[ -x "$HOME/.config/yadm/bin/dot-converge" ]]; then
+  "$HOME/.config/yadm/bin/dot-converge" --quiet || true
+fi
+
 # Two-part staging. The worktree IS $HOME, so a bare `yadm add -A` would
 # sweep in ~/Documents, ~/Downloads, ~/Projects — everything not ignored.
 #   -u          : changes to files already tracked, anywhere
