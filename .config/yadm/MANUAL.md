@@ -23,6 +23,7 @@ Alfred with nothing else to edit.
 
 | Command | What it does |
 |---|---|
+| `dot converge` | Make this machine match the pulled config. **Run this on any other machine after a pull** |
 | `dot doctor` | Check the machine against the config. Run it when something feels off |
 | `dot update` | brew, mas, mise, npm, nvim, tpm, zplug, and a `yadm pull` |
 | `dot sync` | Commit and push the dotfiles now (also aliased `sync-dotfiles`) |
@@ -75,7 +76,42 @@ Steps are `update.d/NN-name.sh`. Notes on the ones with sharp edges:
   selective snapshot worth using, and Arq owns real backups; this answers the
   question a snapshot is a proxy for — *what changed, and what do I pin back to*.
 
+### `dot converge` — the step a second machine needs
+
+`yadm pull` moves only **tracked** files. Everything generated or linked is
+gitignored, because it is an output — so a machine that has only ever pulled
+has none of it:
+
+- `~/.local/bin/dot` (so `dot` is not even on PATH there)
+- the `yadm alt` output, **including `.config/zsh/.zshrc`** — which means none
+  of the shell changes take effect, the most confusing symptom of the lot
+- every colour file: Ghostty's themes and `icon.conf`, `tmux/theme.conf`,
+  `p10k-colors.zsh`, `fzf-colors.zsh`, the nvim colorschemes, btop, htop, the
+  mc skins, the iTerm2 dynamic profile, the VS Code theme extension
+- the agent and editor symlinks
+
+```bash
+~/.config/yadm/bin/dot converge     # full path: dot is not on PATH yet
+dot converge                        # afterwards
+```
+
+It is the **idempotent subset of bootstrap** — no macOS defaults, no install
+wizard, no scheduler — so it is safe to run unattended, and the sync now runs
+it after every pull. It writes nothing when already in sync.
+
+What it deliberately does *not* do, because these need decisions or downloads:
+
+```bash
+dot install          # new packages from the Brewfiles (ghostty, fastfetch, …)
+dot update           # mise runtimes, plugins
+dot cron install     # opt in to the periodic sync on that machine
+```
+
 ### Sync
+
+> **Do not run `dot sync` with work in progress.** It stages and commits
+> everything in scope with a generic `chore(sync)` message — that is its job.
+> Commit anything you want a real message on first.
 
 `scripts/commit-and-push.sh` every two hours, now scheduled by a **launchd user
 agent**, not cron. macOS cron runs outside the GUI session, so `yadm push` there
