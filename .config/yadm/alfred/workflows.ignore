@@ -4,3 +4,8 @@
 # removing a workflow here would just be re-added by the next machine that
 # still has it installed.
 com.alfredapp.vitor.openai
+# New Terminal Window: its Script Filter listed iTerm2 profiles and ran on
+# `python` (python2, gone from macOS), and its actions drove iTerm and
+# Terminal.app via osascript. The `tw` keyword in the generated dot workflow
+# replaces it with Ghostty.
+com.miromannino.new-terminal-window

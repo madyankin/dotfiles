@@ -14,6 +14,8 @@ actually used for:
   agent   <- a task handed to the default coding agent, which is exactly the
              shape Alfred's query box wants
   manual  <- a section of MANUAL.md, listed from its own headings
+  tw      <- a new Ghostty window in a directory, replacing the dead
+             third-party "New Terminal Window" workflow
 
 Stdlib only; /usr/bin/python3 (3.9).
 """
@@ -47,6 +49,58 @@ T="$HOME/.config/yadm/scripts/theme.sh"
 } | /opt/homebrew/bin/jq -R -s 'split("\n")
       | map(select(length > 0) | split("\t"))
       | { items: map({ title: .[0], subtitle: .[1], arg: .[0] }) }'
+'''
+
+# `tw` replaces the third-party "New Terminal Window" workflow, whose Script
+# Filter listed iTerm2 PROFILES from its plist and whose action drove
+# `osascript iterm_new.scpt`. Ghostty has no profiles, and that filter ran on
+# `python` — python2, absent from modern macOS — so it was dead code.
+#
+# The part worth keeping is the DIRECTORY, which Ghostty supports directly via
+# --working-directory. So this offers, in order: the front Finder window (the
+# old `cdf`), $HOME, an exact path if the query is one, and otherwise
+# directories matching the query found with fd under whichever roots exist.
+FILTER_TERM = PRELUDE + r'''
+Q="$1"
+JQ=/opt/homebrew/bin/jq
+
+{
+  f="$(osascript -e 'tell application "Finder" to if (count of windows) > 0 then return POSIX path of (target of front window as alias)' 2>/dev/null)"
+  [ -n "$f" ] && printf '%s	Finder’s front window
+' "${f%/}"
+
+  printf '%s	home
+' "$HOME"
+
+  # An exact path typed in the query wins over any search.
+  case "$Q" in
+    /*|~*) e="${Q/#\~/$HOME}"; [ -d "$e" ] && printf '%s	typed path
+' "${e%/}" ;;
+  esac
+
+  roots=""
+  for r in "$HOME/Code" "$HOME/Projects" "$HOME/Documents" "$HOME/.config"; do
+    [ -d "$r" ] && roots="$roots $r"
+  done
+
+  if [ -n "$Q" ] && [ -n "$roots" ]; then
+    # shellcheck disable=SC2086
+    /opt/homebrew/bin/fd -t d -H -a --max-depth 4 -- "$Q" $roots 2>/dev/null | head -25       | while IFS= read -r d; do printf '%s	match
+' "${d%/}"; done
+  elif [ -n "$roots" ]; then
+    # shellcheck disable=SC2086
+    /opt/homebrew/bin/fd -t d -H -a --max-depth 1 . $roots 2>/dev/null | head -25       | while IFS= read -r d; do printf '%s	%s
+' "${d%/}" "top level"; done
+  fi
+} | "$JQ" -R -s --arg home "$HOME" 'split("
+")
+      | map(select(length > 0) | split("	"))
+      | unique_by(.[0])
+      | { items: map({
+            title: (.[0] | sub("^" + $home; "~") ),
+            subtitle: .[1],
+            arg: .[0]
+          }) }'
 '''
 
 # Sections come straight from the manual's own headings, so the keyword lists
@@ -112,6 +166,14 @@ ACTION_MANUAL = (
     '-e "$HOME/.config/yadm/bin/dot-in-terminal" manual "{query}"\n'
 )
 
+# Opens the window itself rather than going through dot-in-terminal: there is
+# no command to run and no output to keep on screen, just a shell in a
+# directory. Quoted because a path can contain spaces.
+ACTION_TERM = (
+    'export PATH="/opt/homebrew/bin:/usr/bin:/bin:$PATH"\n'
+    '"$HOME/.config/yadm/bin/dot-term" "{query}"\n'
+)
+
 # Theme changes are silent and instant; no terminal needed.
 ACTION_SILENT = (
     'export PATH="/opt/homebrew/bin:/usr/bin:/bin:$PATH"\n'
@@ -173,6 +235,8 @@ UIDS = {
     "a_agent": "A1000000-0000-4000-8000-000000000006",
     "f_manual": "A1000000-0000-4000-8000-000000000007",
     "a_manual": "A1000000-0000-4000-8000-000000000008",
+    "f_term": "A1000000-0000-4000-8000-000000000009",
+    "a_term": "A1000000-0000-4000-8000-00000000000a",
 }
 
 
@@ -187,6 +251,9 @@ def build():
         script_filter(UIDS["f_agent"], "agent", "{query}",
                       "run the default coding agent on a task", FILTER_AGENT),
         script_action(UIDS["a_agent"], ACTION_TERMINAL),
+        script_filter(UIDS["f_term"], "tw", "{query}",
+                      "new Ghostty window in a directory", FILTER_TERM),
+        script_action(UIDS["a_term"], ACTION_TERM),
         script_filter(UIDS["f_manual"], "manual", "{query}",
                       "read a section of the dotfiles manual", FILTER_MANUAL,
                       has_arg=False),
@@ -202,12 +269,14 @@ def build():
         UIDS["f_theme"]: conn(UIDS["f_theme"], UIDS["a_theme"]),
         UIDS["f_agent"]: conn(UIDS["f_agent"], UIDS["a_agent"]),
         UIDS["f_manual"]: conn(UIDS["f_manual"], UIDS["a_manual"]),
+        UIDS["f_term"]: conn(UIDS["f_term"], UIDS["a_term"]),
     }
 
     # Laid out in a column so the graph is readable if it is ever opened.
     uidata = {}
     for i, key in enumerate(["f_dot", "a_dot", "f_theme", "a_theme",
-                             "f_agent", "a_agent", "f_manual", "a_manual"]):
+                             "f_agent", "a_agent", "f_manual", "a_manual",
+                             "f_term", "a_term"]):
         uidata[UIDS[key]] = {"xpos": 40 if key.startswith("f_") else 340,
                              "ypos": 40 + (i // 2) * 140}
 

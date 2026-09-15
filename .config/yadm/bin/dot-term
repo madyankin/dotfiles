@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# dot:summary=open a Ghostty window in a directory (default: here)
+#
+# The CLI half of Alfred's `tw` keyword, so the behaviour is not locked inside
+# a workflow.
+set -uo pipefail
+DOT_ROOT="${DOT_ROOT:-$HOME/.config/yadm}"
+source "$DOT_ROOT/lib/common.sh"
+
+dir="${1:-$PWD}"
+
+# `finder` resolves to the front Finder window — the old workflow's `cdf`.
+if [[ "$dir" == "finder" ]]; then
+  dir="$(osascript -e 'tell application "Finder" to if (count of windows) > 0 then return POSIX path of (target of front window as alias)' 2>/dev/null)"
+  [[ -z "$dir" ]] && { err "no Finder window open"; exit 1; }
+fi
+
+dir="${dir/#\~/$HOME}"
+[[ -d "$dir" ]] || { err "not a directory: $dir"; exit 1; }
+
+# -n for a new instance, because `open` discards --args without it.
+# --window-save-state=never so the new instance does not also restore the
+# previous session's windows alongside this one.
+exec /usr/bin/open -na Ghostty --args \
+  --window-save-state=never \
+  --working-directory="$dir"

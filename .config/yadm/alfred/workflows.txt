@@ -9,7 +9,6 @@ de.chris-grieser.atop	atop	1.9.3	https://chris-grieser.de/
 com.vitorgalvao.alfred.calmnotifications	Calm Notifications	25.1	https://github.com/vitorgalvao/calm-notifications-workflow/
 com.benjamino.folderify	Folderify	1.4.1	https://github.com/BenjaminOddou/alfred-folderify
 de.chris-grieser.homebrew	Homebrew	2.3.0	https://chris-grieser.de/
-com.miromannino.new-terminal-window	New Terminal Window		miromannino.com
 de.samuelraub.prettyjson	Pretty JSON	1.0.0	https://github.com/samuelraub/pretty-json-alfred-workflow
 com.vitorgalvao.alfred.screenshots	Screenshots	2024.3	https://github.com/vitorgalvao/screenshots-workflow/
 de.chris-grieser.shimmering-obsidian	Shimmering Obsidian	4.14.0	https://chris-grieser.de/

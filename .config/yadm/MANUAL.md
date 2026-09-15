@@ -378,9 +378,18 @@ Shell aliases are separate and unaffected: `ca` is `claude --enable-auto-mode`,
 
 ## Alfred
 
-Keyword `dot` lists every subcommand and runs it in Ghostty. `theme` is the
-style menu, `agent <task>` hands a task to the default agent, and `manual`
-opens this document.
+| Keyword | What it does |
+|---|---|
+| `dot` | every subcommand, run in Ghostty |
+| `theme` | theme, background and font — the style menu |
+| `agent <task>` | hands the task to the default coding agent |
+| `tw [dir]` | new Ghostty window in a directory |
+| `manual` | a section of this document |
+
+`tw` offers the front Finder window first, then `$HOME`, then an exact path if
+the query is one, and otherwise directories matching the query found with `fd`
+under whichever of `~/Code`, `~/Projects`, `~/Documents` and `~/.config`
+exist. `dot term [dir|finder]` is the same thing from the shell.
 
 The workflow is **generated** by `scripts/alfred-dot-workflow.py`. A workflow
 `info.plist` edited through Alfred's UI is an unreviewable blob that drifts
@@ -424,7 +433,8 @@ Two supporting files:
 
 - `alfred/workflows.ignore` — bundleids never to list or install. Necessary
   because a union cannot forget: without it, a workflow removed here is
-  re-added by the next machine that still has it.
+  re-added by the next machine that still has it. It holds ChatGPT / DALL-E
+  and *New Terminal Window*, the latter replaced by the `tw` keyword.
 - `alfred/workflows.sources` — per-bundleid download overrides. The source
   column comes from the workflow's own `webaddress` key, which is usually the
   author's homepage rather than a repository.
