@@ -22,6 +22,7 @@ python = "3.13"
 # asks for approval and auto-declines when run non-interactively.
 # "npm:@juliusbrussee/caveman-code" = "latest"
 "npm:agent-browser" = "latest"
+git-lfs = "latest"
 
 [settings]
 # Keep .tool-versions in project repos working (e.g. ~/Code/.tool-versions).
