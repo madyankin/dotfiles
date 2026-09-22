@@ -1,0 +1,179 @@
+# AeroSpace config — Kerrigan (work Mac)
+# Docs: https://nikitabobko.github.io/AeroSpace/guide
+
+config-version = 2
+
+start-at-login = true
+
+# Normalizations
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# Layout settings
+accordion-padding = 0
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# Mouse follows focus
+on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+
+# Gaps between windows
+[gaps]
+inner.horizontal = 10
+inner.vertical = 10
+outer.left = 10
+outer.bottom = 10
+outer.top = 10
+outer.right = 10
+
+[key-mapping]
+preset = 'qwerty'
+
+# Hyper = cmd+ctrl+alt+shift
+# Meh = ctrl+alt+shift (for move operations)
+
+# Main keybindings
+[mode.main.binding]
+
+# Move windows (Meh + hjkl)
+ctrl-alt-shift-h = 'move left'
+ctrl-alt-shift-j = 'move down'
+ctrl-alt-shift-k = 'move up'
+ctrl-alt-shift-l = 'move right'
+
+# Workspaces (Ctrl + number)
+ctrl-1 = 'workspace main'
+ctrl-2 = 'workspace code'
+ctrl-3 = 'workspace terminals'
+ctrl-4 = 'workspace agents'
+ctrl-5 = 'workspace messaging'
+ctrl-6 = 'workspace calendar'
+ctrl-7 = 'workspace music'
+
+# Move to workspace (Meh + number)
+ctrl-alt-shift-1 = 'move-node-to-workspace main'
+ctrl-alt-shift-2 = 'move-node-to-workspace code'
+ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
+ctrl-alt-shift-4 = 'move-node-to-workspace agents'
+ctrl-alt-shift-5 = 'move-node-to-workspace messaging'
+ctrl-alt-shift-6 = 'move-node-to-workspace calendar'
+ctrl-alt-shift-7 = 'move-node-to-workspace music'
+
+# Layout (Hyper)
+cmd-ctrl-alt-shift-v = 'layout tiles vertical'
+cmd-ctrl-alt-shift-h = 'layout tiles horizontal'
+cmd-ctrl-alt-shift-space = 'layout tiles accordion floating'
+cmd-ctrl-alt-shift-f = 'fullscreen'
+ctrl-alt-slash = 'layout floating tiling'
+ctrl-alt-f = 'layout floating tiling'
+
+# Focus (Hyper + arrows)
+cmd-ctrl-alt-shift-left = 'focus left'
+cmd-ctrl-alt-shift-right = 'focus right'
+cmd-ctrl-alt-shift-up = 'focus up'
+cmd-ctrl-alt-shift-down = 'focus down'
+
+# Resize (Hyper + =/-)
+cmd-ctrl-alt-shift-equal = 'resize smart +50'
+cmd-ctrl-alt-shift-minus = 'resize smart -50'
+
+# Service mode
+cmd-ctrl-alt-shift-semicolon = 'mode service'
+
+# Service mode for less common operations
+[mode.service.binding]
+esc = 'mode main'
+r = ['reload-config', 'mode main']
+cmd-ctrl-alt-shift-left = ['join-with left', 'mode main']
+cmd-ctrl-alt-shift-down = ['join-with down', 'mode main']
+cmd-ctrl-alt-shift-up = ['join-with up', 'mode main']
+cmd-ctrl-alt-shift-right = ['join-with right', 'mode main']
+
+# App assignments
+
+# Zoom → always floating, never tiled, stays on the current workspace.
+# Listed first so it wins before any other rule.
+[[on-window-detected]]
+if.app-id = 'us.zoom.xos'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-name-regex-substring = '(?i)zoom'
+run = 'layout floating'
+
+# 1 — main: browsers
+[[on-window-detected]]
+if.app-id = 'app.zen-browser.zen'
+run = 'move-node-to-workspace main'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Safari'
+run = 'move-node-to-workspace main'
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = 'move-node-to-workspace main'
+
+[[on-window-detected]]
+if.app-id = 'org.mozilla.firefox'
+run = 'move-node-to-workspace main'
+
+# 2 — code: Zed
+[[on-window-detected]]
+if.app-id = 'dev.zed.Zed'
+run = 'move-node-to-workspace code'
+
+# 3 — terminals: Ghostty, iTerm2
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = 'move-node-to-workspace terminals'
+
+[[on-window-detected]]
+if.app-id = 'com.googlecode.iterm2'
+run = 'move-node-to-workspace terminals'
+
+# 4 — agents: Claude, ChatGPT
+[[on-window-detected]]
+if.app-id = 'com.anthropic.claudefordesktop'
+run = 'move-node-to-workspace agents'
+
+[[on-window-detected]]
+if.app-id = 'com.openai.chat'
+run = 'move-node-to-workspace agents'
+
+# 5 — messaging: Slack, Mail
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace messaging'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.mail'
+run = 'move-node-to-workspace messaging'
+
+# 6 — calendar
+[[on-window-detected]]
+if.app-id = 'com.apple.iCal'
+run = 'move-node-to-workspace calendar'
+
+# 7 — music
+[[on-window-detected]]
+if.app-id = 'com.apple.Music'
+run = 'move-node-to-workspace music'
+
+# Always floating, no workspace assignment
+[[on-window-detected]]
+if.app-id = 'com.daisydiskapp.DaisyDisk'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'net.sourceforge.skim-app.skim'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.positivegrid.BiasFx2Standalone'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.parallels.desktop.console'
+if.window-title-regex-substring = 'Control Center'
+run = 'layout floating'
