@@ -44,7 +44,8 @@ ctrl-alt-shift-l = 'move right'
 # Workspaces (Ctrl + number)
 ctrl-1 = 'workspace main'
 ctrl-2 = 'workspace dev'
-ctrl-4 = 'workspace agents'
+ctrl-3 = 'workspace agents'
+ctrl-4 = 'workspace guitar'
 ctrl-5 = 'workspace planning'
 ctrl-6 = 'workspace messaging'
 ctrl-7 = 'workspace music'
@@ -53,7 +54,8 @@ ctrl-8 = 'workspace misc'
 # Move to workspace (Meh + number)
 ctrl-alt-shift-1 = 'move-node-to-workspace main'
 ctrl-alt-shift-2 = 'move-node-to-workspace dev'
-ctrl-alt-shift-4 = 'move-node-to-workspace agents'
+ctrl-alt-shift-3 = 'move-node-to-workspace agents'
+ctrl-alt-shift-4 = 'move-node-to-workspace guitar'
 ctrl-alt-shift-5 = 'move-node-to-workspace planning'
 ctrl-alt-shift-6 = 'move-node-to-workspace messaging'
 ctrl-alt-shift-7 = 'move-node-to-workspace music'
@@ -163,10 +165,20 @@ run = 'move-node-to-workspace misc'
 if.app-id = 'com.apple.Music'
 run = 'move-node-to-workspace music'
 
-# Chrome → music, deliberately away from the other browsers, which stay on main
+# Guitar rig. Bias FX keeps its always-float rule and gains a home workspace;
+# Chrome moved here from music.
+[[on-window-detected]]
+if.app-id = 'com.positivegrid.BiasFx2Standalone'
+run = ['move-node-to-workspace guitar', 'layout floating']
+
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace music'
+run = 'move-node-to-workspace guitar'
+
+[[on-window-detected]]
+if.app-id = 'org.videolan.vlc'
+run = 'move-node-to-workspace guitar'
+
 
 # Parallels → misc
 [[on-window-detected]]
@@ -189,7 +201,3 @@ run = 'layout floating'
 if.app-id = 'net.sourceforge.skim-app.skim'
 run = 'layout floating'
 
-# Bias FX → floating
-[[on-window-detected]]
-if.app-id = 'com.positivegrid.BiasFx2Standalone'
-run = 'layout floating'
