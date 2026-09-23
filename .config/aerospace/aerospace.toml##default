@@ -98,10 +98,6 @@ cmd-ctrl-alt-shift-right = ['join-with right', 'mode main']
 
 # Browsers → main
 [[on-window-detected]]
-if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace main'
-
-[[on-window-detected]]
 if.app-id = 'org.mozilla.firefox'
 run = 'move-node-to-workspace main'
 
@@ -161,6 +157,11 @@ run = 'move-node-to-workspace misc'
 # Music → music
 [[on-window-detected]]
 if.app-id = 'com.apple.Music'
+run = 'move-node-to-workspace music'
+
+# Chrome → music, deliberately away from the other browsers, which stay on main
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
 run = 'move-node-to-workspace music'
 
 # Parallels → misc
