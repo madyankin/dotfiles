@@ -47,7 +47,7 @@ ctrl-2 = 'workspace dev'
 ctrl-3 = 'workspace terminals'
 ctrl-4 = 'workspace notes'
 ctrl-5 = 'workspace planning'
-ctrl-6 = 'workspace chats/mail'
+ctrl-6 = 'workspace messaging'
 ctrl-7 = 'workspace music'
 ctrl-8 = 'workspace misc'
 
@@ -57,7 +57,7 @@ ctrl-alt-shift-2 = 'move-node-to-workspace dev'
 ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
 ctrl-alt-shift-4 = 'move-node-to-workspace notes'
 ctrl-alt-shift-5 = 'move-node-to-workspace planning'
-ctrl-alt-shift-6 = 'move-node-to-workspace chats/mail'
+ctrl-alt-shift-6 = 'move-node-to-workspace messaging'
 ctrl-alt-shift-7 = 'move-node-to-workspace music'
 ctrl-alt-shift-8 = 'move-node-to-workspace misc'
 
@@ -138,25 +138,25 @@ run = 'move-node-to-workspace notes'
 if.app-id = 'com.culturedcode.ThingsMac'
 run = 'move-node-to-workspace planning'
 
-# Slack → chats/mail
+# Slack → messaging
 [[on-window-detected]]
 if.app-id = 'com.tinyspeck.slackmacgap'
-run = 'move-node-to-workspace chats/mail'
+run = 'move-node-to-workspace messaging'
 
-# Apple Mail → chats/mail
+# Apple Mail → messaging
 [[on-window-detected]]
 if.app-id = 'com.apple.mail'
-run = 'move-node-to-workspace chats/mail'
+run = 'move-node-to-workspace messaging'
 
-# Telegram → chats/mail
+# Telegram → messaging
 [[on-window-detected]]
 if.app-id = 'ru.keepcoder.Telegram'
-run = 'move-node-to-workspace chats/mail'
+run = 'move-node-to-workspace messaging'
 
-# Messages → chats/mail
+# Messages → messaging
 [[on-window-detected]]
 if.app-id = 'com.apple.MobileSMS'
-run = 'move-node-to-workspace chats/mail'
+run = 'move-node-to-workspace messaging'
 
 # Zoom → misc
 [[on-window-detected]]
