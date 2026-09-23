@@ -113,9 +113,9 @@ run = 'move-node-to-workspace main'
 if.app-id = 'app.zen-browser.zen'
 run = 'move-node-to-workspace main'
 
-# VS Code → dev
+# Zed → dev
 [[on-window-detected]]
-if.app-id = 'com.microsoft.VSCode'
+if.app-id = 'dev.zed.Zed'
 run = 'move-node-to-workspace dev'
 
 # Xcode → dev
