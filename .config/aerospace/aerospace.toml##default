@@ -17,14 +17,17 @@ default-root-container-orientation = 'auto'
 # Mouse follows focus
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
-# Gaps between windows
+# Gaps between windows. Outer gaps are zero on the built-in display — it is
+# small enough that 10pt of screen padding on every edge is a real loss — and
+# 10pt on any external monitor. Inner gaps stay 10pt everywhere, so windows are
+# still separated from each other, just not from the screen edge.
 [gaps]
 inner.horizontal = 10
 inner.vertical = 10
-outer.left = 10
-outer.bottom = 10
-outer.top = 10
-outer.right = 10
+outer.left = [{ monitor.'built-in retina display' = 0 }, 10]
+outer.bottom = [{ monitor.'built-in retina display' = 0 }, 10]
+outer.top = [{ monitor.'built-in retina display' = 0 }, 10]
+outer.right = [{ monitor.'built-in retina display' = 0 }, 10]
 
 [key-mapping]
 preset = 'qwerty'
