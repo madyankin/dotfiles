@@ -5,6 +5,8 @@
 # (top-level, ~46 packages) rather than `brew list --formula` (~179, mostly
 # transitive dependencies that have no business in a manifest).
 
+tap "nikitabobko/tap"     # AeroSpace ships only from the author's tap
+
 # --- CLI ---
 brew "ripgrep"
 brew "fd"
@@ -49,5 +51,4 @@ cask "fork"
 cask "orbstack"
 cask "karabiner-elements" # caps_lock -> hyper, which every WM binding needs
 cask "1password-cli"
-cask "amethyst"           # the tiler actually in use here
-cask "rectangle"
+cask "aerospace"          # the tiler actually in use here

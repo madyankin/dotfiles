@@ -65,7 +65,9 @@ ctrl-alt-shift-8 = 'move-node-to-workspace misc'
 cmd-ctrl-alt-shift-v = 'layout tiles vertical'
 cmd-ctrl-alt-shift-h = 'layout tiles horizontal'
 cmd-ctrl-alt-shift-space = 'layout tiles accordion floating'
-cmd-ctrl-alt-shift-f = 'fullscreen'
+# --no-outer-gaps: the built-in Retina display is small enough that the 10pt
+# outer gaps are worth reclaiming when a window goes fullscreen.
+cmd-ctrl-alt-shift-f = 'fullscreen --no-outer-gaps'
 ctrl-alt-slash = 'layout floating tiling'
 ctrl-alt-f = 'layout floating tiling'
 
