@@ -45,7 +45,7 @@ ctrl-alt-shift-l = 'move right'
 ctrl-1 = 'workspace main'
 ctrl-2 = 'workspace dev'
 ctrl-3 = 'workspace terminals'
-ctrl-4 = 'workspace notes'
+ctrl-4 = 'workspace agents'
 ctrl-5 = 'workspace planning'
 ctrl-6 = 'workspace messaging'
 ctrl-7 = 'workspace music'
@@ -55,7 +55,7 @@ ctrl-8 = 'workspace misc'
 ctrl-alt-shift-1 = 'move-node-to-workspace main'
 ctrl-alt-shift-2 = 'move-node-to-workspace dev'
 ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
-ctrl-alt-shift-4 = 'move-node-to-workspace notes'
+ctrl-alt-shift-4 = 'move-node-to-workspace agents'
 ctrl-alt-shift-5 = 'move-node-to-workspace planning'
 ctrl-alt-shift-6 = 'move-node-to-workspace messaging'
 ctrl-alt-shift-7 = 'move-node-to-workspace music'
@@ -127,11 +127,6 @@ run = 'move-node-to-workspace dev'
 [[on-window-detected]]
 if.app-id = 'com.apple.iCal'
 run = 'move-node-to-workspace planning'
-
-# Obsidian → notes
-[[on-window-detected]]
-if.app-id = 'md.obsidian'
-run = 'move-node-to-workspace notes'
 
 # Things → planning
 [[on-window-detected]]
