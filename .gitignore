@@ -79,6 +79,8 @@ __pycache__/
 .config/agents/skills/.system/
 # Claude system skills, synced down from claude.ai (docx/pdf/pptx/xlsx/...)
 .config/agents/skills/synced/
+# and the sync's own trash, where superseded copies of those skills land
+.config/agents/skills/.trash/
 
 # Per-machine agent config (deliberately not shared between machines)
 /.claude/settings.json
