@@ -44,7 +44,6 @@ ctrl-alt-shift-l = 'move right'
 # Workspaces (Ctrl + number)
 ctrl-1 = 'workspace main'
 ctrl-2 = 'workspace dev'
-ctrl-3 = 'workspace terminals'
 ctrl-4 = 'workspace agents'
 ctrl-5 = 'workspace planning'
 ctrl-6 = 'workspace messaging'
@@ -54,7 +53,6 @@ ctrl-8 = 'workspace misc'
 # Move to workspace (Meh + number)
 ctrl-alt-shift-1 = 'move-node-to-workspace main'
 ctrl-alt-shift-2 = 'move-node-to-workspace dev'
-ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
 ctrl-alt-shift-4 = 'move-node-to-workspace agents'
 ctrl-alt-shift-5 = 'move-node-to-workspace planning'
 ctrl-alt-shift-6 = 'move-node-to-workspace messaging'
@@ -112,6 +110,12 @@ run = 'move-node-to-workspace main'
 # Zed → dev
 [[on-window-detected]]
 if.app-id = 'dev.zed.Zed'
+run = 'move-node-to-workspace dev'
+
+# Ghostty → dev. Terminals used to own ctrl-3; they live with the editor now,
+# so ctrl-3 is deliberately unbound.
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
 run = 'move-node-to-workspace dev'
 
 # Xcode → dev
