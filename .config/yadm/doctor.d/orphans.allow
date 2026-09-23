@@ -1,6 +1,7 @@
 # Config directories that are deliberately tracked without the app installed
 # on this machine. One name per line.
 #
-# Empty since 2026-09-23: aerospace is the window manager in use on both
-# machines now, so its toml is no longer an orphan. Amethyst and Rectangle
-# were uninstalled in the same change.
+# aerospace: tried on Artanis on 2026-09-23 and backed out the same day in
+# favour of Rectangle. Kerrigan still runs it, and both hosts have their own
+# variant of the toml, so the config stays tracked.
+aerospace
