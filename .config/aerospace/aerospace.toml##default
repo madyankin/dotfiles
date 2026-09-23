@@ -42,7 +42,7 @@ ctrl-alt-shift-k = 'move up'
 ctrl-alt-shift-l = 'move right'
 
 # Workspaces (Ctrl + number)
-ctrl-1 = 'workspace web'
+ctrl-1 = 'workspace main'
 ctrl-2 = 'workspace dev'
 ctrl-3 = 'workspace terminals'
 ctrl-4 = 'workspace notes'
@@ -52,7 +52,7 @@ ctrl-7 = 'workspace music'
 ctrl-8 = 'workspace misc'
 
 # Move to workspace (Meh + number)
-ctrl-alt-shift-1 = 'move-node-to-workspace web'
+ctrl-alt-shift-1 = 'move-node-to-workspace main'
 ctrl-alt-shift-2 = 'move-node-to-workspace dev'
 ctrl-alt-shift-3 = 'move-node-to-workspace terminals'
 ctrl-alt-shift-4 = 'move-node-to-workspace notes'
@@ -96,22 +96,22 @@ cmd-ctrl-alt-shift-right = ['join-with right', 'mode main']
 
 # App assignments
 
-# Browsers → web
+# Browsers → main
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace web'
+run = 'move-node-to-workspace main'
 
 [[on-window-detected]]
 if.app-id = 'org.mozilla.firefox'
-run = 'move-node-to-workspace web'
+run = 'move-node-to-workspace main'
 
 [[on-window-detected]]
 if.app-id = 'com.apple.Safari'
-run = 'move-node-to-workspace web'
+run = 'move-node-to-workspace main'
 
 [[on-window-detected]]
 if.app-id = 'app.zen-browser.zen'
-run = 'move-node-to-workspace web'
+run = 'move-node-to-workspace main'
 
 # VS Code → dev
 [[on-window-detected]]
