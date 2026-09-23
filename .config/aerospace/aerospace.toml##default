@@ -109,6 +109,20 @@ run = 'move-node-to-workspace main'
 if.app-id = 'app.zen-browser.zen'
 run = 'move-node-to-workspace main'
 
+# Agent apps → agents. The ChatGPT.app installed here reports com.openai.codex,
+# not the com.openai.chat that Kerrigan sees, so both ids are matched.
+[[on-window-detected]]
+if.app-id = 'com.anthropic.claudefordesktop'
+run = 'move-node-to-workspace agents'
+
+[[on-window-detected]]
+if.app-id = 'com.openai.chat'
+run = 'move-node-to-workspace agents'
+
+[[on-window-detected]]
+if.app-id = 'com.openai.codex'
+run = 'move-node-to-workspace agents'
+
 # Zed → dev
 [[on-window-detected]]
 if.app-id = 'dev.zed.Zed'
