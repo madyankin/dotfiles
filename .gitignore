@@ -77,6 +77,8 @@ __pycache__/
 .config/goose/skills/
 # Codex system skills, managed by Codex itself
 .config/agents/skills/.system/
+# Claude system skills, synced down from claude.ai (docx/pdf/pptx/xlsx/...)
+.config/agents/skills/synced/
 
 # Per-machine agent config (deliberately not shared between machines)
 /.claude/settings.json
