@@ -10,7 +10,7 @@
 
 [tools]
 node = "24"
-python = "3.13"
+python = "3.14"
 
 # Agent CLIs via mise's npm backend rather than `npm install -g`. Globals
 # installed with npm belong to ONE node version and vanish when a project
