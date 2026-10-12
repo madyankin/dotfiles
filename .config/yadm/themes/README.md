@@ -77,7 +77,7 @@ doctor` checks that the names you put here actually exist.
 
 One `dot theme set` writes all of these, for **both** modes:
 
-Ghostty (palette, plus the app icon) · tmux · p10k · fzf · btop · htop ·
+Ghostty (palette, plus the app icon) · tmux · p10k · fzf · htop ·
 mc (truecolor + an ANSI fallback) · nvim · VS Code (as a local extension —
 VS Code cannot load a theme from a bare path) · Zed · the iTerm2 dynamic
 profile · Terminal.app profiles.

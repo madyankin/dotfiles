@@ -138,7 +138,6 @@ __pycache__/
 .config/yadm/themes/*/generated/
 .config/ghostty/themes/yadm-*
 .config/ghostty/icon.conf
-.config/btop/themes/yadm-*.theme
 .config/htop/htoprc.light
 .config/htop/htoprc.dark
 .config/tmux/theme.conf

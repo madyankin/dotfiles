@@ -65,7 +65,6 @@ SCOPED=(
   .config/tmux
   .config/ghostty
   .config/bat
-  .config/btop
   .config/htop
   .config/mise
 )

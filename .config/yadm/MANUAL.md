@@ -66,7 +66,7 @@ missing all of it:
 - the `yadm alt` output, **including `.config/zsh/.zshrc`** — the shell keeps
   running its previous configuration, which is the most confusing symptom
 - every colour file: Ghostty's themes and `icon.conf`, `tmux/theme.conf`,
-  `p10k-colors.zsh`, `fzf-colors.zsh`, the nvim colorschemes, btop, htop, the
+  `p10k-colors.zsh`, `fzf-colors.zsh`, the nvim colorschemes, htop, the
   mc skins, the iTerm2 dynamic profile, the VS Code theme extension
 - the agent and editor symlinks
 
@@ -170,7 +170,7 @@ dotfiles legitimately appear. The Alfred workflows directory is excluded from
 
 ## Themes
 
-One palette drives the terminal, tmux, the prompt, fzf, btop, htop, mc, nvim,
+One palette drives the terminal, tmux, the prompt, fzf, htop, mc, nvim,
 VS Code, Zed, the iTerm2 profile, Terminal.app and Ghostty's app icon.
 
 ```bash

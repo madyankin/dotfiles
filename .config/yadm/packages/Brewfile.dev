@@ -8,7 +8,6 @@
 # --- CLI ---
 brew "ripgrep"
 brew "fd"
-brew "btop"
 brew "tmux"
 brew "direnv"
 brew "coreutils"

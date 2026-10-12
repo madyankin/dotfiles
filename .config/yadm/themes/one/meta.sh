@@ -1,7 +1,7 @@
 # Per-app selections for the one theme.
 #
 # Two kinds of value live here:
-#   - names of things we GENERATE (ghostty/nvim/vscode/zed/btop) — these are
+#   - names of things we GENERATE (ghostty/nvim/vscode/zed) — these are
 #     fixed and identical across themes, since the files are rewritten per theme;
 #   - names of things we only SELECT (bat, iTerm2 profile, htop scheme) —
 #     stock themes chosen to match this palette, and what `theme.sh doctor`

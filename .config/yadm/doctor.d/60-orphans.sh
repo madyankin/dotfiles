@@ -14,7 +14,6 @@ ALLOW="$DOT_ROOT/doctor.d/orphans.allow"
 pairs="
 aerospace:aerospace
 karabiner:karabiner_cli
-btop:btop
 htop:htop
 mc:mc
 ghostty:ghostty
