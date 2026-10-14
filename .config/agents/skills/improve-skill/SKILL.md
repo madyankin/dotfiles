@@ -1,6 +1,6 @@
 ---
 name: improve-skill
-description: Run a retrospective on a skill that was just used, harvest the friction from what actually happened, and rewrite the skill so the next run does not hit it again. Use when the user asks how to improve a skill, says a skill run went badly or had rough edges, asks "what did we learn from that run", or invokes /improve-skill after finishing work with another skill.
+description: Run a retrospective on a skill that was just used, harvest the friction from what actually happened, and rewrite the skill so the next run does not hit it again. Use when the user asks how to improve a skill, says a skill run went badly or had rough edges, asks "what did we learn from that run", or invokes /improve-skill after finishing work with another skill. Also use to tune a skill from past conversations ("self-heal", "where did people disagree with this skill", "learn from the history of X"): history mode mines Claude Code and Codex transcripts for corrections.
 ---
 
 # Improve Skill
@@ -23,9 +23,10 @@ ends are still in context. That context is the single richest source and it is n
 recoverable later — a transcript read after the fact shows what happened but not what was
 almost done, what was rejected, or what took three attempts.
 
-If the run is not in context, say so plainly and work from artifacts: the files the run
-produced, the skill's own text, and what the user remembers. The retro is still worth doing;
-it is just shallower, and you should not pretend otherwise.
+If the run is not in context, or the user asks to learn from history, use **History mode**:
+past transcripts show every correction across many runs, though not what was almost done. Say
+which source you used. With no transcripts either, work from artifacts and what the user
+remembers, and say the retro is shallower.
 
 ## Workflow
 
@@ -39,8 +40,8 @@ it is just shallower, and you should not pretend otherwise.
 
    Read `SKILL.md` and every file in `references/`. You are about to edit them; read them
    whole, not by grep.
-2. **Harvest friction.** See below. Produce a concrete, evidence-backed list — no generic
-   software-quality advice.
+2. **Harvest friction.** See below, or History mode when the run is not in context. Produce
+   a concrete, evidence-backed list — no generic software-quality advice.
 3. **Ask the user only what you cannot observe.** See "What to ask".
 4. **Classify each item into a fix type.** See the table. This is where most of the value is:
    the same friction has a cheap wrong fix and an expensive right one, and the right one is
@@ -49,6 +50,37 @@ it is just shallower, and you should not pretend otherwise.
 6. **Prove it: re-run the skill.** Non-negotiable — see "Close the loop".
 7. **Record it** in the target skill's `## Changelog`, one line, dated.
 8. **Report**: what changed, what it removes from every future run, what you chose not to do.
+
+## History mode
+
+Corrections from past runs are the evidence here. One run is an anecdote. The same correction
+in three runs is a missing rule.
+
+1. **Collect.** Run the digest and save it to the scratchpad, never into the skill or a repo:
+   ```bash
+   python3 -I ~/.config/agents/skills/improve-skill/scripts/skill_runs.py <name> [--since 90d] > <scratchpad>/runs.md
+   ```
+   Plugin prefixes are merged (`dev:x` = `rocky:x`). `U!` marks a hint word only. Read every
+   `U` turn. Runs `inside` another skill or started by a scheduled task often log turns about
+   the outer job; do not count those against this skill.
+   If `~/.config/agents/backlog/_skills.md` has open items for this skill, start from them.
+2. **Classify** each user turn, rejection, and interrupt: *disagreement* (agent did X, user
+   wanted Y), *scope change* (a new request, not a gap), or *neutral*.
+3. **Cluster** disagreements across runs. Seen in ≥2 runs → rule candidate. Seen once → ask
+   the user whether it recurs.
+4. For each cluster write: what the agent did, what the user wanted, and what instruction
+   would have made the first attempt right. Cite runs by date and session id.
+5. Continue with Workflow steps 3–8. The fix types are the same.
+6. **Proof is a replay.** Re-run the skill on the args of the clearest disagreeing run. The
+   corrected behaviour must show up without the user correcting it. Name any cluster you could
+   not replay as unproven. After a proven fix, close its `_skills.md` item with
+   `python3 -I ~/.config/agents/skills/backlog/scripts/backlog.py --slug _skills done <n>`.
+
+Transcripts hold private data. Do not copy transcript text into the skill or the report;
+paraphrase the pattern.
+
+Weekly report-only scan (ranks every skill, writes clusters to `_skills.md`, edits nothing):
+`skill_runs.py --all --since-last`.
 
 ## Harvesting friction
 
@@ -151,7 +183,7 @@ break anything, not that it generalises. When a change is about a case the re-ru
 (the collision rule, the empty-input guard), test that case directly, even if only with a
 throwaway call.
 
-## Changelog
+## Record the change
 
 Append one line to a `## Changelog` at the bottom of the target `SKILL.md`; create the
 section if it isn't there.
@@ -179,3 +211,7 @@ State plainly:
   the user.
 
 Never report an improvement you did not exercise as if you had.
+
+## Changelog
+
+- 2026-10-14 — history mode: `scripts/skill_runs.py` mines Claude Code + Codex transcripts for corrections; weekly `--all --since-last` scan feeds `backlog/_skills.md`. Renamed the changelog-rule section to "Record the change" so this file's own changelog does not collide with it.

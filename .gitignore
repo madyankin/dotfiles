@@ -178,3 +178,6 @@ __pycache__/
 # plaintext API key in one. This rule comes last so it applies inside the
 # re-included directories too.
 .config/yadm/alfred/Alfred.alfredpreferences/workflows/*/prefs.plist
+
+# Local per-repo backlogs and self-heal state (skills/backlog)
+.config/agents/backlog/
