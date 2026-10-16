@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Plan Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Starter for a plan map: header + counters, path, inventory with filters, decisions, footer.
+   Keep the tokens; replace the content. Every data-status item feeds the counters and filters. */
+:root {
+  --bg: #f4f6f9; --surface: #ffffff; --ink: #15202c; --muted: #5a6778; --line: #dce2ea; --band: #e9edf3;
+  --accent: #2c56c9;
+  --have: #1d7f55; --have-bg: #e2f2e9;
+  --build: #a86200; --build-bg: #fbefd9;
+  --gap: #bf3047; --gap-bg: #fbe4e8;
+  --sans: "Golos Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e131a; --surface: #151c25; --ink: #e5eaf0; --muted: #98a5b5; --line: #29333f; --band: #1d2631;
+  --accent: #86a2ff;
+  --have: #52c48e; --have-bg: #12281e;
+  --build: #f0a640; --build-bg: #2d2311;
+  --gap: #ff7085; --gap-bg: #33161c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0e131a; --surface: #151c25; --ink: #e5eaf0; --muted: #98a5b5; --line: #29333f; --band: #1d2631;
+  --accent: #86a2ff;
+  --have: #52c48e; --have-bg: #12281e;
+  --build: #f0a640; --build-bg: #2d2311;
+  --gap: #ff7085; --gap-bg: #33161c; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; padding: 0 16px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 64px; display: flex; flex-direction: column; gap: 48px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
+h2 { font-size: 20px; font-weight: 600; }
+h3 { font-size: 15px; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--accent); }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--band); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { color: var(--muted); max-width: 68ch; }
+.refs, .loc { font-family: var(--mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.sec-head { display: flex; flex-direction: column; gap: 4px; }
+.sec-head p { color: var(--muted); }
+
+/* Banner for dated changes */
+.banner { border-left: 4px solid var(--have); background: var(--have-bg); padding: 10px 14px; border-radius: 8px; font-size: 14px; }
+.banner.warn { border-color: var(--build); background: var(--build-bg); }
+
+/* Counters */
+header { display: flex; flex-direction: column; gap: 12px; }
+.summary { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+.stat { display: flex; align-items: baseline; gap: 8px; padding: 10px 14px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); }
+.stat b { font-size: 22px; font-variant-numeric: tabular-nums; }
+.stat.have b { color: var(--have); } .stat.build b { color: var(--build); } .stat.gap b { color: var(--gap); } .stat.q b { color: var(--accent); }
+
+/* Chips and tags */
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.have { color: var(--have); background: var(--have-bg); }
+.chip.build { color: var(--build); background: var(--build-bg); }
+.chip.gap { color: var(--gap); background: var(--gap-bg); }
+.tag { font-family: var(--mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line); padding: 1px 6px; border-radius: 4px; }
+.qref { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--accent); border: 1px solid currentColor; padding: 0 5px; border-radius: 4px; text-decoration: none; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: 12.5px; color: var(--muted); }
+
+/* Path */
+.flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 900px) { .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .flow { grid-template-columns: minmax(0, 1fr); } }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.step-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.num { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.step p { font-size: 13.5px; color: var(--muted); }
+.step .qs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: auto; }
+.step[data-status="gap"] { border-style: dashed; border-color: var(--gap); }
+
+/* Diagram box */
+.figure { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; overflow-x: auto; }
+.figure svg { width: 100%; min-width: 560px; height: auto; display: block; }
+
+/* Inventory */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filters button { font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cols { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.col { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.col-head { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.col li { font-size: 13.5px; padding-left: 14px; position: relative; }
+.col li::before { content: ""; position: absolute; left: 0; top: 0.6em; width: 6px; height: 6px; border-radius: 50%; }
+.col li[data-status="have"]::before { background: var(--have); }
+.col li[data-status="build"]::before { background: var(--build); }
+.col li[data-status="gap"]::before { background: var(--gap); }
+[hidden] { display: none !important; }
+
+/* Tables */
+.tbl-box { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 560px; }
+.tbl th, .tbl td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.tbl th { font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl .num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbl tr.divider td { background: var(--band); font-weight: 600; }
+.tbl tr.win td { background: var(--have-bg); }
+
+/* Decisions */
+.qs-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; list-style: none; margin: 0; padding: 0; }
+@media (max-width: 760px) { .qs-list { grid-template-columns: minmax(0, 1fr); } }
+.qs-list li { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; }
+.qs-list small { grid-column: 2; color: var(--muted); font-size: 12.5px; }
+.qs-list .decided { grid-column: 2; font-size: 13px; color: var(--have); font-weight: 500; }
+.qs-list li[data-decided] { border-color: var(--have); }
+
+/* Draft message */
+.draft { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.draft pre { margin: 0; white-space: pre-wrap; font-family: var(--sans); font-size: 14px; }
+.draft button { align-self: flex-start; font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--band); color: var(--ink); cursor: pointer; }
+
+footer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; display: flex; flex-direction: column; gap: 4px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<header>
+  <span class="eyebrow">Project · research 2026-01-01</span>
+  <h1>Feature name: what exists, what to build, what is missing</h1>
+  <p class="lede">One sentence: the goal and the single most important finding.</p>
+  <p class="refs">service-a@abc1234 · service-b@def5678</p>
+  <div class="summary">
+    <div class="stat have"><b data-count="have">0</b> exist</div>
+    <div class="stat build"><b data-count="build">0</b> to build</div>
+    <div class="stat gap"><b data-count="gap">0</b> missing</div>
+    <div class="stat q"><b data-count="open">0</b> open decisions</div>
+  </div>
+</header>
+
+<!-- Dated banner, only after something changed:
+<p class="banner">2026-01-08: S2 done in <a href="#">change link</a>. Numbers below say "before" where they predate it.</p> -->
+
+<section id="path">
+  <div class="sec-head">
+    <h2>Path</h2>
+    <p>Steps in real execution order.</p>
+  </div>
+  <div class="flow">
+    <article class="step" data-status="have">
+      <div class="step-top"><span class="num">S1</span><span class="chip have">extend existing</span></div>
+      <h3>Step title</h3>
+      <p>What happens in this step, in plain words.</p>
+      <div class="qs"><span class="tag">service-a</span></div>
+    </article>
+    <article class="step" data-status="build">
+      <div class="step-top"><span class="num">S2</span><span class="chip build">write new</span></div>
+      <h3>Step title</h3>
+      <p>What happens in this step.</p>
+      <div class="qs"><span class="tag">service-b</span><a class="qref" href="#q1">Q1</a></div>
+    </article>
+    <article class="step" data-status="gap">
+      <div class="step-top"><span class="num">S3</span><span class="chip gap">decide, then write</span></div>
+      <h3>Step title</h3>
+      <p>What is missing and why it matters.</p>
+      <div class="qs"><span class="tag">service-b</span><a class="qref" href="#q2">Q2</a></div>
+    </article>
+  </div>
+  <div class="legend">
+    <span class="chip have">extend existing</span><span>code exists, small change</span>
+    <span class="chip build">write new</span><span>clear what to write</span>
+    <span class="chip gap">decide, then write</span><span>blocked by a decision</span>
+  </div>
+</section>
+
+<section id="today">
+  <div class="sec-head">
+    <h2>How it works today</h2>
+    <p>Red marks where data is lost. Solid line = seen in code, dashed = inferred.</p>
+  </div>
+  <div class="figure">
+    <svg viewBox="0 0 720 140" role="img" aria-label="Mechanism diagram">
+      <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+      <rect x="10" y="40" width="160" height="60" rx="10" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="90" y="75" text-anchor="middle" fill="var(--ink)" font-size="14">Source</text>
+      <line x1="170" y1="70" x2="280" y2="70" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="225" y="60" text-anchor="middle" fill="var(--muted)" font-size="11">events</text>
+      <rect x="280" y="40" width="160" height="60" rx="10" fill="var(--gap-bg)" stroke="var(--gap)"/>
+      <text x="360" y="75" text-anchor="middle" fill="var(--ink)" font-size="14">Processor</text>
+      <line x1="440" y1="70" x2="550" y2="70" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr)"/>
+      <text x="495" y="60" text-anchor="middle" fill="var(--muted)" font-size="11">rows</text>
+      <rect x="550" y="40" width="160" height="60" rx="10" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="630" y="75" text-anchor="middle" fill="var(--ink)" font-size="14">Store</text>
+    </svg>
+  </div>
+</section>
+
+<section id="inventory">
+  <div class="sec-head">
+    <h2>By component</h2>
+    <p>Each item points to the code it is about.</p>
+  </div>
+  <div class="filters" role="group" aria-label="Filter by status">
+    <button type="button" data-filter="all" aria-pressed="true">All</button>
+    <button type="button" data-filter="have" aria-pressed="false">Exists</button>
+    <button type="button" data-filter="build" aria-pressed="false">To build</button>
+    <button type="button" data-filter="gap" aria-pressed="false">Missing</button>
+  </div>
+  <div class="cols">
+    <div class="col">
+      <div class="col-head"><h3>service-a</h3><span class="loc">path/to/service-a</span></div>
+      <ul>
+        <li data-status="have">Item that exists <span class="loc">src/file.go:42</span></li>
+        <li data-status="build">Item to write <span class="loc">src/new_file.go</span></li>
+      </ul>
+    </div>
+    <div class="col">
+      <div class="col-head"><h3>service-b</h3><span class="loc">path/to/service-b</span></div>
+      <ul>
+        <li data-status="gap">Missing item, blocked by <a class="qref" href="#q2">Q2</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="decisions">
+  <div class="sec-head">
+    <h2>Decisions</h2>
+    <p>Solved questions stay here with the date and the answer.</p>
+  </div>
+  <ol class="qs-list">
+    <li id="q1" data-decided>
+      <span class="qref">Q1</span><p>Question in plain words?</p>
+      <small>Blocks S2.</small>
+      <span class="decided">Decided 2026-01-05: the answer, in one line.</span>
+    </li>
+    <li id="q2">
+      <span class="qref">Q2</span><p>Question in plain words?</p>
+      <small>Blocks S3. Who decides: name, role.</small>
+    </li>
+  </ol>
+</section>
+
+<section id="ask">
+  <div class="sec-head"><h2>Question to send</h2><p>Not sent yet.</p></div>
+  <div class="draft">
+    <pre id="draft-text">Draft message in plain words.</pre>
+    <button type="button" data-copy="draft-text">Copy</button>
+  </div>
+</section>
+
+<footer>
+  <span>Source: <code>/full/path/to/research.md</code>, <code>/full/path/to/plan.md</code></span>
+  <span>Page and doc are updated together.</span>
+</footer>
+
+</main>
+<script>
+(() => {
+  const items = [...document.querySelectorAll('.col li[data-status]')];
+  const count = (s) => items.filter((el) => el.dataset.status === s).length;
+  for (const s of ['have', 'build', 'gap']) {
+    const el = document.querySelector(`[data-count="${s}"]`);
+    if (el) el.textContent = count(s);
+  }
+  const open = document.querySelectorAll('.qs-list li:not([data-decided])').length;
+  const openEl = document.querySelector('[data-count="open"]');
+  if (openEl) openEl.textContent = open;
+
+  const buttons = [...document.querySelectorAll('.filters button')];
+  const apply = (f) => {
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === f)));
+    items.forEach((el) => { el.hidden = f !== 'all' && el.dataset.status !== f; });
+    try { localStorage.setItem('plan-filter', f); } catch (e) {}
+  };
+  buttons.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter)));
+  let saved = 'all';
+  try { saved = localStorage.getItem('plan-filter') || 'all'; } catch (e) {}
+  apply(saved);
+
+  document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+    const text = document.getElementById(b.dataset.copy).textContent;
+    try { await navigator.clipboard.writeText(text); b.textContent = 'Copied'; } catch (e) { b.textContent = 'Copy failed'; }
+  }));
+})();
+</script>
+</body>
+</html>
