@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apple Mail"
+  short_description: "Read, file and draft email in Mail.app"
+  default_prompt: "Use $apple-mail to list my unread mail from today."

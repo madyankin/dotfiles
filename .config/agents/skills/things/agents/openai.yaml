@@ -1,0 +1,4 @@
+interface:
+  display_name: "Things"
+  short_description: "Read and update Things 3 to-dos"
+  default_prompt: "Use $things to show what is on my Today list."

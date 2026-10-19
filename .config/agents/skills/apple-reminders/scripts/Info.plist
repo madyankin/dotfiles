@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIdentifier</key>
+	<string>agent-skills.reminders</string>
+	<key>CFBundleName</key>
+	<string>reminders</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>Read and update reminders for the agent skill.</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Read and update reminders for the agent skill.</string>
+</dict>
+</plist>

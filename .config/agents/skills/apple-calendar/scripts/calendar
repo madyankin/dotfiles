@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Apple Calendar CLI. See ../SKILL.md.
+#
+# Compiles calendar.swift into the user cache when the source changes, then
+# runs it. Needs only the Xcode Command Line Tools (swiftc). The binary path
+# and signing identifier stay fixed, so the Calendars permission is asked once.
+set -euo pipefail
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+name=calendar
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/agent-skills"
+bin="$cache/$name"
+hash="$(cat "$dir/$name.swift" "$dir/Info.plist" | shasum -a 256 | cut -c1-16)"
+
+if [[ ! -x "$bin" || "$(cat "$bin.hash" 2>/dev/null)" != "$hash" ]]; then
+  command -v swiftc >/dev/null || { echo '{"error":"swiftc not found","hint":"xcode-select --install"}' >&2; exit 1; }
+  mkdir -p "$cache"
+  swiftc -O -swift-version 5 "$dir/$name.swift" -o "$bin.tmp" \
+    -Xlinker -sectcreate -Xlinker __TEXT -Xlinker __info_plist -Xlinker "$dir/Info.plist" >&2
+  codesign -s - -f --identifier "agent-skills.$name" "$bin.tmp" 2>/dev/null
+  mv "$bin.tmp" "$bin"
+  echo "$hash" >"$bin.hash"
+fi
+exec "$bin" "$@"

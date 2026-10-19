@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apple Reminders"
+  short_description: "Read and update Apple Reminders"
+  default_prompt: "Use $apple-reminders to show reminders due this week."

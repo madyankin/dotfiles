@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Things 3 CLI. See ../SKILL.md.
+set -euo pipefail
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec /usr/bin/osascript -l JavaScript "$dir/things.js" "$@"

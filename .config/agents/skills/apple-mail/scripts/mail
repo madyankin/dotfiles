@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Apple Mail CLI. See ../SKILL.md.
+set -euo pipefail
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec /usr/bin/osascript -l JavaScript "$dir/mail.js" "$@"

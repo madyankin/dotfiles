@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apple Calendar"
+  short_description: "Read and update Apple Calendar events"
+  default_prompt: "Use $apple-calendar to show my events for the next 7 days."
