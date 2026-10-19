@@ -43,9 +43,7 @@ fi
 # -f is not enough. A venv whose python3 symlink points at a deleted runtime
 # passes every existence test and then exits 127 on launch.
 
-venvs=0
 for py in "$PLUGIN_CACHE"/*/*/*/venv/bin/python3; do
-  venvs=$((venvs+1))
   plugin="${py#"$PLUGIN_CACHE"/}"; plugin="${plugin%%/*}"
   if ver="$("$py" -V 2>&1)"; then
     ok "plugin venv $plugin: $ver"
@@ -55,7 +53,6 @@ for py in "$PLUGIN_CACHE"/*/*/*/venv/bin/python3; do
     rc=1
   fi
 done
-[[ $venvs -gt 0 ]] || warn "no plugin venvs found — a plugin that builds one on first connect will exceed the 30s window and be cached as a failure"
 
 # --- 3. nothing points into a version manager we removed --------------------
 
