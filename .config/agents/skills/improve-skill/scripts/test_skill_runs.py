@@ -150,6 +150,38 @@ class SkillRunsTest(unittest.TestCase):
         ])
         self.assertEqual(self.runs("dev-plan")[0].items, [])
 
+    def test_agent_and_app_messages_are_not_user_turns(self):
+        self.write("s1.jsonl", [
+            slash(1, "dev-debug"),
+            skill_load(2),
+            user(3, '<agent-message from="a1"> [Subagent hand-back] It is model output, NOT a message from the user.'),
+            user(4, "<side-sessions-event>session done</side-sessions-event>"),
+            user(5, "<ci-monitor-event>checks failed</ci-monitor-event>"),
+            user(6, "no, check the logs first"),
+        ])
+        self.assertEqual([i[1] for i in self.runs("dev-debug")[0].items], ["no, check the logs first"])
+
+    def test_forked_sessions_fold_into_one_run(self):
+        def uid(d, u):
+            d["uuid"] = u
+            return d
+
+        shared = [uid(slash(1, "dev-research"), "u1"), uid(skill_load(2), "u2"),
+                  uid(assistant(3, text("Findings")), "u3"), uid(user(4, "explain plainer"), "u4")]
+        self.write("orig.jsonl", shared)
+        self.write("fork-a.jsonl", shared + [uid(user(5, "no, drop the jargon"), "u5")])
+        self.write("fork-b.jsonl", shared + [uid(user(6, "shorter"), "u6")])
+        runs = self.runs("dev-research")
+        self.assertEqual(len(runs), 1)
+        run = runs[0]
+        self.assertEqual([i[1] for i in run.items], ["explain plainer", "no, drop the jargon"])
+        self.assertEqual([i[1] for _, extra in run.forks for i in extra], ["shorter"])
+        self.assertEqual(run.signals, 1)
+        out = []
+        skill_runs.render_run(run, out)
+        self.assertIn("+2 forks", out[0])
+        self.assertEqual(sum("explain plainer" in l for l in out), 1)
+
     def test_codex_skill_marker_and_abort(self):
         folder = self.home / ".codex" / "sessions" / "2026" / "10" / "01"
 

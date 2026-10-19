@@ -27,6 +27,8 @@ HINT = re.compile(
 SKIP_PREFIXES = (
     "<local-command-", "<task-notification", "<system-reminder", "<bash-input", "<bash-stdout",
     "<bash-stderr", "Caveat:",
+    # Subagent hand-backs, other sessions' notes, and app events land as user turns but carry no user words.
+    "<agent-message", "<side-sessions-event", "<ci-monitor-event",
 )
 CODEX_SKIP_PREFIXES = ("<environment_context", "<user_instructions", "# AGENTS.md", "<permissions")
 
@@ -39,6 +41,7 @@ class Event:
     skill: str = ""
     args: str = ""
     by_user: bool = False  # slash command or $skill, not the agent calling the Skill tool
+    uid: str = ""  # transcript line uuid; a forked session copies its parent's lines with the same uuids
 
 
 @dataclass
@@ -60,10 +63,18 @@ class Run:
     via: str
     outer: str  # skill whose run this one was called inside, if any
     items: list  # (kind, text, context, hinted)
+    item_uids: list = field(default_factory=list)
+    uid: str = ""  # uuid of the invoking line
+    forks: list = field(default_factory=list)  # (Session, items only that fork has)
 
     @property
     def signals(self):
-        return sum(1 for kind, _, _, hinted in self.items if kind in ("reject", "interrupt") or hinted)
+        every = self.items + [i for _, extra in self.forks for i in extra]
+        return sum(1 for kind, _, _, hinted in every if kind in ("reject", "interrupt") or hinted)
+
+    @property
+    def key(self):
+        return (self.skill, self.uid) if self.uid else (self.skill, self.ts, self.args)
 
 
 def bare(name):
@@ -117,50 +128,57 @@ def parse_claude(path):
     for i, d in enumerate(lines):
         if d.get("isSidechain"):
             continue
-        ts = d.get("timestamp", "")
-        session.cwd = session.cwd or d.get("cwd", "")
-        kind = d.get("type")
-        msg = d.get("message") or {}
-        content = msg.get("content")
-        if kind == "assistant" and isinstance(content, list):
-            for b in content:
-                if b.get("type") == "tool_use" and b.get("name") == "Skill":
-                    inp = b.get("input") or {}
-                    session.events.append(Event("invoke", ts, skill=bare(inp.get("skill", "")), args=str(inp.get("args", ""))))
-            text = blocks_text(content)
-            if text.strip():
-                session.events.append(Event("assistant", ts, text))
-        elif kind == "attachment":
-            att = d.get("attachment") or {}
-            if att.get("type") == "queued_command" and att.get("commandMode") == "prompt":
-                add_user_text(session, ts, str(att.get("prompt", "")))
-        elif kind == "user":
-            if d.get("isCompactSummary"):
-                session.events.append(Event("compact", ts))
-                continue
-            if d.get("isMeta"):
-                continue
-            if isinstance(content, str):
-                m = re.search(r"<command-name>(/?[^<]+)</command-name>", content)
-                if m:
-                    # Built-ins like /compact share the marker; only skills inject their SKILL.md next.
-                    if is_skill_load(lines[i + 1 : i + 5]):
-                        args = re.search(r"<command-args>(.*?)</command-args>", content, re.S)
-                        session.events.append(Event("invoke", ts, skill=bare(m.group(1)), args=args.group(1).strip() if args else "", by_user=True))
-                    continue
-                add_user_text(session, ts, content)
-            elif isinstance(content, list):
-                for b in content:
-                    if b.get("type") == "tool_result" and b.get("is_error"):
-                        body = b.get("content")
-                        body = body if isinstance(body, str) else blocks_text(body or [])
-                        if "doesn't want to proceed" in body:
-                            reason = body.split("the user said:", 1)[1].strip() if "the user said:" in body else ""
-                            session.events.append(Event("reject", ts, reason))
-                text = blocks_text(content)
-                if text:
-                    add_user_text(session, ts, text)
+        before = len(session.events)
+        parse_claude_line(session, lines, i, d)
+        for e in session.events[before:]:
+            e.uid = d.get("uuid", "")
     return session
+
+
+def parse_claude_line(session, lines, i, d):
+    ts = d.get("timestamp", "")
+    session.cwd = session.cwd or d.get("cwd", "")
+    kind = d.get("type")
+    msg = d.get("message") or {}
+    content = msg.get("content")
+    if kind == "assistant" and isinstance(content, list):
+        for b in content:
+            if b.get("type") == "tool_use" and b.get("name") == "Skill":
+                inp = b.get("input") or {}
+                session.events.append(Event("invoke", ts, skill=bare(inp.get("skill", "")), args=str(inp.get("args", ""))))
+        text = blocks_text(content)
+        if text.strip():
+            session.events.append(Event("assistant", ts, text))
+    elif kind == "attachment":
+        att = d.get("attachment") or {}
+        if att.get("type") == "queued_command" and att.get("commandMode") == "prompt":
+            add_user_text(session, ts, str(att.get("prompt", "")))
+    elif kind == "user":
+        if d.get("isCompactSummary"):
+            session.events.append(Event("compact", ts))
+            return
+        if d.get("isMeta"):
+            return
+        if isinstance(content, str):
+            m = re.search(r"<command-name>(/?[^<]+)</command-name>", content)
+            if m:
+                # Built-ins like /compact share the marker; only skills inject their SKILL.md next.
+                if is_skill_load(lines[i + 1 : i + 5]):
+                    args = re.search(r"<command-args>(.*?)</command-args>", content, re.S)
+                    session.events.append(Event("invoke", ts, skill=bare(m.group(1)), args=args.group(1).strip() if args else "", by_user=True))
+                return
+            add_user_text(session, ts, content)
+        elif isinstance(content, list):
+            for b in content:
+                if b.get("type") == "tool_result" and b.get("is_error"):
+                    body = b.get("content")
+                    body = body if isinstance(body, str) else blocks_text(body or [])
+                    if "doesn't want to proceed" in body:
+                        reason = body.split("the user said:", 1)[1].strip() if "the user said:" in body else ""
+                        session.events.append(Event("reject", ts, reason))
+            text = blocks_text(content)
+            if text:
+                add_user_text(session, ts, text)
 
 
 def is_skill_load(following):
@@ -219,7 +237,7 @@ def runs_in(session, target=None):
                 break
             if prev.kind == "invoke" and not outer:
                 outer = prev.skill
-        items, context, users = [], "", 0
+        items, uids, context, users = [], [], "", 0
         for nxt in events[i + 1 :]:
             # A skill the agent calls before the user speaks is a step of this run, not a new run.
             if (nxt.kind == "invoke" and (nxt.by_user or users)) or users >= WINDOW_USER_TURNS:
@@ -231,11 +249,13 @@ def runs_in(session, target=None):
             elif nxt.kind == "user":
                 users += 1
                 items.append(("user", nxt.text, context, bool(HINT.search(nxt.text))))
+                uids.append(nxt.uid)
                 context = ""
             else:
                 items.append((nxt.kind, nxt.text, context, False))
+                uids.append(nxt.uid)
                 context = ""
-        runs.append(Run(e.skill, session, e.ts, e.args, trigger, "user" if e.by_user else "agent", outer, items))
+        runs.append(Run(e.skill, session, e.ts, e.args, trigger, "user" if e.by_user else "agent", outer, items, uids, e.uid))
     return runs
 
 
@@ -270,8 +290,26 @@ def collect(home, since, codex, target=None, project=None):
         for run in runs_in(session, target):
             if not since or (run.ts and datetime.fromisoformat(run.ts.replace("Z", "+00:00")) >= since):
                 runs.append(run)
+    runs = merge_forks(runs)
     runs.sort(key=lambda r: r.ts, reverse=True)
     return runs, unreadable
+
+
+def merge_forks(runs):
+    """Fold copies of one invocation (forked sessions) into the copy with the most items."""
+    groups = {}
+    for r in runs:
+        groups.setdefault(r.key, []).append(r)
+    merged = []
+    for copies in groups.values():
+        copies.sort(key=lambda r: len(r.items), reverse=True)
+        main, seen = copies[0], {u for u in copies[0].item_uids if u}
+        for other in copies[1:]:
+            extra = [i for i, u in zip(other.items, other.item_uids) if not u or u not in seen]
+            seen.update(u for u in other.item_uids if u)
+            main.forks.append((other.session, extra))
+        merged.append(main)
+    return merged
 
 
 def render_run(run, out):
@@ -279,12 +317,23 @@ def render_run(run, out):
     head = f"## {run.ts[:16].replace('T', ' ')} · {s.source} · {s.cwd or '?'} · {s.sid[:8]} · via {run.via}"
     if run.outer:
         head += f" inside {run.outer}"
+    if run.forks:
+        head += f" · +{len(run.forks)} forks"
     if run.args:
         head += f" · args: {clip(run.args, 120)}"
     out.append(head)
     if run.trigger:
         out.append(f"trigger: {clip(run.trigger, USER_MAX)}")
-    for kind, text, context, hinted in run.items:
+    render_items(run.items, out)
+    for session, extra in run.forks:
+        if any(kind != "compact" for kind, *_ in extra):
+            out.append(f"fork {session.sid[:8]}, turns after it split off:")
+            render_items(extra, out)
+    out.append("")
+
+
+def render_items(items, out):
+    for kind, text, context, hinted in items:
         if context:
             out.append(f"- A: {clip(context, ASSISTANT_MAX)}")
         if kind == "user":
@@ -295,16 +344,16 @@ def render_run(run, out):
             out.append("- INTERRUPTED")
         elif kind == "compact":
             out.append("- COMPACTED (earlier turns only summarized)")
-    out.append("")
 
 
 def render_single(target, runs, max_runs, unreadable, since):
-    with_items = [r for r in runs if r.items]
+    with_items = [r for r in runs if r.items or any(extra for _, extra in r.forks)]
     out = [
         f"# {target}: {len(runs)} runs, {sum(1 for r in runs if r.signals)} with signals"
         + (f", since {since.date()}" if since else ""),
         "Legend: U = user turn, U! = turn with a disagreement hint word, A = agent text just before it.",
         "A run 'inside' another skill, or triggered by a scheduled task, may log turns about the outer job.",
+        "'+N forks' = one invocation copied into N forked sessions, counted once; only turns a fork adds are shown.",
         "",
     ]
     for run in with_items[:max_runs]:

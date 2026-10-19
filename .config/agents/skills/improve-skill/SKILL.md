@@ -215,3 +215,4 @@ Never report an improvement you did not exercise as if you had.
 ## Changelog
 
 - 2026-10-14 — history mode: `scripts/skill_runs.py` mines Claude Code + Codex transcripts for corrections; weekly `--all --since-last` scan feeds `backlog/_skills.md`. Renamed the changelog-rule section to "Record the change" so this file's own changelog does not collide with it.
+- 2026-10-19 — `skill_runs.py`: subagent hand-backs, side-session notes and CI events no longer count as user turns; forked copies of one invocation fold into one run (`+N forks`, fork-only turns shown). 60-day scan: 394 → 365 runs, dev-research 24 → 9 signals.
