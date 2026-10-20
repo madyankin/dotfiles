@@ -1,0 +1,4 @@
+interface:
+  display_name: "Edward Tufte"
+  short_description: "Review or design charts, dashboards and slides by Tufte's principles"
+  default_prompt: "Use $edward-tufte to review this graphic for lie factor, chartjunk and data-ink, then propose a redesign."
