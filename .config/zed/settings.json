@@ -7,7 +7,7 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "diff_view_style": "split",
+  "diff_view_style": "unified",
   "outline_panel": {
     "dock": "left"
   },
