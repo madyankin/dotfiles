@@ -64,11 +64,33 @@ integrity audit when a scale or comparison is involved: a clean lie is still a l
 
 ## Workflow
 
-1. Get the actual graphic or its full description, plus the underlying numbers when integrity is in question. Ask for the numbers rather than guess them.
+Say which mode the run is in: **critique** (a display exists) or **design** (you draw a mock of a product screen).
+
+1. Critique: get the actual graphic or its full description, plus the underlying numbers when integrity is in question. Ask for the numbers rather than guess them.
+   Design: build the source ledger first (see "Design mode: sources"). Draw only after it exists.
 2. Run the integrity audit when any axis, scale or comparison is involved. Report the lie factor as a number.
 3. Inventory the elements. Classify each as data-ink, redundant data-ink or non-data-ink. Score chartjunk 0–5.
 4. Propose the redesign: form, scale, labels, what to erase, how to add data. Name a concrete alternative, never "make it cleaner".
 5. When the medium is slides, say whether one dense page serves better and what it would hold.
+
+## Design mode: sources
+
+"Show the source" applies to a mock too. A reader takes every value in a mock as a product fact.
+
+- Read the API serializer, model and DB columns behind the screen. Note each field with `path:line`.
+- Every text, number, label and state in the mock traces to code or is marked proposed:
+
+| Shown | Allowed when | `data-src` |
+|---|---|---|
+| Number | The field exists; the value is a sample | `api/app/serializers/x_serializer.rb:40 total_cents` |
+| Enum value, state, badge | The code emits that exact value | `api/app/models/x.rb:12 running` |
+| Explanation, warning text | The code emits that text or template | `api/app/models/x.rb:30 Not enough data.` |
+| Anything else | Never silently | `proposed: <what is missing in code>` |
+| Control with no data claim (caret, tab name) | No digit in it | `ui: <what it does>` |
+
+- Put `data-mock` on the product frame. Style `[data-src^="proposed"]` visibly (dashed outline, "proposed" tag).
+- Before showing the mock, run `python3 -I ~/.config/agents/skills/edward-tufte/scripts/check_mock_sources.py <mock.html> --root ~/Code`. It fails on unsourced text, a cited line that lacks the token, or unstyled proposed items. Fix until it exits 0.
+- A Figma or image mock cannot run the checker. Give the ledger as a table instead.
 
 ## Output shape
 
@@ -76,6 +98,7 @@ integrity audit when a scale or comparison is involved: a clean lie is still a l
 - Element inventory as a table: element, class, issue.
 - Fixes in severity order: distorts > obscures > competes > redundant > unnecessary.
 - The recommended alternative as a concrete spec.
+- Design mode: the checker's ledger counts, then every proposed item with what code it needs.
 - End with one question about the story the data should tell, if it is still unclear.
 - Write in the user's language. Terms stay in English: data-ink, lie factor, small multiples, sparkline.
 
@@ -103,3 +126,7 @@ User: pie chart of eight competitors' market share; the manager wants it to "pop
 > the bars, no gridlines, no legend. Want it to pop? Put last year's share beside
 > this year's. Interesting data, clearly shown, is what holds attention. What is
 > the market-share story the reader must take away?
+
+## Changelog
+
+- 2026-10-28 — design mode: source ledger before drawing; `scripts/check_mock_sources.py` fails a mock with values, states or text that do not trace to a code line or carry a visible "proposed" mark.

@@ -6,6 +6,10 @@ each run, so a retro can work from history instead of memory.
 
   skill_runs.py <skill> [--since 90d] [--max-runs 30]
   skill_runs.py --all [--since-last] [--top 5]
+  skill_runs.py --commit-scan
+
+--since-last starts at the last committed scan and records this scan as pending;
+--commit-scan makes it the new start. A scan whose output is lost is then repeated.
 """
 import argparse
 import json
@@ -35,13 +39,14 @@ CODEX_SKIP_PREFIXES = ("<environment_context", "<user_instructions", "# AGENTS.m
 
 @dataclass
 class Event:
-    kind: str  # invoke | user | assistant | reject | interrupt | compact
+    kind: str  # invoke | end | user | assistant | reject | interrupt | compact
     ts: str
     text: str = ""
     skill: str = ""
     args: str = ""
     by_user: bool = False  # slash command or $skill, not the agent calling the Skill tool
     uid: str = ""  # transcript line uuid; a forked session copies its parent's lines with the same uuids
+    tool_id: str = ""  # Skill tool_use id; an `end` event with the same id closes a skill that ran in a subagent
 
 
 @dataclass
@@ -66,6 +71,7 @@ class Run:
     item_uids: list = field(default_factory=list)
     uid: str = ""  # uuid of the invoking line
     forks: list = field(default_factory=list)  # (Session, items only that fork has)
+    forked: bool = False  # ran in a subagent; its own turns are in the subagent transcript, not here
 
     @property
     def signals(self):
@@ -145,7 +151,7 @@ def parse_claude_line(session, lines, i, d):
         for b in content:
             if b.get("type") == "tool_use" and b.get("name") == "Skill":
                 inp = b.get("input") or {}
-                session.events.append(Event("invoke", ts, skill=bare(inp.get("skill", "")), args=str(inp.get("args", ""))))
+                session.events.append(Event("invoke", ts, skill=bare(inp.get("skill", "")), args=str(inp.get("args", "")), tool_id=b.get("id", "")))
         text = blocks_text(content)
         if text.strip():
             session.events.append(Event("assistant", ts, text))
@@ -169,7 +175,12 @@ def parse_claude_line(session, lines, i, d):
                 return
             add_user_text(session, ts, content)
         elif isinstance(content, list):
+            result = d.get("toolUseResult")
+            forked = isinstance(result, dict) and result.get("status") == "forked"
             for b in content:
+                if forked and b.get("type") == "tool_result":
+                    # A forked skill is over once its result returns; later user turns are about the parent job.
+                    session.events.append(Event("end", ts, tool_id=b.get("tool_use_id", "")))
                 if b.get("type") == "tool_result" and b.get("is_error"):
                     body = b.get("content")
                     body = body if isinstance(body, str) else blocks_text(body or [])
@@ -230,17 +241,25 @@ def runs_in(session, target=None):
     for i, e in enumerate(events):
         if e.kind != "invoke" or not e.skill or (target and e.skill != target):
             continue
-        trigger, outer = "", ""
+        trigger, outer, ended = "", "", set()
         for prev in reversed(events[:i]):
             if prev.kind == "user":
                 trigger = prev.text
                 break
-            if prev.kind == "invoke" and not outer:
+            if prev.kind == "end":
+                ended.add(prev.tool_id)
+            if prev.kind == "invoke" and not outer and not (prev.tool_id and prev.tool_id in ended):
                 outer = prev.skill
-        items, uids, context, users = [], [], "", 0
+        items, uids, context, users, limit, forked = [], [], "", 0, WINDOW_USER_TURNS, False
         for nxt in events[i + 1 :]:
+            if nxt.kind == "end":
+                if e.tool_id and nxt.tool_id == e.tool_id:
+                    # The parent never loaded this skill; only the user's reply to the relayed result is about it.
+                    forked, limit = True, users + 1
+                continue
             # A skill the agent calls before the user speaks is a step of this run, not a new run.
-            if (nxt.kind == "invoke" and (nxt.by_user or users)) or users >= WINDOW_USER_TURNS:
+            # A forked run has no steps in the parent, so any later skill starts a new run.
+            if (nxt.kind == "invoke" and (nxt.by_user or users or forked)) or users >= limit:
                 break
             if nxt.kind == "invoke":
                 continue
@@ -255,7 +274,7 @@ def runs_in(session, target=None):
                 items.append((nxt.kind, nxt.text, context, False))
                 uids.append(nxt.uid)
                 context = ""
-        runs.append(Run(e.skill, session, e.ts, e.args, trigger, "user" if e.by_user else "agent", outer, items, uids, e.uid))
+        runs.append(Run(e.skill, session, e.ts, e.args, trigger, "user" if e.by_user else "agent", outer, items, uids, e.uid, forked=forked))
     return runs
 
 
@@ -317,6 +336,8 @@ def render_run(run, out):
     head = f"## {run.ts[:16].replace('T', ' ')} · {s.source} · {s.cwd or '?'} · {s.sid[:8]} · via {run.via}"
     if run.outer:
         head += f" inside {run.outer}"
+    if run.forked:
+        head += " · forked"
     if run.forks:
         head += f" · +{len(run.forks)} forks"
     if run.args:
@@ -346,14 +367,20 @@ def render_items(items, out):
             out.append("- COMPACTED (earlier turns only summarized)")
 
 
+LEGEND = (
+    "Legend: U = user turn, U! = turn with a disagreement hint word, A = agent text just before it.",
+    "A run 'inside' another skill, or triggered by a scheduled task, may log turns about the outer job.",
+    "'+N forks' = one invocation copied into N forked sessions, counted once; only turns a fork adds are shown.",
+    "'forked' = the skill ran in a subagent: only the user's first turn after its result is shown; the subagent transcript is not read.",
+)
+
+
 def render_single(target, runs, max_runs, unreadable, since):
     with_items = [r for r in runs if r.items or any(extra for _, extra in r.forks)]
     out = [
         f"# {target}: {len(runs)} runs, {sum(1 for r in runs if r.signals)} with signals"
         + (f", since {since.date()}" if since else ""),
-        "Legend: U = user turn, U! = turn with a disagreement hint word, A = agent text just before it.",
-        "A run 'inside' another skill, or triggered by a scheduled task, may log turns about the outer job.",
-        "'+N forks' = one invocation copied into N forked sessions, counted once; only turns a fork adds are shown.",
+        *LEGEND,
         "",
     ]
     for run in with_items[:max_runs]:
@@ -368,7 +395,7 @@ def render_all(runs, top, unreadable, since):
     for r in runs:
         by_skill.setdefault(r.skill, []).append(r)
     ranked = sorted(by_skill.items(), key=lambda kv: (sum(r.signals for r in kv[1]), len(kv[1])), reverse=True)
-    out = [f"# All skills: {len(runs)} runs" + (f" since {since.isoformat(timespec='minutes')}" if since else ""), ""]
+    out = [f"# All skills: {len(runs)} runs" + (f" since {since.isoformat(timespec='minutes')}" if since else ""), *LEGEND, ""]
     out += ["| skill | runs | runs with signals | signals |", "|---|---|---|---|"]
     for skill, rs in ranked:
         out.append(f"| {skill} | {len(rs)} | {sum(1 for r in rs if r.signals)} | {sum(r.signals for r in rs)} |")
@@ -385,26 +412,46 @@ def render_all(runs, top, unreadable, since):
     return "\n".join(out)
 
 
+def read_state(state):
+    return json.loads(state.read_text()) if state.exists() else {}
+
+
+def write_state(state, data):
+    state.parent.mkdir(parents=True, exist_ok=True)
+    tmp = state.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data) + "\n")
+    tmp.replace(state)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("skill", nargs="?", help="skill name; plugin prefix optional")
     ap.add_argument("--all", action="store_true", help="rank every skill and digest the top ones")
     ap.add_argument("--since", help="90d, 2w, or ISO date (default 90d; --all with --since-last uses the state file)")
     ap.add_argument("--since-last", action="store_true", help="--all only: start from the last recorded scan")
-    ap.add_argument("--state", help="state file for --since-last (default ~/.config/agents/backlog/.self-heal-state.json)")
+    ap.add_argument("--commit-scan", action="store_true", help="start the next --since-last scan where the pending one started")
+    ap.add_argument("--state", help="state file for --since-last and --commit-scan (default ~/.config/agents/backlog/.self-heal-state.json)")
     ap.add_argument("--max-runs", type=int, default=30)
     ap.add_argument("--top", type=int, default=5)
     ap.add_argument("--project", help="only sessions whose cwd contains this substring")
     ap.add_argument("--no-codex", action="store_true")
     args = ap.parse_args(argv)
-    if bool(args.skill) == args.all:
-        ap.error("give a skill name or --all")
+    if sum((bool(args.skill), args.all, args.commit_scan)) != 1:
+        ap.error("give a skill name, --all, or --commit-scan")
 
     home = Path.home()
     state = Path(args.state) if args.state else home / ".config" / "agents" / "backlog" / ".self-heal-state.json"
+    data = read_state(state)
+    if args.commit_scan:
+        if "pending" not in data:
+            print(f"no pending scan in {state}", file=sys.stderr)
+            return 1
+        write_state(state, {"last_scan": data["pending"]})
+        print(f"next --since-last scan starts at {data['pending']}")
+        return 0
     since = parse_since(args.since or "90d")
-    if args.since_last and state.exists():
-        since = datetime.fromisoformat(json.loads(state.read_text())["last_scan"])
+    if args.since_last and "last_scan" in data:
+        since = datetime.fromisoformat(data["last_scan"])
     started = datetime.now(timezone.utc)
 
     target = bare(args.skill) if args.skill else None
@@ -412,8 +459,7 @@ def main(argv=None):
     if args.all:
         print(render_all(runs, args.top, unreadable, since))
         if args.since_last:
-            state.parent.mkdir(parents=True, exist_ok=True)
-            state.write_text(json.dumps({"last_scan": started.isoformat()}) + "\n")
+            write_state(state, {**data, "pending": started.isoformat()})
     else:
         print(render_single(target, runs, args.max_runs, unreadable, since))
 

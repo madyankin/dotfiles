@@ -31,8 +31,14 @@ def text(t):
     return {"type": "text", "text": t}
 
 
-def skill_call(name, args=""):
-    return {"type": "tool_use", "id": "toolu_1", "name": "Skill", "input": {"skill": name, "args": args}}
+def skill_call(name, args="", tid="toolu_1"):
+    return {"type": "tool_use", "id": tid, "name": "Skill", "input": {"skill": name, "args": args}}
+
+
+def forked_result(n, tid):
+    body = 'Skill "dev:dev-commit" completed (forked execution).\n\nResult:\nCommitted.'
+    return user(n, [{"type": "tool_result", "tool_use_id": tid, "content": body}],
+                toolUseResult={"success": True, "status": "forked", "agentId": "a1", "result": "Committed."})
 
 
 def skill_load(n):
@@ -182,6 +188,41 @@ class SkillRunsTest(unittest.TestCase):
         self.assertIn("+2 forks", out[0])
         self.assertEqual(sum("explain plainer" in l for l in out), 1)
 
+    def test_forked_skill_run_ends_at_its_result(self):
+        self.write("s1.jsonl", [
+            user(1, "split it into commits"),
+            assistant(2, skill_call("dev:dev-commit", "first", "toolu_a")),
+            forked_result(3, "toolu_a"),
+            assistant(4, skill_call("dev:dev-commit", "second", "toolu_b")),
+            forked_result(5, "toolu_b"),
+            assistant(6, text("Both committed.")),
+            user(7, "no, wrong ticket in the message"),
+            assistant(8, text("PR body draft: ...")),
+            user(9, "no, the PR body is wrong"),
+            user(10, "stop, post it to Slack instead"),
+        ])
+        first, second = sorted(self.runs("dev-commit"), key=lambda r: r.ts)
+        self.assertTrue(first.forked and second.forked)
+        self.assertEqual((first.items, first.signals), ([], 0))
+        self.assertEqual(second.outer, "")
+        self.assertEqual([i[1] for i in second.items], ["no, wrong ticket in the message"])
+        out = []
+        skill_runs.render_run(second, out)
+        self.assertIn("forked", out[0])
+
+    def test_inline_skill_run_still_collects_later_turns(self):
+        self.write("s1.jsonl", [
+            user(1, "commit"),
+            assistant(2, skill_call("dev:dev-commit", "", "toolu_a")),
+            user(3, [{"type": "tool_result", "tool_use_id": "toolu_a", "content": "Launching skill: dev:dev-commit"}],
+                 toolUseResult={"success": True, "commandName": "dev:dev-commit"}),
+            skill_load(4),
+            user(5, "no, mention the ticket"),
+        ])
+        run = self.runs("dev-commit")[0]
+        self.assertFalse(run.forked)
+        self.assertEqual([i[1] for i in run.items], ["no, mention the ticket"])
+
     def test_codex_skill_marker_and_abort(self):
         folder = self.home / ".codex" / "sessions" / "2026" / "10" / "01"
 
@@ -209,19 +250,35 @@ class SkillRunsTest(unittest.TestCase):
         runs, _ = skill_runs.collect(self.home, skill_runs.parse_since("2025-01-01"), False, "dev-plan")
         self.assertEqual(runs, [])
 
+    def scan(self, *argv):
+        out = io.StringIO()
+        with redirect_stdout(out):
+            code = skill_runs.main(list(argv))
+        return code, out.getvalue()
+
     def test_all_ranking_and_since_last_state(self):
         self.write("s1.jsonl", [slash(1, "dev-plan"), skill_load(2), user(3, "no, wrong")])
+        state = str(self.home / "state.json")
+        _, out = self.scan("--all", "--since-last", "--state", state)
+        self.assertIn("| dev-plan | 1 | 1 | 1 |", out)
+        self.assertIn("U!: no, wrong", out)
+        self.assertEqual(self.scan("--commit-scan", "--state", state)[0], 0)
+        _, out = self.scan("--all", "--since-last", "--state", state)
+        self.assertIn("# All skills: 0 runs", out)
+
+    def test_since_last_without_commit_repeats_the_scan(self):
+        self.write("s1.jsonl", [slash(1, "dev-plan"), skill_load(2), user(3, "no, wrong")])
         state = self.home / "state.json"
-        out = io.StringIO()
-        with redirect_stdout(out):
-            skill_runs.main(["--all", "--since-last", "--state", str(state)])
-        self.assertIn("| dev-plan | 1 | 1 | 1 |", out.getvalue())
-        self.assertIn("U!: no, wrong", out.getvalue())
-        self.assertIn("last_scan", state.read_text())
-        out = io.StringIO()
-        with redirect_stdout(out):
-            skill_runs.main(["--all", "--since-last", "--state", str(state)])
-        self.assertIn("# All skills: 0 runs", out.getvalue())
+        state.write_text(json.dumps({"last_scan": "2026-09-01T00:00:00+00:00"}))
+        self.scan("--all", "--since-last", "--state", str(state))  # output lost, never committed
+        self.assertEqual(json.loads(state.read_text())["last_scan"], "2026-09-01T00:00:00+00:00")
+        _, out = self.scan("--all", "--since-last", "--state", str(state))
+        self.assertIn("| dev-plan | 1 | 1 | 1 |", out)
+
+    def test_commit_scan_without_pending_fails(self):
+        state = self.home / "state.json"
+        self.assertEqual(self.scan("--commit-scan", "--state", str(state))[0], 1)
+        self.assertFalse(state.exists())
 
 
 if __name__ == "__main__":

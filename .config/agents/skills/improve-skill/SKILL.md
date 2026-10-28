@@ -62,7 +62,8 @@ in three runs is a missing rule.
    ```
    Plugin prefixes are merged (`dev:x` = `rocky:x`). `U!` marks a hint word only. Read every
    `U` turn. Runs `inside` another skill or started by a scheduled task often log turns about
-   the outer job; do not count those against this skill.
+   the outer job; do not count those against this skill. A `forked` run shows only the user's
+   first reply to its result.
    If `~/.config/agents/backlog/_skills.md` has open items for this skill, start from them.
 2. **Classify** each user turn, rejection, and interrupt: *disagreement* (agent did X, user
    wanted Y), *scope change* (a new request, not a gap), or *neutral*.
@@ -79,8 +80,10 @@ in three runs is a missing rule.
 Transcripts hold private data. Do not copy transcript text into the skill or the report;
 paraphrase the pattern.
 
-Weekly report-only scan (ranks every skill, writes clusters to `_skills.md`, edits nothing):
-`skill_runs.py --all --since-last`.
+Weekly report-only scan (task `skill-self-heal-report`, edits no skill): `skill_runs.py --all
+--since-last` ranks every skill since the last committed scan and digests the top ones. The
+agent clusters by hand into `_skills.md` via `backlog.py add`, then runs `skill_runs.py
+--commit-scan`. A scan never committed is repeated next time.
 
 ## Harvesting friction
 
@@ -216,3 +219,4 @@ Never report an improvement you did not exercise as if you had.
 
 - 2026-10-14 — history mode: `scripts/skill_runs.py` mines Claude Code + Codex transcripts for corrections; weekly `--all --since-last` scan feeds `backlog/_skills.md`. Renamed the changelog-rule section to "Record the change" so this file's own changelog does not collide with it.
 - 2026-10-19 — `skill_runs.py`: subagent hand-backs, side-session notes and CI events no longer count as user turns; forked copies of one invocation fold into one run (`+N forks`, fork-only turns shown). 60-day scan: 394 → 365 runs, dev-research 24 → 9 signals.
+- 2026-10-28 — `skill_runs.py`: a forked skill run (ran in a subagent) keeps only the user's first reply to its result and ends at the next skill call; `--since-last` advances the state only on `--commit-scan`. Clustering stays manual; text now says so. 30-day dev-commit scan: 11 → 0 runs with signals, dev-research 3 → 1.
