@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2016
+
+set -euo pipefail
+
+usage() {
+	cat <<'USAGE'
+Usage:
+  pending-review list PR [OWNER/REPO]
+  pending-review add  PR PATH LINE|START-END BODY_FILE [OWNER/REPO] [--dry-run]
+  pending-review edit COMMENT_ID BODY_FILE
+
+Comments go into your PENDING review on the PR, created when missing. Nothing is
+submitted. Lines are on the PR head and must be inside the diff. COMMENT_ID is the
+node id `list` prints (PRRC_...).
+USAGE
+	exit 1
+}
+
+repo_of() {
+	if [ -n "${1:-}" ]; then
+		echo "$1"
+	else
+		gh repo view --json nameWithOwner -q .nameWithOwner
+	fi
+}
+
+# GitHub answers "Something went wrong" now and then; the same call passes on a retry.
+retry() {
+	local try out
+	for try in 1 2 3 4; do
+		if out=$("$@" 2>&1); then
+			echo "$out"
+			return 0
+		fi
+		echo "attempt $try failed: $out" >&2
+		sleep $((try * 2))
+	done
+	return 1
+}
+
+pending_review() {
+	local repo=$1 pr=$2
+	gh api graphql -f owner="${repo%/*}" -f name="${repo#*/}" -F pr="$pr" -f query='
+      query($owner: String!, $name: String!, $pr: Int!) {
+        viewer { login }
+        repository(owner: $owner, name: $name) {
+          pullRequest(number: $pr) {
+            id
+            reviews(states: PENDING, first: 20) { nodes { id author { login } } }
+          }
+        }
+      }' --jq '.data as $d | $d.repository.pullRequest as $p
+              | [$p.id, ([$p.reviews.nodes[] | select(.author.login == $d.viewer.login) | .id][0] // "")]
+              | @tsv'
+}
+
+in_diff() {
+	local repo=$1 pr=$2 path=$3 line=$4
+	gh api "repos/$repo/pulls/$pr/files" --paginate \
+		--jq ".[] | select(.filename == \"$path\") | .patch" |
+		awk -v line="$line" '
+          /^@@/ {
+            match($0, /\+[0-9]+(,[0-9]+)?/)
+            split(substr($0, RSTART + 1, RLENGTH - 1), r, ",")
+            count = (r[2] == "" ? 1 : r[2])
+            if (line >= r[1] && line < r[1] + count) found = 1
+          }
+          END { exit found ? 0 : 1 }'
+}
+
+cmd_list() {
+	local pr=$1 repo
+	repo=$(repo_of "${2:-}")
+	gh api graphql -f owner="${repo%/*}" -f name="${repo#*/}" -F pr="$pr" -f query='
+      query($owner: String!, $name: String!, $pr: Int!) {
+        viewer { login }
+        repository(owner: $owner, name: $name) {
+          pullRequest(number: $pr) {
+            reviews(states: PENDING, first: 20) {
+              nodes { author { login } comments(first: 100) { nodes { id path line url body } } }
+            }
+          }
+        }
+      }' --jq '.data as $d | $d.repository.pullRequest.reviews.nodes[]
+              | select(.author.login == $d.viewer.login) | .comments.nodes[]
+              | "\(.id)\t\(.path):\(.line)\t\(.body | split("\n")[0][0:70])"'
+}
+
+cmd_add() {
+	local pr=$1 path=$2 lines=$3 body_file=$4 repo dry_run=false
+	shift 4
+	local args=()
+	for arg in "$@"; do
+		if [ "$arg" = "--dry-run" ]; then dry_run=true; else args+=("$arg"); fi
+	done
+	repo=$(repo_of "${args[0]:-}")
+
+	local line=${lines##*-} start_line=""
+	[ "$lines" != "$line" ] && start_line=${lines%%-*}
+
+	for l in $line $start_line; do
+		if ! in_diff "$repo" "$pr" "$path" "$l"; then
+			echo "Error: $path:$l is not in the diff of $repo#$pr. Anchor on a changed line." >&2
+			exit 1
+		fi
+	done
+
+	local pr_id review_id
+	IFS=$'\t' read -r pr_id review_id < <(pending_review "$repo" "$pr")
+
+	if $dry_run; then
+		echo "would add to ${review_id:-a new pending review} on $repo#$pr: $path:${start_line:+$start_line-}$line"
+		return 0
+	fi
+
+	if [ -z "$review_id" ]; then
+		review_id=$(retry gh api graphql -f pr="$pr_id" -f query='
+          mutation($pr: ID!) {
+            addPullRequestReview(input: {pullRequestId: $pr}) { pullRequestReview { id } }
+          }' --jq '.data.addPullRequestReview.pullRequestReview.id')
+	fi
+
+	local range="" start_args=()
+	if [ -n "$start_line" ]; then
+		range=', startLine: $start, startSide: RIGHT'
+		start_args=(-F start="$start_line")
+	fi
+
+	retry gh api graphql -f review="$review_id" -f path="$path" -F line="$line" ${start_args[@]+"${start_args[@]}"} \
+		-F body=@"$body_file" -f query="
+      mutation(\$review: ID!, \$path: String!, \$line: Int!, ${start_line:+\$start: Int!, }\$body: String!) {
+        addPullRequestReviewThread(input: {
+          pullRequestReviewId: \$review, path: \$path, body: \$body, line: \$line, side: RIGHT$range
+        }) { thread { comments(first: 1) { nodes { id url } } } }
+      }" --jq '.data.addPullRequestReviewThread.thread.comments.nodes[0] | "\(.id)\t\(.url)"'
+}
+
+cmd_edit() {
+	local id=$1 body_file=$2
+	retry gh api graphql -f id="$id" -F body=@"$body_file" -f query='
+      mutation($id: ID!, $body: String!) {
+        updatePullRequestReviewComment(input: {pullRequestReviewCommentId: $id, body: $body}) {
+          pullRequestReviewComment { url }
+        }
+      }' --jq '.data.updatePullRequestReviewComment.pullRequestReviewComment.url'
+}
+
+[ $# -lt 2 ] && usage
+
+case $1 in
+list)
+	shift
+	cmd_list "$@"
+	;;
+add)
+	shift
+	[ $# -lt 4 ] && usage
+	cmd_add "$@"
+	;;
+edit)
+	shift
+	[ $# -lt 2 ] && usage
+	cmd_edit "$@"
+	;;
+*) usage ;;
+esac
