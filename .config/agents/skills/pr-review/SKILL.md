@@ -22,8 +22,9 @@ Five phases. Say which one you are in when it changes.
 
 Gather before judging:
 
-- The diff, every existing review and comment, including the user's own pending review. Do
-  not repeat a point already made.
+- The diff, every existing review and comment. Comments in the user's own pending review
+  count as posted: `bash "$s" list <pr>` (see Posting). Never propose them again, list them
+  as open, or ask the user to submit them.
 - The repo's rules: `AGENTS.md`, `CONTRIBUTING.md`, any review lens under `.agents/skills/`.
 - The PR head in a clean worktree. Run its lint and the changed specs there, and again merged
   with the current base branch when the PR is behind.
@@ -54,16 +55,21 @@ What to look for beyond bugs:
 | An empty value standing in for "not loaded" (`items: []`) | Leave the key out |
 | A base method whose keyword names are swapped for `**` to quiet a linter | Keep the names: they are the contract. Disable the cop inline |
 | Two saves of the same record to compute two things | One transaction or savepoint, both computed inside |
+| A fact about class X (its constants, its scopes) defined in another class, however small | Move it to X. SRP is about reasons to change, not size |
+| A service compares input with another class's constants, or builds that class's record | A predicate and a method on that class; branch tests move to its spec |
+| Several classes share a name prefix (`TermsAcceptance`, `TermsStatus`) | One namespace, before merge while it is only a rename |
 
 Specs:
 
-- Name the branch each new example covers. Two examples on one branch is a duplicate.
+- Name the branch each new example covers. Two examples on one branch is a duplicate. One
+  example that shows an error reaches the caller is not a duplicate of the class's own spec.
 - A stub that raises an error the real code never raises tests nothing.
 - Examples that differ only in input and expected value are one table.
 - A side-effect check (`count` unchanged) once per code path, not on every example.
 
-Output: one numbered list, most severe first. For each: file:line on the PR head, the failing
-input or "structure", the proof.
+Output: one numbered list, most severe first. For each: a link to the line on GitHub, the
+failing input or "structure", the proof. Refer to items by number and name, never by private
+codes (`R1`, `B2`) or bare PR numbers.
 
 ## 2. Walkthrough
 
@@ -75,8 +81,8 @@ Each turn shows:
 2. The proposed code.
 3. The draft comment.
 
-Then stop and wait: post, skip, or change. Show code only during a walkthrough; elsewhere prose
-is enough.
+Then stop and wait: post, skip, or change. Every draft comment, in a walkthrough or not, comes
+after the current and proposed code. Explanations without a draft can be prose.
 
 When the user asks "why do you think so", split what the code shows from what you inferred.
 If you overstated, say so in one sentence and lower the severity.
@@ -97,8 +103,10 @@ Skip agent-signed ones. Then write:
 
 - One to three plain sentences. "Let's …", "Can we …", "Nit: …". End with "like so:" and a
   code block.
-- No headings, bullets or bold. No jargon ("collaborator", "invariant"). Plain words a
-  teammate uses.
+- No headings, bullets or bold. No jargon ("collaborator", "invariant") and no internal
+  mechanics: "No need to check the count here, we return before anything is created".
+- Lead with what the code under review shows. No precedent links or fallback plans the user
+  did not ask for. No deploy-order notes for changes that ship together.
 - Never link the lines the comment sits on.
 - Every claim about other code carries a permalink on the claim phrase, pointing at the exact
   lines that prove it: `https://github.com/<o>/<r>/blob/<sha>/<path>#L<a>-L<b>`. Not the file,
@@ -160,4 +168,5 @@ When a finding is about what an app shows, check it in the browser:
 
 ## Changelog
 
+- 2026-11-06 — from a second review session: pending comments count as posted; drafts always show code first; numbered items with GitHub links; plain voice; three design smells; caller-error example is not a duplicate.
 - 2026-11-06 — created from a full PR review session: walkthrough with current/proposed code, voice, pending-review script, permalinks on claims, severity by failing input, design and spec checks.
