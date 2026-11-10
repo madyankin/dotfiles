@@ -131,11 +131,8 @@ run = 'move-node-to-workspace agents'
 if.app-id = 'dev.zed.Zed'
 run = 'move-node-to-workspace dev'
 
-# Ghostty → dev. Terminals used to own ctrl-3; they live with the editor now,
-# so ctrl-3 is deliberately unbound.
-[[on-window-detected]]
-if.app-id = 'com.mitchellh.ghostty'
-run = 'move-node-to-workspace dev'
+# Ghostty has no workspace assignment, so new terminal windows stay on the
+# currently focused workspace.
 
 # Xcode → dev
 [[on-window-detected]]

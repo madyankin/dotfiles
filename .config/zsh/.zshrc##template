@@ -42,6 +42,6 @@ command -v fzf >/dev/null && source <(fzf --zsh)
 [[ -f "$ZDOTDIR/local.zsh" ]] && source "$ZDOTDIR/local.zsh"
 
 # --- Runtimes ---
-eval "$(mise activate zsh)"
+eval "$(mise activate zsh --shims)"
 # direnv after mise, so a project .envrc can still override a mise pin.
 command -v direnv >/dev/null && eval "$(direnv hook zsh)"

@@ -17,13 +17,12 @@ export ZDOTDIR="$HOME/.config/zsh"
 # ./bin is deliberately gone. It put the bin/ of whatever repo you happened to
 # be standing in ahead of your own scripts, including repos cloned by agents.
 # Use direnv's `PATH_add bin` per project instead; it is hooked in .zshrc.
-PATH="$HOME/.local/bin:$HOME/.bin:$HOME/.gem/bin:/opt/homebrew/opt/ruby/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/local/sbin:$HOME/go/bin:$PATH"
+PATH="$HOME/.local/bin:$HOME/.bin:$HOME/.gem/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/local/sbin:$HOME/go/bin:$PATH"
 export PATH
 
 # --- Ruby ---
-# Gems go to a version-independent directory. Homebrew's own gem bin path is
-# /opt/homebrew/lib/ruby/gems/<MAJOR.MINOR.0>/bin, which silently breaks on
-# every ruby upgrade — it was still pinned to 3.4.0 while ruby was 4.0.
+# Gems go to a version-independent directory so mise Ruby upgrades preserve
+# user-installed executables.
 export GEM_HOME="$HOME/.gem"
 
 # --- Locale ---

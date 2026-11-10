@@ -13,7 +13,6 @@ brew "htop"
 brew "mas"
 brew "midnight-commander"  # canonical name; "mc" is an alias
 brew "mise"
-brew "ruby"           # ~/.zshenv pins /opt/homebrew/opt/ruby/bin; asdf used to supply ruby
 brew "pinentry-mac"
 brew "powerlevel10k"
 brew "speedtest-cli"
