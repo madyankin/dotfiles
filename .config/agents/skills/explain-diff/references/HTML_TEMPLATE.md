@@ -1,407 +1,142 @@
-# HTML template
+# Static HTML starting point
 
-Skeleton for the explainer page. Copy it, keep the structure and the CSS contracts, replace
-everything in `«»`. Delete the diagram families and the stepper you don't use — but reuse what
-you keep rather than inventing new visuals per section.
-
-For charts, node-link graphs, sliders, proof walks, and stepped figures, see
-[VISUALIZATIONS.md](VISUALIZATIONS.md): it carries the `Viz` CSS and JS blocks to paste in at
-the marked points, the interaction patterns, and the rule on which subjects **must** carry an
-interactive figure. Each figure belongs immediately after the paragraph it explains — the
-mounts below are placed that way on purpose; move them with their text, don't pool them.
-
-The quiz engine below satisfies `QUIZ_RULES.md` mechanically (seeded per-question shuffle,
-feedback hidden until click, no correctness leaked into the DOM). Fill `QUIZ` with your five
-questions and leave the engine alone.
+Adapt or remove sections to fit the change. Replace every «placeholder» with verified facts. The snippets below are a layout example, **not** source code for the change. Keep the same input in both flowcharts and the table. Use real, line-linked excerpts in the code section. No script is required.
 
 ```html
 <!doctype html>
-<html lang="«en|ru»">
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>«Title»</title>
-<style>
-  :root {
-    --bg:#fbfbfa; --fg:#1f2328; --muted:#5b6470; --line:#e2e4e8;
-    --card:#ffffff; --accent:#3b6db5; --accent-soft:#eaf1fb;
-    --ok:#1f7a45; --ok-soft:#e7f4ec; --bad:#a13a3a; --bad-soft:#fbecec;
-    --code-bg:#f4f5f7;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg:#191b1f; --fg:#e4e6ea; --muted:#a0a7b2; --line:#31353b;
-      --card:#21242a; --accent:#7aa7e6; --accent-soft:#23303f;
-      --ok:#6cc38c; --ok-soft:#1e3327; --bad:#e08a8a; --bad-soft:#3a2525;
-      --code-bg:#1c1f24;
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>«Change title»</title>
+  <style>
+    :root { color-scheme:dark; --bg:#111827; --panel:#1f2937; --ink:#f3f4f6;
+      --muted:#cbd5e1; --line:#64748b; --accent:#93c5fd; --changed:#fbbf24; }
+    @media (prefers-color-scheme:light) {
+      :root { color-scheme:light; --bg:#fff; --panel:#f3f4f6; --ink:#111827;
+        --muted:#374151; --line:#64748b; --accent:#1d4ed8; --changed:#92400e; }
     }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin:0; padding:2rem 1rem 6rem; background:var(--bg); color:var(--fg);
-    font:16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-  main { max-width: 46rem; margin: 0 auto; }
-  h1 { font-size:1.9rem; line-height:1.25; margin:0 0 .4rem; }
-  h2 { font-size:1.35rem; margin:2.6rem 0 .8rem; padding-top:.6rem; border-top:1px solid var(--line); }
-  h3 { font-size:1.05rem; margin:1.6rem 0 .5rem; }
-  p, li { overflow-wrap:break-word; }
-  a { color:var(--accent); }
-  .sub { color:var(--muted); margin:0 0 1.5rem; }
-  .toc { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:.9rem 1.2rem; }
-  .toc ol { margin:.3rem 0 0; padding-left:1.2rem; }
-
-  /* Code — the white-space rule is mandatory, do not remove it. */
-  pre { white-space: pre; overflow-x:auto; background:var(--code-bg); border:1px solid var(--line);
-        border-radius:8px; padding:.85rem 1rem; font-size:.85rem; line-height:1.5; }
-  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-  p code, li code, td code { background:var(--code-bg); padding:.1rem .3rem; border-radius:4px; font-size:.9em; }
-  .fileref { color:var(--muted); font-size:.8rem; display:block; margin:-.4rem 0 .5rem; }
-
-  /* Callouts */
-  .callout { border-left:3px solid var(--accent); background:var(--accent-soft);
-             padding:.75rem 1rem; border-radius:0 8px 8px 0; margin:1.2rem 0; }
-  .callout .label { font-weight:600; font-size:.78rem; letter-spacing:.04em;
-                    text-transform:uppercase; color:var(--muted); display:block; margin-bottom:.25rem; }
-  .callout p:last-child { margin-bottom:0; }
-
-  details { border:1px solid var(--line); border-radius:8px; padding:.6rem .9rem; margin:1.2rem 0; background:var(--card); }
-  summary { cursor:pointer; font-weight:600; }
-
-  table { border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.9rem; display:block; overflow-x:auto; }
-  th, td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; vertical-align:top; }
-  th { background:var(--card); }
-
-  figure { margin:1.6rem 0; }
-  figcaption { color:var(--muted); font-size:.82rem; margin-top:.5rem; }
-
-  /* Diagram family 1 — flow */
-  .flow { display:flex; flex-wrap:wrap; align-items:stretch; gap:.5rem; }
-  .node { flex:1 1 8rem; min-width:7rem; background:var(--card); border:1px solid var(--line);
-          border-radius:8px; padding:.6rem .7rem; }
-  .node .title { font-weight:600; font-size:.9rem; }
-  .node .data { font-family:ui-monospace,Menlo,monospace; font-size:.75rem; color:var(--muted); margin-top:.3rem; }
-  .edge { align-self:center; color:var(--muted); font-size:.78rem; white-space:nowrap; padding:0 .1rem; }
-
-  /* Diagram family 2 — before/after */
-  .ba { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
-  .ba > div { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:.7rem .9rem; }
-  .ba .head { font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin-bottom:.4rem; }
-  @media (max-width:560px) { .ba { grid-template-columns:1fr; } .flow { flex-direction:column; } }
-
-  /* Stepper — walk a sequence one state at a time */
-  .stepper { background:var(--card); border:1px solid var(--line); border-radius:10px;
-             padding:.9rem 1rem; margin:1.4rem 0; }
-  .stepper .controls { display:flex; gap:.5rem; align-items:center; margin-bottom:.7rem; }
-  .stepper button { font:inherit; cursor:pointer; background:var(--bg); color:var(--fg);
-                    border:1px solid var(--line); border-radius:6px; padding:.3rem .7rem; }
-  .stepper button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-  .stepper button[disabled] { opacity:.45; cursor:default; }
-  .stepper .counter { color:var(--muted); font-size:.85rem; }
-  .stepper .stage { min-height:5.5rem; }
-  .stepper .note { color:var(--muted); font-size:.88rem; margin-top:.6rem; }
-
-  /* Proof / derivation stepper — paired with Viz.proof */
-  .proof { list-style:none; counter-reset:pf; padding:0; margin:1rem 0; }
-  .proof li { counter-increment:pf; display:grid; grid-template-columns:auto 1fr;
-              gap:.2rem 1rem; padding:.5rem .8rem; border-left:3px solid transparent;
-              border-radius:0 6px 6px 0; }
-  .proof li::before { content:"(" counter(pf) ")"; color:var(--muted); font-size:.8rem;
-                      font-family:ui-monospace, Menlo, monospace; grid-row:1; }
-  .proof .expr { font-family:ui-serif, Georgia, serif; font-size:1.02rem; }
-  .proof .why { grid-column:2; color:var(--muted); font-size:.84rem; }
-  .proof li.at { border-left-color:var(--accent); background:var(--accent-soft); }
-  .proof li.next { opacity:.28; }
-  .proof li.done { opacity:.85; }
-
-  /* Viz — charts and node-link graphs.
-     Paste the CSS block from references/VISUALIZATIONS.md here when the page has figures,
-     together with its JS block below. Delete this comment if it has none. */
-
-  /* Quiz */
-  .q { background:var(--card); border:1px solid var(--line); border-radius:10px;
-       padding:1rem 1.1rem; margin:1.1rem 0; }
-  .q .stem { font-weight:600; margin:0 0 .7rem; }
-  .opt { display:block; width:100%; text-align:left; font:inherit; cursor:pointer;
-         background:var(--bg); color:var(--fg); border:1px solid var(--line);
-         border-radius:8px; padding:.55rem .75rem; margin:.35rem 0; }
-  .opt:hover:not([disabled]) { border-color:var(--accent); }
-  .opt:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-  .opt[disabled] { cursor:default; }
-  .opt.correct { border-color:var(--ok); background:var(--ok-soft); }
-  .opt.wrong   { border-color:var(--bad); background:var(--bad-soft); }
-  .opt .mark { font-weight:700; margin-right:.4rem; }
-  .fb { margin-top:.7rem; padding:.6rem .8rem; border-radius:8px; font-size:.92rem; }
-  .fb.ok  { background:var(--ok-soft);  border-left:3px solid var(--ok); }
-  .fb.no  { background:var(--bad-soft); border-left:3px solid var(--bad); }
-  .score { font-weight:600; margin-top:1.2rem; }
-</style>
+    * { box-sizing:border-box; }
+    body { margin:0 auto; padding:1.5rem; max-width:76rem; background:var(--bg);
+      color:var(--ink); font:1rem/1.5 system-ui,sans-serif; }
+    h1,h2,h3,p,figure { margin-block:0 1rem; }
+    h1 { line-height:1.2; } h2 { margin-top:2rem; }
+    a { color:var(--accent); } a:focus-visible,summary:focus-visible {
+      outline:2px solid var(--accent); outline-offset:3px; }
+    .meta,figcaption,.note { color:var(--muted); }
+    .comparison { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+    .panel { min-width:0; padding:1rem; border:1px solid var(--line);
+      border-radius:.6rem; background:var(--panel); }
+    .flow { list-style:none; margin:0; padding:0; }
+    .flow > li { padding:.6rem .8rem; border:1px solid var(--line);
+      border-radius:.4rem; background:var(--bg); }
+    .flow > li + li { margin-top:1.6rem; position:relative; }
+    .flow > li + li::before { content:"↓"; position:absolute; top:-1.55rem;
+      left:50%; transform:translateX(-50%); color:var(--muted); }
+    .flow .changed { border:2px solid var(--changed); }
+    .branches { display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:.5rem; margin:.5rem 0 0; padding:0; list-style:none; }
+    .branches li { border:1px solid var(--line); border-radius:.35rem;
+      padding:.45rem; font-size:.9rem; overflow-wrap:anywhere; }
+    .branches strong { display:block; color:var(--accent); }
+    .table-wrap { overflow-x:auto; }
+    table { border-collapse:collapse; width:100%; min-width:34rem; }
+    th,td { border:1px solid var(--line); padding:.55rem; text-align:left; vertical-align:top; }
+    th { background:var(--panel); }
+    .code-row { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(12rem,1fr);
+      gap:1rem; margin:1rem 0; align-items:start; }
+    .code-row > * { min-width:0; }
+    pre { white-space:pre; overflow-x:auto; margin:0; padding:.85rem;
+      border:1px solid var(--line); border-radius:.4rem; background:var(--panel); }
+    code { font: .9rem/1.45 ui-monospace,SFMono-Regular,monospace; }
+    .explain { border-left:3px solid var(--accent); padding-left:.8rem; }
+    details { margin:1rem 0; padding:.6rem .9rem; border:1px solid var(--line);
+      border-radius:.4rem; }
+    summary { cursor:pointer; font-weight:600; }
+    @media (max-width:700px) {
+      body { padding:1rem; }
+      .comparison,.code-row { grid-template-columns:1fr; }
+    }
+  </style>
 </head>
 <body>
-<main>
+  <header>
+    <h1>«Change title»</h1>
+    <p>«One-sentence behavioral summary.»</p>
+    <p class="meta">«base SHA» → «head SHA» · «comparison scope»</p>
+  </header>
 
-<h1>«Title: what changed, in one line»</h1>
-<p class="sub">«One or two sentences: the change, the repo, the source (PR #, branch, commit range), the date.»</p>
+  <main>
+    <h2>Before → After</h2>
+    <figure>
+      <div class="comparison">
+        <section class="panel" aria-label="Before change">
+          <h3>Before</h3>
+          <ol class="flow">
+            <li>Input: «the shared example»</li>
+            <li>«Old step»</li>
+            <li class="changed">«Old decision or action»
+              <ul class="branches">
+                <li><strong>If «condition»</strong>«outcome A»</li>
+                <li><strong>Otherwise</strong>«outcome B»</li>
+              </ul>
+            </li>
+            <li>Output / side effect: «old result for the shared input»</li>
+          </ol>
+        </section>
+        <section class="panel" aria-label="After change">
+          <h3>After</h3>
+          <ol class="flow">
+            <li>Input: «the same example»</li>
+            <li>«New step»</li>
+            <li class="changed">«New decision or action»
+              <ul class="branches">
+                <li><strong>If «condition»</strong>«outcome A»</li>
+                <li><strong>Otherwise</strong>«outcome B»</li>
+              </ul>
+            </li>
+            <li>Output / side effect: «new result for the shared input»</li>
+          </ol>
+        </section>
+      </div>
+      <figcaption>«One observation the reader should notice; identify the changed step.»</figcaption>
+    </figure>
 
-<nav class="toc">
-  <strong>Contents</strong>
-  <ol>
-    <li><a href="#background">«Background»</a></li>
-    <li><a href="#intuition">«Intuition»</a></li>
-    <li><a href="#code">«Code»</a></li>
-    <li><a href="#quiz">«Quiz»</a></li>
-  </ol>
-</nav>
+    <h2>Same input, different result</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Input</th><th>Before</th><th>After</th><th>Evidence</th></tr></thead>
+        <tbody><tr><td>«shared input»</td><td>«old output»</td>
+          <td>«new output»</td><td>«test or code citation»</td></tr></tbody>
+      </table>
+    </div>
 
-<h2 id="background">«Background»</h2>
+    <h2>Code in context</h2>
+    <h3>«One step in execution order»</h3>
+    <div class="comparison">
+      <div>
+        <p>Before · <a href="«old SHA permalink with #Lx-Ly»">«path:lines»</a></p>
+        <div class="code-row">
+          <pre><code>«escaped real old code»</code></pre>
+          <p class="explain">«What these lines did for the shared input.»</p>
+        </div>
+      </div>
+      <div>
+        <p>After · <a href="«new SHA permalink with #Lx-Ly»">«path:lines»</a></p>
+        <div class="code-row">
+          <pre><code>«escaped real new code»</code></pre>
+          <p class="explain">«What changed and why the output differs.»</p>
+        </div>
+      </div>
+    </div>
 
-<details>
-  <summary>«New to this subsystem? Start here» — skip if you already know «X»</summary>
-  <p>«Beginner mental model. Plain language, no assumed vocabulary.»</p>
-</details>
-
-<p>«The narrow background: exactly the components, contracts, and prior behavior the change touches.»</p>
-
-<div class="callout">
-  <span class="label">Definition</span>
-  <p>«Term the rest of the page leans on.»</p>
-</div>
-
-<figure>
-  <div class="flow">
-    <div class="node"><div class="title">«Client»</div><div class="data">«{id: 42}»</div></div>
-    <div class="edge">→ «HTTP POST»</div>
-    <div class="node"><div class="title">«Service»</div><div class="data">«lookup(42)»</div></div>
-    <div class="edge">→ «miss»</div>
-    <div class="node"><div class="title">«Store»</div><div class="data">«nil»</div></div>
-  </div>
-  <figcaption>«What the path looked like before the change, with real values on the wire.»</figcaption>
-</figure>
-
-<h2 id="intuition">«Intuition»</h2>
-
-<p>«The core idea in prose, before any implementation detail. Use one toy example and carry it through.»</p>
-
-<figure>
-  <div class="ba">
-    <div><div class="head">Before</div><p>«Behavior with the toy input.»</p></div>
-    <div><div class="head">After</div><p>«Behavior with the same toy input.»</p></div>
-  </div>
-  <figcaption>«Same input, both sides. State the observable difference in one sentence.»</figcaption>
-</figure>
-
-<figure>
-  <div id="«chartId»"></div>
-  <figcaption>«What the numbers show, where they came from, and what to notice.»</figcaption>
-</figure>
-
-<div class="stepper" id="trace">
-  <div class="controls">
-    <button type="button" data-step="-1">«Назад»</button>
-    <button type="button" data-step="1">«Вперёд»</button>
-    <button type="button" data-play aria-pressed="false">▶</button>
-    <span class="counter"></span>
-  </div>
-  <div class="stage"></div>
-  <p class="note"></p>
-</div>
-
-<h2 id="code">«Code»</h2>
-
-<h3>«Group 1 — ordered by execution flow, not filename»</h3>
-<span class="fileref">«path/to/file.rb:42-58»</span>
-<pre><code>«the lines that matter, not the whole diff»</code></pre>
-<p>«Why this shape, and what it guarantees.»</p>
-
-<div class="callout">
-  <span class="label">Edge case</span>
-  <p>«The case a reader would get wrong.»</p>
-</div>
-
-<h2 id="quiz">«Quiz»</h2>
-<p>«Five questions. If you can't pass them, you don't understand the change well enough to ship it.»</p>
-<div id="quiz"></div>
-<p class="score" id="score" hidden></p>
-
-<script>
-// Viz: paste the JS block from references/VISUALIZATIONS.md here when the page has figures.
-
-(function () {
-  "use strict";
-
-  // Stepper engine. Each step renders a FULL state, not a delta, so jumping in mid-sequence
-  // still makes sense. `render(stage)` draws with Viz; `html` is the static fallback.
-  // Mount one per stepped figure — a page normally has several, next to the text each explains.
-  window.mountStepper = function (boxId, STEPS) {
-    var box = document.getElementById(boxId);
-    if (!box || !STEPS.length) return;
-
-    var stage = box.querySelector(".stage");
-    var note = box.querySelector(".note");
-    var counter = box.querySelector(".counter");
-    var back = box.querySelector('[data-step="-1"]');
-    var fwd = box.querySelector('[data-step="1"]');
-    var play = box.querySelector("[data-play]");
-    var timer = null, at = 0;
-
-    function render() {
-      stage.innerHTML = "";
-      if (STEPS[at].render) STEPS[at].render(stage);      // e.g. Viz.graph / Viz.proof
-      else stage.innerHTML = STEPS[at].html;
-      note.textContent = STEPS[at].note || "";
-      counter.textContent = (at + 1) + " / " + STEPS.length;
-      back.disabled = at === 0;
-      fwd.disabled = at === STEPS.length - 1;
-    }
-    function stop() {
-      if (timer) { clearInterval(timer); timer = null; }
-      if (play) { play.setAttribute("aria-pressed", "false"); play.textContent = "▶"; }
-    }
-    function go(d) { stop(); at = Math.min(STEPS.length - 1, Math.max(0, at + d)); render(); }
-
-    back.addEventListener("click", function () { go(-1); });
-    fwd.addEventListener("click", function () { go(1); });
-    if (play) play.addEventListener("click", function () {          // never autoplay on load
-      if (timer) return stop();
-      if (at === STEPS.length - 1) { at = 0; render(); }
-      play.setAttribute("aria-pressed", "true");
-      play.textContent = "⏸";
-      timer = setInterval(function () {
-        at++; render();
-        if (at >= STEPS.length - 1) stop();                         // stop on arrival
-      }, 1200);
-    });
-    render();
-  };
-})();
-
-(function () {
-  "use strict";
-
-  // «traced request» — one entry per step.
-  mountStepper("trace", [
-    { render: function (stage) { Viz.graph(stage, { nodes: «…», edges: «…», aria: "«state after step 1»" }); },
-      note: "«What just happened and why it matters»" }
-    // … one entry per step
-  ]);
-})();
-
-(function () {
-  "use strict";
-
-  // Replace with your five questions. `answer` is the index into `options`;
-  // the engine shuffles display order, so the position here is not what the reader sees.
-  var SEED = «pick an integer, e.g. 20260913»;
-  var QUIZ = [
-    {
-      stem: "«Question about behavior, causality, a contract, an edge case, or a trade-off»",
-      options: [
-        "«Option — a real misprediction someone could make»",
-        "«Option»",
-        "«Option»",
-        "«Option»"
-      ],
-      answer: 0,
-      why: [
-        "«Why this option is wrong — name the misconception»",
-        "«Why this option is wrong»",
-        "«Why this option is wrong»",
-        "«Why this option is wrong»"
-      ],
-      correctWhy: "«Why the right answer is right — cite the behavior or code path»"
-    }
-    // … four more
-  ];
-
-  function rng(seed) {                       // mulberry32 — deterministic per page
-    return function () {
-      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-      return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-  }
-
-  var rand = rng(SEED);
-  var root = document.getElementById("quiz");
-  var scoreEl = document.getElementById("score");
-  var answered = 0, right = 0;
-
-  QUIZ.forEach(function (q, qi) {
-    var order = q.options.map(function (_, i) { return i; });
-    for (var i = order.length - 1; i > 0; i--) {          // Fisher–Yates, seeded
-      var j = Math.floor(rand() * (i + 1));
-      var t = order[i]; order[i] = order[j]; order[j] = t;
-    }
-
-    var card = document.createElement("div");
-    card.className = "q";
-
-    var stem = document.createElement("p");
-    stem.className = "stem";
-    stem.textContent = (qi + 1) + ". " + q.stem;
-    card.appendChild(stem);
-
-    var fb = document.createElement("div");
-    fb.className = "fb";
-    fb.hidden = true;
-
-    var buttons = {};                                     // original index -> button
-
-    function mark(btn, glyph, cls) {
-      btn.classList.add(cls);
-      var m = document.createElement("span");
-      m.className = "mark";
-      m.textContent = glyph;                              // never color alone
-      btn.prepend(m);
-    }
-
-    order.forEach(function (oi) {
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "opt";
-      btn.textContent = q.options[oi];                    // no correctness in DOM or a11y text
-      buttons[oi] = btn;
-      btn.addEventListener("click", function () {
-        if (!fb.hidden) return;
-        var ok = oi === q.answer;
-        answered++; if (ok) right++;
-        Array.prototype.forEach.call(card.querySelectorAll(".opt"), function (b) {
-          b.disabled = true;
-        });
-        if (ok) {
-          mark(btn, "✓", "correct");
-        } else {
-          mark(btn, "✗", "wrong");
-          mark(buttons[q.answer], "✓", "correct");        // show what was right
-        }
-        fb.className = "fb " + (ok ? "ok" : "no");
-        fb.textContent = ok ? q.correctWhy : (q.why[oi] + " — " + q.correctWhy);
-        fb.hidden = false;
-        scoreEl.hidden = false;
-        scoreEl.textContent = right + " / " + answered + " «correct so far»";
-      });
-      card.appendChild(btn);
-    });
-
-    card.appendChild(fb);
-    root.appendChild(card);
-  });
-})();
-</script>
-
-</main>
+    <details>
+      <summary>Background, boundaries, and investigation</summary>
+      <p>«Only context that supports the explanation, plus caveats and sources.»</p>
+    </details>
+  </main>
 </body>
 </html>
 ```
 
-## Before saving
-
-- Every `«»` placeholder replaced, including `SEED`.
-- Each `pre` rule still carries `white-space: pre` (or `pre-wrap`).
-- No `http://`, `https://`, `src="./`, or `@import` outside prose links.
-- Five entries in `QUIZ`, correct-answer positions spread across the four slots after
-  shuffling, each `why[]` covering every wrong option.
-- Figures: the `Viz` CSS and JS blocks pasted in if any figure uses them, every chart and
-  graph given a real `aria` sentence, every axis labelled with units, no invented numbers.
-- Stepper deleted if unused; if used, `STEPS` filled and the counter reads `1 / n` on load.
+For a structural change with no meaningful branch, remove the branch lists. For a longer path, add verified steps; avoid empty boxes. Never leave a placeholder, fictitious citation, or code sample in a finished page.
