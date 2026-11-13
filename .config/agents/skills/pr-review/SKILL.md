@@ -75,11 +75,37 @@ codes (`R1`, `B2`) or bare PR numbers.
 
 One finding per turn, as `n/N`. Recount when findings merge or drop.
 
-Each turn shows:
+Each turn has the same layout, so the user sees where a step starts:
 
-1. The current code, quoted from the PR head, with path and line numbers.
-2. The proposed code.
-3. The draft comment.
+````markdown
+---
+
+## n/N — <finding in a few words>
+
+### What's wrong
+2–3 short lines: the claim, the failing input or "structure", the proof.
+
+### Current
+[path:a-b](path:a) @ <short sha>
+```ruby
+<code quoted from the PR head>
+```
+
+### Proposed
+```ruby
+<new code>
+```
+
+### Comment (lines a–b)
+> <draft, quoted>
+
+---
+
+Post, skip, or change?
+````
+
+Write the headings in the user's language; the draft stays in the PR's language. Any list or
+note for the whole review goes above the first rule, never inside a step.
 
 Then stop and wait: post, skip, or change. Every draft comment, in a walkthrough or not, comes
 after the current and proposed code. Explanations without a draft can be prose.
@@ -168,5 +194,6 @@ When a finding is about what an app shows, check it in the browser:
 
 ## Changelog
 
+- 2026-11-13 — walkthrough step layout: rule, `n/N` heading, fixed What's wrong / Current / Proposed / Comment blocks, question last.
 - 2026-11-06 — from a second review session: pending comments count as posted; drafts always show code first; numbered items with GitHub links; plain voice; three design smells; caller-error example is not a duplicate.
 - 2026-11-06 — created from a full PR review session: walkthrough with current/proposed code, voice, pending-review script, permalinks on claims, severity by failing input, design and spec checks.
