@@ -1,4 +1,5 @@
 ---
+name: branch-diff
 description: Shows the diff between current branch and master/main. Use when the user wants to see changes, review branch differences, prepare for PR, or understand what's modified in the current branch.
 readonly: true
 ---

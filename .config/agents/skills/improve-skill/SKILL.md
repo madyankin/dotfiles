@@ -1,6 +1,14 @@
 ---
 name: improve-skill
-description: Run a retrospective on a skill that was just used, harvest the friction from what actually happened, and rewrite the skill so the next run does not hit it again. Use when the user asks how to improve a skill, says a skill run went badly or had rough edges, asks "what did we learn from that run", or invokes /improve-skill after finishing work with another skill. Also use to tune a skill from past conversations ("self-heal", "where did people disagree with this skill", "learn from the history of X"): history mode mines Claude Code and Codex transcripts for corrections.
+description: >-
+  Run a retrospective on a skill that was just used, harvest the friction from
+  what actually happened, and rewrite the skill so the next run does not hit it
+  again. Use when the user asks how to improve a skill, says a skill run went
+  badly or had rough edges, asks "what did we learn from that run", or invokes
+  /improve-skill after finishing work with another skill. Also use to tune a
+  skill from past conversations ("self-heal", "where did people disagree with
+  this skill", "learn from the history of X"): history mode mines Claude Code
+  and Codex transcripts for corrections.
 ---
 
 # Improve Skill
