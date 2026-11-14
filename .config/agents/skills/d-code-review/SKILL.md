@@ -1,12 +1,14 @@
 ---
-name: pr-review
-description: Review someone else's pull request together with the user — find what is wrong and prove it, walk the findings one by one with current and proposed code, draft each comment in the user's own voice, put approved ones into the user's pending GitHub review, and submit only when told. Use when the user asks to review a PR, to go through findings one by one, to draft or post review comments, to check a PR for SOLID/SRP or redundant specs, or says "сделай ревью", "давай по одному", "драфт коммента", "запости", "отправь ревью".
+name: d-code-review
+description: Review local code changes or a pull request, prove findings, and walk PR feedback through drafting, pending comments, and submission under the user's control. Use for code review, PR review, review comments, SOLID/SRP checks, redundant tests, or requests such as "сделай ревью" and "давай по одному".
 ---
 
-# PR Review
+# D Code Review
 
-The user reviews; you do the legwork. They decide every comment. Your job is to find real
-problems, prove them, and turn the ones they accept into comments that read as theirs.
+For local changes, produce an evidence-backed review without posting anything.
+For a PR, the user reviews; you do the legwork. They decide every comment. Your
+job is to find real problems, prove them, and turn the ones they accept into
+comments that read as theirs.
 
 Five phases. Say which one you are in when it changes.
 
@@ -22,6 +24,9 @@ Five phases. Say which one you are in when it changes.
 
 Gather before judging:
 
+- Determine the scope. With no PR input, review the base-to-HEAD diff plus
+  uncommitted changes and read code from the working tree. With a PR, use its
+  diff and a clean checkout of its head.
 - The diff, every existing review and comment. Comments in the user's own pending review
   count as posted: `bash "$s" list <pr>` (see Posting). Never propose them again, list them
   as open, or ask the user to submit them.
@@ -31,6 +36,11 @@ Gather before judging:
 - Other open PRs that touch the same files or interface: `gh pr list --search "<path>" --state open`.
 - A closed or earlier attempt at the same feature, when the user points at one. Name what to
   borrow and what not to, with the reason.
+- Run the relevant lint, type checks, and changed tests documented by the repo.
+  Report failures instead of silently skipping them.
+- Run `d-docs` in review mode conceptually: compare changed public behavior,
+  interfaces, comments, API specifications, stories, and repository docs. Merge
+  documentation drift into the same findings list.
 
 Rules for a finding:
 
@@ -148,7 +158,7 @@ Never a standalone comment: REST `POST .../pulls/<n>/comments` publishes immedia
 local queue the user cannot see.
 
 ```bash
-s=~/.config/agents/skills/pr-review/scripts/pending-review
+s=~/.config/agents/skills/d-code-review/scripts/pending-review
 bash "$s" add <pr> <path> <line|start-end> <body.md> [owner/repo]   # creates the pending review if missing
 bash "$s" list <pr> [owner/repo]                                     # comment ids, path:line, first line
 bash "$s" edit <comment id> <body.md>                                # REST cannot edit a pending comment
@@ -192,8 +202,3 @@ When a finding is about what an app shows, check it in the browser:
 - Present an inference as proved, or a structural nit as a bug.
 - Quote a line number you did not check at the linked sha.
 
-## Changelog
-
-- 2026-11-13 — walkthrough step layout: rule, `n/N` heading, fixed What's wrong / Current / Proposed / Comment blocks, question last.
-- 2026-11-06 — from a second review session: pending comments count as posted; drafts always show code first; numbered items with GitHub links; plain voice; three design smells; caller-error example is not a duplicate.
-- 2026-11-06 — created from a full PR review session: walkthrough with current/proposed code, voice, pending-review script, permalinks on claims, severity by failing input, design and spec checks.
