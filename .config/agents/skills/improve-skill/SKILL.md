@@ -83,7 +83,7 @@ in three runs is a missing rule.
 6. **Proof is a replay.** Re-run the skill on the args of the clearest disagreeing run. The
    corrected behaviour must show up without the user correcting it. Name any cluster you could
    not replay as unproven. After a proven fix, close its `_skills.md` item with
-   `python3 -I ~/.config/agents/skills/backlog/scripts/backlog.py --slug _skills done <n>`.
+   `python3 -I ~/.config/agents/skills/d-backlog/scripts/backlog.py --slug _skills done <n>`.
 
 Transcripts hold private data. Do not copy transcript text into the skill or the report;
 paraphrase the pattern.

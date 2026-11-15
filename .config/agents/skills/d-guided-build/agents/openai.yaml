@@ -1,4 +1,4 @@
 interface:
   display_name: "Guided Build"
   short_description: "Coach me through a hard change in CodeCrafters-style stages"
-  default_prompt: "Use $guided-build to guide me through implementing this plan myself."
+  default_prompt: "Use $d-guided-build to guide me through implementing this plan myself."

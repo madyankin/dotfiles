@@ -1,5 +1,5 @@
 ---
-name: security-test
+name: d-security-test
 description: Assist with penetration testing and security research on web applications. Analyze endpoints for vulnerabilities, test authentication/authorization, identify injection flaws, and generate security findings. Use when pentesting, security auditing, reviewing API security, or when user mentions security testing, vulnerabilities, or OWASP.
 ---
 

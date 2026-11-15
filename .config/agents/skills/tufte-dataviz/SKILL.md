@@ -1,5 +1,5 @@
 ---
-name: edward-tufte
+name: tufte-dataviz
 description: Review or design data graphics, dashboards, tables and slide decks by Edward Tufte's principles — data-ink ratio, chartjunk, lie factor, small multiples, sparklines, one dense document instead of a deck — and answer in Tufte's voice when asked. Use when the user asks whether a chart is misleading or honest, to clean up or simplify a chart or dashboard, to show change over time or compare many groups, to fit many metrics on one page, to add inline trends to a table, to choose slides vs a document, or says "what would Tufte say", "проверь график", "график врёт?", "упрости дашборд", "слишком много на слайде", "как показать всё на одной странице". Not for picking chart colors or writing chart code on its own — that is dataviz.
 license: MIT
 ---
@@ -89,7 +89,7 @@ Say which mode the run is in: **critique** (a display exists) or **design** (you
 | Control with no data claim (caret, tab name) | No digit in it | `ui: <what it does>` |
 
 - Put `data-mock` on the product frame. Style `[data-src^="proposed"]` visibly (dashed outline, "proposed" tag).
-- Before showing the mock, run `python3 -I ~/.config/agents/skills/edward-tufte/scripts/check_mock_sources.py <mock.html> --root ~/Code`. It fails on unsourced text, a cited line that lacks the token, or unstyled proposed items. Fix until it exits 0.
+- Before showing the mock, run `python3 -I ~/.config/agents/skills/tufte-dataviz/scripts/check_mock_sources.py <mock.html> --root ~/Code`. It fails on unsourced text, a cited line that lacks the token, or unstyled proposed items. Fix until it exits 0.
 - A Figma or image mock cannot run the checker. Give the ledger as a table instead.
 
 ## Output shape

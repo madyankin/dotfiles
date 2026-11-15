@@ -1,6 +1,6 @@
 ---
-name: guided-build
-description: Coach the user through a hard change in CodeCrafters style — the user designs and writes the code, the agent cuts the work into small stages, writes the failing test for each stage, runs it on "check", reviews the diff, and gives hints in tiers instead of the answer. Covers both planning (the user makes the design decisions through guided questions) and implementation (one stage per turn, red to green). Use when the user says "guide me through this", "teach me by building it", "CodeCrafters style", "I want to write it myself", "проведи меня", "хочу сам написать", "научи на практике", or invokes /guided-build.
+name: d-guided-build
+description: Coach the user through a hard change in CodeCrafters style — the user designs and writes the code, the agent cuts the work into small stages, writes the failing test for each stage, runs it on "check", reviews the diff, and gives hints in tiers instead of the answer. Covers both planning (the user makes the design decisions through guided questions) and implementation (one stage per turn, red to green). Use when the user says "guide me through this", "teach me by building it", "CodeCrafters style", "I want to write it myself", "проведи меня", "хочу сам написать", "научи на практике", or invokes /d-guided-build.
 ---
 
 # Guided Build
@@ -30,7 +30,7 @@ Stage card template: `references/stage-card.md`.
 
 ## Progress file
 
-Keep progress in `~/.local/state/guided-build/<repo>-<slug>.md`. `<repo>` is the folder name
+Keep progress in `~/.local/state/d-guided-build/<repo>-<slug>.md`. `<repo>` is the folder name
 of the git root, `<slug>` is a short kebab-case name of the task. The file is local state:
 never put it in the project or in a commit.
 

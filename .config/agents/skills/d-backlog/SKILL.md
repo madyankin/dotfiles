@@ -1,6 +1,6 @@
 ---
-name: backlog
-description: Park findings noticed in passing — bugs, dead code, stale docs, missing tests outside the current task — in a per-repo backlog file, and triage that backlog later. Use proactively, without being asked, whenever you notice something worth fixing that is out of scope for the current change. Also use when the user says "add to backlog", "запиши на потом", "запиши в бэклог", "разбери бэклог", "what's in the backlog", or invokes /backlog.
+name: d-backlog
+description: Park findings noticed in passing — bugs, dead code, stale docs, missing tests outside the current task — in a per-repo backlog file, and triage that backlog later. Use proactively, without being asked, whenever you notice something worth fixing that is out of scope for the current change. Also use when the user says "add to backlog", "запиши на потом", "запиши в бэклог", "разбери бэклог", "what's in the backlog", or invokes /d-backlog.
 ---
 
 # Backlog
@@ -12,7 +12,7 @@ later, in its own pass.
 Script: `scripts/backlog.py` (stdlib only). Run it with `python3 -I`.
 
 ```bash
-B=~/.config/agents/skills/backlog/scripts/backlog.py
+B=~/.config/agents/skills/d-backlog/scripts/backlog.py
 python3 -I $B add "<finding>" --where path/to/file.rb:42
 python3 -I $B list            # this repo, numbered
 python3 -I $B list --all      # every repo with open items
@@ -49,7 +49,7 @@ cannot say what breaks or what it costs, skip it.
 
 ## Triage
 
-On `/backlog`, "разбери бэклог", or a request to review it:
+On `/d-backlog`, "разбери бэклог", or a request to review it:
 
 1. `list` (or `list --all` if the user asks across repos).
 2. Re-check each item against the current code. An item that is already fixed gets `done` with

@@ -1,5 +1,5 @@
 ---
-name: qa-tracer
+name: d-qa-tracer
 description: Prove a feature works end to end with a tracer-bullet e2e test — one thin path from the real entry point (web UI, HTTP API, CLI, or iOS app) through every layer to an observable result, checked to fail when the feature breaks and to pass three runs in a row, with an evidence report. Use when the user asks to "e2e test this feature", "fire a tracer bullet", "prove this works end to end", "QA this", "write an e2e test for X", "smoke test the flow", or wants any behavior verified through the whole stack.
 ---
 

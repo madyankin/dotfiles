@@ -1,5 +1,5 @@
 ---
-name: swiftdata
+name: swift-data
 description: SwiftData best practices and architecture expert - advises on @Model schema design, ModelContext/ModelContainer lifecycle, @Query fetching, relationships, migrations, SwiftUI integration, performance, testing, and CloudKit sync. Use when the user asks about SwiftData, @Model, @Query, ModelContext, ModelContainer, SwiftData relationships, SwiftData migrations, SwiftData CloudKit, SwiftData performance, or testing with SwiftData.
 ---
 
