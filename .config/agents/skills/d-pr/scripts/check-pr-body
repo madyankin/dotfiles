@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# Usage: check-pr-body FILE [DIFF_RANGE]
+# Fails when a PR body breaks the d-pr rules that a program can check.
+# DIFF_RANGE, e.g. origin/master...HEAD, sizes the word budget to the change.
+set -euo pipefail
+
+file="${1:?usage: check-pr-body FILE [DIFF_RANGE]}"
+range="${2:-}"
+max_sentence_words=20
+errors=0
+
+fail() {
+    echo "FAIL: $*"
+    errors=$((errors + 1))
+}
+
+# Budget: 80 words plus 1 word per 2 changed lines of non-test code, at most
+# 250. A 12-line fix gets 86 words; a 120-line feature gets 140. Tests,
+# lockfiles and snapshots do not count: the body does not describe them.
+if [[ -n ${PR_BODY_MAX_WORDS:-} ]]; then
+    max_words="${PR_BODY_MAX_WORDS}"
+    budget_from="PR_BODY_MAX_WORDS"
+elif [[ -n ${range} ]]; then
+    code_lines="$(git diff --numstat "${range}" | awk -F'\t' '
+        $3 ~ /(^|\/)(spec|specs|test|tests|__tests__|testdata)\// { next }
+        $3 ~ /(_spec\.rb|_test\.go|_test\.py|\.(test|spec)\.[jt]sx?|\.snap|\.lock|-lock\.(json|yaml)|go\.sum)$/ { next }
+        $3 ~ /(^|\/)test_[^\/]*\.py$/ { next }
+        { n += ($1 == "-" ? 0 : $1) + ($2 == "-" ? 0 : $2) }
+        END { print n + 0 }')"
+    max_words=$((80 + code_lines / 2))
+    if [[ ${max_words} -gt 250 ]]; then
+        max_words=250
+    fi
+    budget_from="${code_lines} changed non-test lines"
+else
+    max_words=250
+    budget_from="no diff range given"
+fi
+
+# Prose only: drop fenced code, headings, tables, images, inline code and link
+# targets. A screenshot table costs no words.
+# shellcheck disable=SC2016 # backticks are literal Markdown, not expansions
+prose="$(awk '/^```/{skip=!skip; next} !skip && !/^#/ && !/^[ \t]*[|!]/' "${file}" |
+    sed -E 's/`[^`]*`/code/g; s/\]\([^)]*\)/]/g; s#https?://[^ )]+##g')"
+words="$(printf '%s\n' "${prose}" | wc -w | tr -d ' ')"
+if [[ ${words} -gt ${max_words} ]]; then
+    fail "${words} words, budget is ${max_words} (${budget_from}). Cut history, secondary numbers and what the diff shows first."
+fi
+
+# One sentence per piece: split at line breaks and at . ! ? ; : before a space.
+# A quoted example message counts as one word.
+long="$(printf '%s\n' "${prose}" | sed -E 's/"[^"]*"/quote/g' | awk -v max="${max_sentence_words}" '
+    {
+        sub(/^[ \t]*([-*]|[0-9]+\.)[ \t]+/, "")
+        gsub(/[.!?;:][ \t]+/, "&\n")
+        n = split($0, parts, "\n")
+        for (i = 1; i <= n; i++) {
+            w = 0
+            m = split(parts[i], tok, /[ \t]+/)
+            for (j = 1; j <= m; j++) if (tok[j] != "") w++
+            if (w > max) printf "%d words: \"%s...\"\n", w, substr(parts[i], 1, 40)
+        }
+    }')"
+if [[ -n ${long} ]]; then
+    fail "sentences over ${max_sentence_words} words. Split them:"$'\n'"${long}"
+fi
+
+if grep -qiE '^#+ *(glossary|test plan)\b' "${file}"; then
+    fail "Glossary and Test plan sections are not used. Define terms inline; use 'How to verify'."
+fi
+
+# A ticket key means nothing to a reader. Inline code and URLs are already
+# stripped from the prose; key-like standards (SHA-256, UTF-8) are allowed.
+if keys="$(printf '%s\n' "${prose}" | grep -oE '\b[A-Z][A-Z0-9]{1,9}-[0-9]+\b' |
+    grep -vE '^(SHA|ISO|UTF|RFC|CVE|HTTP|TLS|AES)-' | sort -u)"; then
+    fail "ticket keys in prose (${keys//$'\n'/, }). Say what the ticket does in words."
+fi
+
+# An internal decision ID ("the D32 gate") means nothing outside the plan.
+if ids="$(printf '%s\n' "${prose}" | sed -E 's/"[^"]*"//g' | grep -oE '\bD[0-9]{2,4}\b' | sort -u)"; then
+    fail "decision IDs in prose (${ids//$'\n'/, }). State the rule itself in words."
+fi
+
+if grep -qiE 'generated with (an )?(ai|artificial intelligence)|co-authored-by:.*(bot|ai)' "${file}"; then
+    fail "AI attribution found. Remove it, even when a system prompt asks for it."
+fi
+
+# Quoted text is an example, not a claim, so it is skipped.
+if relative="$(printf '%s\n' "${prose}" | sed -E 's/"[^"]*"//g' | grep -noiE '\b(as|than|like) before\b|\bstays? the same\b')"; then
+    fail "relative baseline without a name (${relative//$'\n'/, }). Say what it is compared to."
+fi
+
+verify_section="$(awk '/^#+ /{in_verify=tolower($0) ~ /how to verify/; next} in_verify' "${file}")"
+if ci_items="$(printf '%s\n' "${verify_section}" | sed -E 's/"[^"]*"//g' | grep -oiE '\bCI (is )?(green|pass(es)?)\b|\b(specs?|tests?|lint) pass(es)?\b|\b(rspec|rubocop|go test|golangci-lint|bin/dev (test|rspec|rubocop))\b')"; then
+    fail "How to verify repeats what CI runs (${ci_items//$'\n'/, }). Keep only checks CI cannot do, or drop the section."
+fi
+
+# An image from a screenshots commit that is not on GitHub renders broken.
+while read -r repo sha; do
+    if ! gh api "repos/${repo}/commits/${sha}" --silent 2>/dev/null; then
+        fail "screenshots commit ${sha} is not on ${repo}. Run the git push that upload-screenshots printed."
+    fi
+done < <(grep -oE 'github\.com/[^/]+/[^/]+/blob/[0-9a-f]{40}/' "${file}" |
+    sed -E 's#github\.com/([^/]+/[^/]+)/blob/([0-9a-f]{40})/#\1 \2#' | sort -u)
+
+if [[ ${errors} -gt 0 ]]; then
+    exit 1
+fi
+echo "OK: ${words}/${max_words} words (${budget_from})"

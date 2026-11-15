@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+"""Usage: upload-screenshots DIR
+
+Stores the images (PNG or JPEG) in DIR as one commit on <branch>-screenshots, prints the
+push command to stderr and the PR body's Screenshots section to stdout.
+
+The commit holds only the images and touches neither HEAD nor the working
+tree. It extends the remote screenshots branch when one exists, so links in
+an older PR body keep working.
+
+Layout of DIR:
+  <subject>-before.png, <subject>-after.png  a before/after row
+  <subject>.png                              a single shot (a feature)
+  <variant>/<...>.png                        one table per variant: dark/, light/
+A leading "NN-" on a subject sets the row order and is dropped from the label.
+"""
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+
+def git(*args: str, stdin: str | None = None) -> str:
+    return subprocess.run(
+        ["git", *args], input=stdin, capture_output=True, text=True, check=True
+    ).stdout.strip()
+
+
+def shots(directory: Path) -> dict[str, dict[str, dict[str, Path]]]:
+    """{variant: {subject: {"before"|"after"|"shot": path}}}"""
+    found: dict[str, dict[str, dict[str, Path]]] = {}
+    images = [p for p in sorted(directory.glob("*.*")) + sorted(directory.glob("*/*.*"))
+              if p.suffix.lower() in (".png", ".jpg", ".jpeg")]
+    for png in images:
+        variant = "" if png.parent == directory else png.parent.name
+        match = re.fullmatch(r"(.+?)(?:-(before|after))?", png.stem)
+        if not match:
+            continue
+        subject, state = match.group(1), match.group(2) or "shot"
+        found.setdefault(variant, {}).setdefault(subject, {})[state] = png
+    return found
+
+
+def label(subject: str) -> str:
+    text = re.sub(r"^\d+-", "", subject).replace("-", " ")
+    return text[:1].upper() + text[1:]
+
+
+def main() -> int:
+    if len(sys.argv) != 2 or not Path(sys.argv[1]).is_dir():
+        print(__doc__, file=sys.stderr)
+        return 2
+    directory = Path(sys.argv[1])
+    found = shots(directory)
+    if not found:
+        print(f"no PNG or JPEG files in {directory}", file=sys.stderr)
+        return 1
+
+    branch = git("branch", "--show-current")
+    if not branch:
+        print("detached HEAD: switch to the PR branch first", file=sys.stderr)
+        return 1
+    ref = f"refs/heads/{branch}-screenshots"
+    repo = subprocess.run(
+        ["gh", "repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+    names: dict[Path, str] = {}
+    entries = []
+    for variant, subjects in found.items():
+        for subject, states in subjects.items():
+            for state, png in states.items():
+                name = "-".join(p for p in (variant, subject, state if state != "shot" else "") if p) + png.suffix.lower()
+                names[png] = name
+                entries.append(f"100644 blob {git('hash-object', '-w', str(png))}\t{name}")
+    tree = git("mktree", stdin="\n".join(sorted(entries, key=lambda e: e.split("\t")[1])) + "\n")
+
+    parent = git("ls-remote", "origin", ref).split("\t")[0]
+    parent_args: list[str] = []
+    if parent:
+        git("fetch", "-q", "origin", ref)
+        parent_args = ["-p", parent]
+    commit = git("commit-tree", tree, *parent_args, "-m", f"Screenshots for {branch}")
+
+    base = f"https://github.com/{repo}/blob/{commit}"
+    out = ["## Screenshots", ""]
+    for variant, subjects in found.items():
+        paired = any("before" in s for s in subjects.values())
+        if variant:
+            out += [f"**{label(variant)}**", ""]
+        out += ["| | Before | After |", "|---|---|---|"] if paired else ["| | Screenshot |", "|---|---|"]
+        for subject in sorted(subjects):
+            states = subjects[subject]
+            cell = lambda s: f"![]({base}/{names[states[s]]}?raw=true)" if s in states else "—"
+            if paired:
+                out.append(f"| {label(subject)} | {cell('before')} | {cell('after') if 'after' in states else cell('shot')} |")
+            else:
+                out.append(f"| {label(subject)} | {cell('shot') if 'shot' in states else cell('after')} |")
+            if {"before", "after"} <= states.keys() and states["before"].read_bytes() == states["after"].read_bytes():
+                print(f"identical before and after: {variant + '/' if variant else ''}{subject}", file=sys.stderr)
+        out.append("")
+    print("\n".join(out).rstrip())
+
+    print(f"push it, then use the section above:\ngit push origin {commit}:{ref}", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except subprocess.CalledProcessError as error:
+        print(f"{' '.join(error.cmd)}: {error.stderr.strip()}", file=sys.stderr)
+        sys.exit(1)
