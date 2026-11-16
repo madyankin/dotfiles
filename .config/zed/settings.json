@@ -15,6 +15,7 @@
     "dock": "left"
   },
   "git_panel": {
+    "tree_view": true,
     "dock": "left"
   },
   "cli_default_open_behavior": "existing_window",
