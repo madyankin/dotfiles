@@ -181,3 +181,5 @@ __pycache__/
 
 # Local per-repo backlogs and self-heal state (skills/backlog)
 .config/agents/backlog/
+
+**/.claude/settings.local.json
