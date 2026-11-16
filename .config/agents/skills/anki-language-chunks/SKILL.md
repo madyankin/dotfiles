@@ -62,14 +62,14 @@ Discover current decks/models and exact field names before drafting the import. 
 | Answer | Natural German with `<mark>` and optional `<b>` emphasis |
 | Pattern | Construction matching this exact answer |
 | Rule | Brief accurate explanation of the retrieval target |
-| Audio | Full-utterance audio only, or empty |
+| Audio | Full-utterance recording or requested TTS; `[sound:filename.wav]`, or empty |
 | Accept | Optional natural alternative(s), or empty |
 
 Use tags such as `deutsch`, `a2-1`, `lektion-01`, `familie`, `possessivpronomen`, `dativ`, `src-kurs-a2-1`; adjust to the actual source. Preserve provenance for rewritten existing notes without treating copies as literal quotations.
 
 Preserve the existing typography and theme when using the model. If this model is absent, propose creating it with `Prompt` first (not Level: repeated sort-field values can trip duplicate checks), then the remaining fields in the table. Bundled [front.html](assets/front.html), [back.html](assets/back.html) and [styling.css](assets/styling.css) reproduce the approved design: system colors with readable secondary text, blue light-theme accents and mint dark-theme accents. Preview and obtain approval for creating/modifying a model. Do not automatically replace live CSS with bundled assets.
 
-Do not invent audio files or attach single-word audio to a new sentence. Leave Audio empty and disclose it if no matching full-utterance recording exists.
+Do not invent audio files or attach single-word audio to a new sentence. If the user wants synthesized audio, use the local open-source [Piper](https://github.com/OHF-Voice/piper1-gpl) engine with a voice for the answer language (for German, `de_DE-thorsten-medium` is a starting choice). The [official CLI guide](https://github.com/OHF-Voice/piper1-gpl/blob/main/docs/CLI.md) documents `pip install piper-tts`, `python3 -m piper.download_voices de_DE-thorsten-medium`, and `python3 -m piper -m de_DE-thorsten-medium -f sentence.wav -- 'Der Satz.'`. Use a compatible Python environment: on this Mac, system Python 3.15 cannot resolve Piper's `onnxruntime` dependency, while Python 3.13 works. Confirm the installed voice and its model card before use. Synthesize the **whole plain-text Answer**, without HTML markup; never synthesize the Russian prompt or only the highlighted chunk. Preview a sample for pronunciation, then verify every resulting file is playable and nonempty. Keep the generated media and a text-to-filename manifest until import verification; use stable unique filenames. Copy media into Anki and set Audio only after the card-content approval gate, and include audio creation and any updates to existing notes in the preview. If Piper or a suitable voice is unavailable, report that and leave Audio empty until it is available; do not silently fall back to a different voice or engine. If the user does not ask for TTS, use a supplied matching recording or leave Audio empty.
 
 ## Duplicates, write and verify
 
@@ -83,5 +83,9 @@ After approval:
 3. Read back created/updated notes: verify fields, tags, the requested direction, and one generated card per intended task. Do not rate, reset or move existing reviews.
 4. If a local catalogue already represents this deck, update it only with successfully imported content and preserve its theme. Otherwise a new catalogue is optional. Do not label a local draft “added” if Anki was unreachable.
 5. Report actual created/updated/skipped/failed counts and missing audio. Offer or suggest sync; do not initiate it unless authorized. Never resolve a one-way sync conflict automatically.
+
+## Changelog
+
+- 2026-11-16 — Added an opt-in Piper workflow for full-answer speech audio, including preview, pronunciation and file checks, and verified Anki attachment.
 
 If the connection fails, preserve the exact approved payload and tell the user to open Anki/check the add-on. Do not retry blindly. Once they say it is open, resume the same approved set with duplicate protection; no new approval is needed unless the proposal changed.
