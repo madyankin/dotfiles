@@ -68,10 +68,11 @@ in three runs is a missing rule.
    ```bash
    python3 -I ~/.config/agents/skills/improve-skill/scripts/skill_runs.py <name> [--since 90d] > <scratchpad>/runs.md
    ```
-   Plugin prefixes are merged (`dev:x` = `rocky:x`). `U!` marks a hint word only. Read every
-   `U` turn. Runs `inside` another skill or started by a scheduled task often log turns about
-   the outer job; do not count those against this skill. A `forked` run shows only the user's
-   first reply to its result.
+   Plugin prefixes are merged (`dev:x` = `rocky:x`). `U!` marks a hint word in the user's own
+   words; app notes and pasted blocks are stripped first. Read every `U` turn. Runs `inside`
+   another skill or started by a scheduled task often log turns about the outer job; do not
+   count those against this skill. A `forked` run, and an agent call mid-conversation, show only
+   the user's first reply.
    If `~/.config/agents/backlog/_skills.md` has open items for this skill, start from them.
 2. **Classify** each user turn, rejection, and interrupt: *disagreement* (agent did X, user
    wanted Y), *scope change* (a new request, not a gap), or *neutral*.
@@ -228,3 +229,4 @@ Never report an improvement you did not exercise as if you had.
 - 2026-10-14 — history mode: `scripts/skill_runs.py` mines Claude Code + Codex transcripts for corrections; weekly `--all --since-last` scan feeds `backlog/_skills.md`. Renamed the changelog-rule section to "Record the change" so this file's own changelog does not collide with it.
 - 2026-10-19 — `skill_runs.py`: subagent hand-backs, side-session notes and CI events no longer count as user turns; forked copies of one invocation fold into one run (`+N forks`, fork-only turns shown). 60-day scan: 394 → 365 runs, dev-research 24 → 9 signals.
 - 2026-10-28 — `skill_runs.py`: a forked skill run (ran in a subagent) keeps only the user's first reply to its result and ends at the next skill call; `--since-last` advances the state only on `--commit-scan`. Clustering stays manual; text now says so. 30-day dev-commit scan: 11 → 0 runs with signals, dev-research 3 → 1.
+- 2026-11-17 — `skill_runs.py`: app `<system-reminder>` notes stripped from user turns (were Python-repr junk or hid the user's words), `<pasted_content>` shown as `[pasted text]` and never hinted, images as `[image]`; an agent call mid-conversation keeps only the first reply. 30-day scan: 25 → 19 `U!`, all remaining are the user's own words; dataviz 6 → 0.

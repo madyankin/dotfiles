@@ -35,6 +35,10 @@ SKIP_PREFIXES = (
     "<agent-message", "<side-sessions-event", "<ci-monitor-event",
 )
 CODEX_SKIP_PREFIXES = ("<environment_context", "<user_instructions", "# AGENTS.md", "<permissions")
+# The app prepends status notes to the user's own words in the same turn; drop the notes, keep the words.
+REMINDER = re.compile(r"<system-reminder>.*?</system-reminder>", re.S)
+# Pasted plans or tickets are not the user's words; their hint words are not disagreement.
+PASTED = re.compile(r"<pasted_content\b[^>]*>.*?</pasted_content\b[^>]*>", re.S)
 
 
 @dataclass
@@ -106,9 +110,23 @@ def blocks_text(content, kind="text"):
     return "\n".join(b.get("text", "") for b in content if isinstance(b, dict) and b.get("type") == kind)
 
 
+def turn_text(content):
+    """User turn as text, with an [image] marker per attached screenshot."""
+    if isinstance(content, str):
+        return content
+    parts = []
+    for b in content or []:
+        if isinstance(b, dict) and b.get("type") == "image":
+            parts.append("[image]")
+        elif isinstance(b, dict) and b.get("type") == "text":
+            parts.append(REMINDER.sub("", b.get("text", "")).strip())
+    return "\n".join(p for p in parts if p)
+
+
+
 def add_user_text(session, ts, text):
-    text = text.strip()
-    if not text or text.startswith(SKIP_PREFIXES):
+    text = PASTED.sub("[pasted text]", REMINDER.sub("", text)).strip()
+    if not text or text == "[image]" or text.startswith(SKIP_PREFIXES):
         return
     if text.startswith("[Request interrupted"):
         session.events.append(Event("interrupt", ts))
@@ -158,7 +176,7 @@ def parse_claude_line(session, lines, i, d):
     elif kind == "attachment":
         att = d.get("attachment") or {}
         if att.get("type") == "queued_command" and att.get("commandMode") == "prompt":
-            add_user_text(session, ts, str(att.get("prompt", "")))
+            add_user_text(session, ts, turn_text(att.get("prompt", "")))
     elif kind == "user":
         if d.get("isCompactSummary"):
             session.events.append(Event("compact", ts))
@@ -187,7 +205,7 @@ def parse_claude_line(session, lines, i, d):
                     if "doesn't want to proceed" in body:
                         reason = body.split("the user said:", 1)[1].strip() if "the user said:" in body else ""
                         session.events.append(Event("reject", ts, reason))
-            text = blocks_text(content)
+            text = turn_text(content)
             if text:
                 add_user_text(session, ts, text)
 
@@ -242,6 +260,7 @@ def runs_in(session, target=None):
         if e.kind != "invoke" or not e.skill or (target and e.skill != target):
             continue
         trigger, outer, ended = "", "", set()
+        earlier_users = sum(1 for prev in events[:i] if prev.kind == "user")
         for prev in reversed(events[:i]):
             if prev.kind == "user":
                 trigger = prev.text
@@ -251,6 +270,10 @@ def runs_in(session, target=None):
             if prev.kind == "invoke" and not outer and not (prev.tool_id and prev.tool_id in ended):
                 outer = prev.skill
         items, uids, context, users, limit, forked = [], [], "", 0, WINDOW_USER_TURNS, False
+        if not e.by_user and earlier_users > 1:
+            # The agent called the skill mid-conversation as a step of a bigger job; after the first
+            # reply the user is back to that job. A session the trigger opened is the skill's own.
+            limit = 1
         for nxt in events[i + 1 :]:
             if nxt.kind == "end":
                 if e.tool_id and nxt.tool_id == e.tool_id:
@@ -372,6 +395,8 @@ LEGEND = (
     "A run 'inside' another skill, or triggered by a scheduled task, may log turns about the outer job.",
     "'+N forks' = one invocation copied into N forked sessions, counted once; only turns a fork adds are shown.",
     "'forked' = the skill ran in a subagent: only the user's first turn after its result is shown; the subagent transcript is not read.",
+    "'via agent' mid-conversation = only the user's first turn after the call is shown; later turns are about the outer job.",
+    "[pasted text] = pasted block, not the user's words, never counted as a hint. [image] = attached screenshot.",
 )
 
 

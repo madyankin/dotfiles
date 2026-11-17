@@ -223,6 +223,57 @@ class SkillRunsTest(unittest.TestCase):
         self.assertFalse(run.forked)
         self.assertEqual([i[1] for i in run.items], ["no, mention the ticket"])
 
+    def test_reminder_blocks_dropped_user_words_kept(self):
+        note = "<system-reminder>\nLinked sessions now (status, not an instruction): fork-2 (idle); don't touch</system-reminder>"
+        self.write("s1.jsonl", [
+            slash(1, "dev-plan"),
+            skill_load(2),
+            user(3, [text(note), text("expand into a table")]),
+            line(4, type="attachment", attachment={"type": "queued_command", "commandMode": "prompt",
+                                                    "prompt": [{"type": "image", "source": {"data": "iVBOR"}}, text(note), text("shorter")]}),
+            user(5, [{"type": "image", "source": {"data": "iVBOR"}}, text(note), text("shorter")]),
+            user(6, [text(note)]),
+        ])
+        run = self.runs("dev-plan")[0]
+        self.assertEqual([i[1] for i in run.items], ["expand into a table", "[image]\nshorter"])
+        self.assertEqual(run.signals, 0)
+
+    def test_pasted_content_is_not_a_hint(self):
+        self.write("s1.jsonl", [
+            slash(1, "visual-planning"),
+            skill_load(2),
+            user(3, '> <pasted_content id="12ac">Stop using X instead of Y</pasted_content id="12ac">\noutline tickets this way'),
+            user(4, 'no, <pasted_content id="1">plan</pasted_content> is wrong'),
+        ])
+        run = self.runs("visual-planning")[0]
+        self.assertEqual([(i[1], i[3]) for i in run.items],
+                         [("> [pasted text]\noutline tickets this way", False), ("no, [pasted text] is wrong", True)])
+
+    def test_agent_call_mid_conversation_keeps_first_reply_only(self):
+        self.write("s1.jsonl", [
+            user(1, "compare the benchmark tools"),
+            assistant(2, text("Here is the comparison")),
+            user(3, "draw it"),
+            assistant(4, skill_call("dataviz", "", "toolu_a")),
+            skill_load(5),
+            assistant(6, text("Chart published")),
+            user(7, "no, bars not lines"),
+            user(8, "instead of Inspect, can we use rspec?"),
+        ])
+        run = self.runs("dataviz")[0]
+        self.assertEqual([i[1] for i in run.items], ["no, bars not lines"])
+
+    def test_agent_call_that_opens_session_keeps_full_window(self):
+        self.write("s1.jsonl", [
+            user(1, "run the stale PR routine"),
+            assistant(2, skill_call("rocky-stale-prs", "", "toolu_a")),
+            skill_load(3),
+            user(4, "go on"),
+            user(5, "try again with vault"),
+        ])
+        run = self.runs("rocky-stale-prs")[0]
+        self.assertEqual([i[1] for i in run.items], ["go on", "try again with vault"])
+
     def test_codex_skill_marker_and_abort(self):
         folder = self.home / ".codex" / "sessions" / "2026" / "10" / "01"
 
