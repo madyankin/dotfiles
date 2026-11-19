@@ -19,6 +19,20 @@ carries **F** (seen in code, config, logs or metrics — with a pointer), **I**
 look, what it costs). If the user names a textbook or model to follow, read it
 first and adopt its vocabulary. Details: `references/method.md`.
 
+## Machine lens
+
+A lens holds this machine's context: workspace docs, observability
+datasources, deploy platform, Ask-first boundaries, helper skills. Before
+step 1, read `~/.config/agents/lenses/d-subsystem-audit.md` if it exists. Say
+`Lens: <path>` or `Lens: none`.
+
+- **Lens found:** read it whole and follow its links. Its rules add to this
+  skill's rules. On a conflict, the lens wins.
+- **No lens:** discover the same context from the repos' agent docs and the
+  tools the session has.
+
+Lenses are machine-local. Never copy lens content into this skill.
+
 ## Steps
 
 1. **Scope.** Name the component, its entry points and its exits. List the

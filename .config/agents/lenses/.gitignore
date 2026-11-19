@@ -1,0 +1,3 @@
+# Machine-local skill lenses. Never commit lens content.
+*
+!.gitignore
