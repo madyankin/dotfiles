@@ -91,6 +91,9 @@ If reality differs from the plan:
    - Why it matters
 3. Ask how to proceed
 
+A unit listed under the plan's "Rule Exceptions" is approved there. It is not
+a mismatch.
+
 ## Verification
 
 After each phase:
@@ -126,6 +129,29 @@ results instead.
 
 Do NOT tick manual items until the user confirms them.
 
+## Convergence
+
+Run after the last phase passes its automated checks, or when the user says
+"converge".
+
+1. Read the plan's Desired End State, every **Need** line, and the ticket's
+   acceptance criteria. Read the branch diff against its base, plus
+   uncommitted changes.
+2. Find gaps. Give each one kind:
+   - **missing**: a planned change or criterion has no code
+   - **partial**: the code exists, but a case, error path or test from the
+     plan is absent
+   - **contradicts**: the code does something other than what the plan or
+     ticket says
+   - **unrequested**: the code has no Need in the plan
+3. No gaps: leave the plan file unchanged. Say "Converged: the code matches
+   the plan and the ticket."
+4. Gaps: append `## Phase N: Convergence` to the plan. Add one unchecked item
+   per gap, with its kind, `file:line`, and the plan line it breaks. An
+   unrequested item asks: keep it and add a Need, or remove it. End the turn
+   with the list. Fix nothing in this turn. The next turn implements this
+   phase like any other.
+
 ## Resuming Work
 
 If the plan has existing checkmarks:
@@ -139,5 +165,7 @@ If the plan has existing checkmarks:
 - This phase's checkboxes ticked in the plan file, on disk
 - Automated verification passed
 - Turn ended with the manual-verification report
+- After the last phase, Convergence ran: the result is "Converged" or a
+  Convergence phase in the plan
 - Plan and research files not in any commit
 - Commits created only when the user asked

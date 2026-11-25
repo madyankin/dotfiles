@@ -56,6 +56,15 @@ For plans:
 - File references plausible and current
 - Success criteria split into automated and manual
 - Risks and dependencies identified
+- Coverage: each ticket acceptance criterion maps to at least one change item
+  and one test or check. A criterion with none is **critical**. With no
+  ticket, say `Coverage: no ticket` and skip the table.
+- Wording: Desired End State and success criteria use values you can check.
+  "fast", "robust", "scalable", "as needed", "etc.", TODO or `???` without a
+  number or check next to them is **major**.
+- Duplicates and conflicts: two items that ask for the same thing in
+  different words are **minor**. Two items that ask for opposite things are
+  **major**.
 
 For research:
 
@@ -85,6 +94,12 @@ For research:
 ### Minor
 
 - [finding or "None"]
+
+## Coverage
+
+| Acceptance criterion              | Plan items      | Verified by                |
+| --------------------------------- | --------------- | -------------------------- |
+| [criterion in its own words (id)] | [Phase N, item] | [test or check, or "none"] |
 
 ## Required Changes
 

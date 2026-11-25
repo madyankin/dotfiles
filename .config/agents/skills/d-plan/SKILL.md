@@ -55,8 +55,12 @@ Commit a file only when the user asks for that file by name. Then move it to
    `d-codebase-analyzer`, and `d-pattern-finder` in parallel. Otherwise perform
    those passes directly.
 3. Read all files identified by research
-4. Present understanding and focused questions -- only ask what code
-   investigation cannot answer
+4. Present understanding. Then rate each area Clear, Partial or Missing:
+   scope and behavior; data and states; edge cases and failures; limits
+   (performance, security, privacy); other services and integrations; how we
+   know it is done. Ask only about Partial or Missing areas that code cannot
+   answer. Ask at most 5 questions, one at a time. Each question gives 2-3
+   options and marks one as recommended; "yes" accepts it.
 
 ### Step 2: Research and Discovery
 
@@ -64,7 +68,14 @@ Commit a file only when the user asks for that file by name. Then move it to
 2. External research gate: always research when the plan touches security/auth,
    billing/payments, data migrations, privacy/compliance, or public API
    contracts
-3. Present findings and 2-3 design options with pros/cons
+3. Turn each unknown into one research task, and run the tasks in parallel.
+   The unknowns are: each Partial or Missing area from Step 1, each new
+   dependency, and each call into another service. External findings carry a
+   link and the date read. A claim with no source is marked as an assumption.
+4. Present findings and 2-3 design options with pros/cons. Record each choice
+   under `## Decisions`.
+5. An unknown you cannot resolve stays under Open Questions. Every phase that
+   depends on it gets a `**Blocked by**: [question]` line.
 
 ### Step 3: Plan Structure
 
@@ -94,6 +105,10 @@ touches, look for `.agents/skills/d-implement-<repo>/SKILL.md`, where
 missing, also try `.agents/skills/d-implement-lens/SKILL.md`. Say
 `Lens: <path>` or `Lens: none` per repo. A found lens is read whole, with its
 links; its rules add to these, and win on a conflict.
+
+When a unit has to break a lens rule or the placement rule, add a row to
+"Rule Exceptions". dev-implement treats a listed exception as approved, not as
+a mismatch.
 
 ### Step 4: Write the Plan
 
@@ -127,6 +142,20 @@ last_updated: [YYYY-MM-DD]
 ## What We Are NOT Doing
 
 [Out-of-scope items to prevent scope creep]
+
+## Clarifications
+
+### Session YYYY-MM-DD
+
+- Q: [question] → A: [answer]
+
+## Decisions
+
+### [Choice in one plain sentence]
+
+- **Decision:** [what we chose]
+- **Why:** [the reason, with a ref or link]
+- **Rejected:** [option] — [why not]
 
 ## Implementation Approach
 
@@ -175,6 +204,11 @@ last_updated: [YYYY-MM-DD]
 - **Options:** [A, recommended because …] / [B]
 - **Refs:** `path:line`
 
+## Rule Exceptions
+
+| Rule broken | Why needed | Simpler option rejected because |
+| ----------- | ---------- | ------------------------------- |
+
 ## Optional, not in plan
 
 - [Unit]: [what it would buy]
@@ -210,4 +244,7 @@ The user reads the outline, open questions and summary without the code open.
   under "Optional, not in plan"
 - Each phase has automated and manual success criteria
 - Out-of-scope section explicitly defined
+- Every answer the user gave sits under Clarifications, and the section it
+  changes reflects it
+- Every design choice sits under Decisions with its rejected options
 

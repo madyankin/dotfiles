@@ -26,6 +26,10 @@ Recipes per surface are in `references/surfaces.md`. The report format is in
      repo.
 
 2. **Define the bullet.** Write it down before any code:
+   - When a plan or ticket exists, first list its acceptance criteria, each as
+     one Given / When / Then line. Fire the first bullet at the criterion
+     that carries the feature. Step 9's menu lists the criteria that still
+     have no bullet before the generic paths.
    - One line in Given / When / Then form.
    - The layers it passes, in order (for example: form → controller → service → database →
      list page).

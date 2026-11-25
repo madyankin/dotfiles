@@ -90,6 +90,9 @@ Get user confirmation before proceeding.
 - Update success criteria if needed
 - If adding a phase, follow the existing pattern
 - If modifying scope, update the "What We Are NOT Doing" section
+- Log answers to questions asked in this run under `## Clarifications`, in
+  `### Session YYYY-MM-DD`. Create the section if the plan has none. Never
+  edit older entries: a reversed answer gets a new entry.
 - If the plan is an umbrella plan with sub-plans in repo subdirectories,
   propagate relevant changes to the affected sub-plans too
 

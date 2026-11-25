@@ -111,8 +111,16 @@ means for the question. No file:line refs here.]
 
 ### [Component 1]
 
-- What exists (file:line references)
-- How it connects to other components
+- [F] What exists (file:line references)
+- [I] How it connects to other components, when this is inferred: the facts
+  it rests on, and what would prove it wrong
+- [Q] What the code cannot show: where to look, and what that would cost
+
+## Against the Question's Assumption
+
+[Findings that go against what the question took for granted. Write "None
+found" when you looked and found none. Write "The question assumed nothing"
+when it did not.]
 
 ## Code References
 
@@ -148,6 +156,9 @@ The user reads the summary and open questions without the code open.
 ## Rules
 
 - Document what IS, not what SHOULD BE
+- Every finding in Detailed Findings carries one label: **F** (seen in code,
+  config, logs or docs, with a pointer), **I** (inferred), or **Q** (open).
+  Summary stays plain, with no labels and no refs.
 - Include specific file:line references
 - In project mode: write the research doc to `_scratchpad/research/`
 - In workspace mode: write per-repo research to each repo's `_scratchpad/research/`,
