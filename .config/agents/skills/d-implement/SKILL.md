@@ -80,6 +80,22 @@ If the plan names a class that the lens or this rule puts elsewhere, that is a
 mismatch: handle it as below before you write the class. A class the plan does
 not name follows the rule without asking.
 
+## Minimum Code
+
+- Write only what the plan's Needs and the ticket ask for. No option,
+  argument, config key or branch that no caller uses.
+- No new class, module, interface, hook or helper for one caller, unless
+  § Placement or the lens asks for it.
+- One reason to change per class, component or function. If its job needs
+  "and" to describe, split it. Size does not matter.
+- Other SOLID principles: follow them where the code already has the place
+  for it (a base class, an interface, an injected client). Never add one only
+  to satisfy a principle.
+- No refactor, rename or cleanup outside the change. Name it in the phase
+  report instead.
+
+Convergence flags anything left over as **unrequested**.
+
 ## Handling Mismatches
 
 If reality differs from the plan:

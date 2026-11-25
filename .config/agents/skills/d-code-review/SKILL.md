@@ -67,6 +67,8 @@ What to look for beyond bugs:
 | Two saves of the same record to compute two things | One transaction or savepoint, both computed inside |
 | A fact about class X (its constants, its scopes) defined in another class, however small | Move it to X. SRP is about reasons to change, not size |
 | A service compares input with another class's constants, or builds that class's record | A predicate and a method on that class; branch tests move to its spec |
+| An option, branch, config or file no requirement or caller needs | Delete it; the ticket sets the scope |
+| A class, interface, base class or hook with one caller, or added only for a principle | Inline it into the caller or the data's owner |
 | Several classes share a name prefix (`TermsAcceptance`, `TermsStatus`) | One namespace, before merge while it is only a rename |
 
 Specs:
