@@ -49,11 +49,31 @@ even when they sit inside the repo. Commit one only when the user asks for that
 file by name: move it to `docs/plans/` or `docs/research/` and commit it from
 there.
 
+## Progress
+
+The plan file records each finished step on its `####` heading:
+`#### 4. Title [done: uncommitted]`, then `[done: <short sha>]` once
+committed. Mark a step the moment its code and checks pass.
+
+At the end of every turn that finished a step or a phase, and whenever the
+user asks where things stand, run:
+
+```bash
+python3 -I <this skill's dir>/scripts/plan_progress.py <plan>
+```
+
+Show the result to the user as a visual. Draw it with a visual or widget tool
+if this environment has one, keeping the script's states and hashes. Otherwise
+paste the output in a `text` block. Never build the picture by hand from
+memory: when it looks wrong, fix the marks in the plan, then run the script
+again.
+
 ## Commits
 
 - Do not commit until the user asks.
 - When asked, commit one plan step per commit and stage only that step's files.
-  Follow the repository's commit conventions.
+  Follow the repository's commit conventions. Then change the step's mark to
+  the new short sha.
 
 ## Repo Lens
 
@@ -119,7 +139,7 @@ After each phase:
 3. Run a system-wide impact check: verify changed behavior does not break
    adjacent flows
 4. Tick the automated checkboxes in the plan file
-5. **End your turn** with this report. Do not start the next phase. The only
+5. **End your turn** with the progress visual (see Progress), then this report. Do not start the next phase. The only
    exception: the user said in this conversation to run several phases or the
    whole plan without stopping.
 
@@ -179,9 +199,15 @@ If the plan has existing checkmarks:
 ## Success Criteria
 
 - This phase's checkboxes ticked in the plan file, on disk
+- Every finished step marked `[done: …]` in the plan, and the progress visual
+  shown from `plan_progress.py`
 - Automated verification passed
 - Turn ended with the manual-verification report
 - After the last phase, Convergence ran: the result is "Converged" or a
   Convergence phase in the plan
 - Plan and research files not in any commit
 - Commits created only when the user asked
+
+## Changelog
+
+- 2026-11-25 — progress visual: finished steps marked `[done: <sha>|uncommitted]` on their plan heading; `scripts/plan_progress.py` draws phases and steps from the plan; shown after every finished step and on "where are we".
