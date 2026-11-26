@@ -1,6 +1,6 @@
 # Static HTML starting point
 
-Adapt or remove sections to fit the change. Replace every «placeholder» with verified facts. The snippets below are a layout example, **not** source code for the change. Keep the same input in both flowcharts and the table. Use real, line-linked excerpts in the code section. No script is required.
+Adapt to the change; numbered sections follow the page structure in SKILL.md, drop empty ones. Replace every «placeholder» with verified facts. Diagrams: inline SVG, every edge labeled in text — UML for entities, flowcharts for algorithms, BPMN for processes. Contracts as tables. No script is required.
 
 ```html
 <!doctype html>
@@ -53,6 +53,15 @@ Adapt or remove sections to fit the change. Replace every «placeholder» with v
     details { margin:1rem 0; padding:.6rem .9rem; border:1px solid var(--line);
       border-radius:.4rem; }
     summary { cursor:pointer; font-weight:600; }
+    .core { font-size:1.15rem; }
+    figure svg { display:block; width:100%; height:auto; color:var(--ink); }
+    figure .scroll { overflow-x:auto; }
+    .step { margin:1.5rem 0; }
+    .step > p:first-child strong { color:var(--accent); }
+    .path { font:.85rem ui-monospace,monospace; color:var(--muted); margin:.25rem 0; }
+    .risks { padding-left:1.2rem; } .risks li + li { margin-top:.8rem; }
+    footer { margin-top:2.5rem; padding-top:1rem; border-top:1px solid var(--line);
+      color:var(--muted); font-size:.9rem; }
     @media (max-width:700px) {
       body { padding:1rem; }
       .comparison,.code-row { grid-template-columns:1fr; }
@@ -62,81 +71,85 @@ Adapt or remove sections to fit the change. Replace every «placeholder» with v
 <body>
   <header>
     <h1>«Change title»</h1>
-    <p>«One-sentence behavioral summary.»</p>
     <p class="meta">«base SHA» → «head SHA» · «comparison scope»</p>
   </header>
 
   <main>
-    <h2>Before → After</h2>
-    <figure>
-      <div class="comparison">
-        <section class="panel" aria-label="Before change">
-          <h3>Before</h3>
-          <ol class="flow">
-            <li>Input: «the shared example»</li>
-            <li>«Old step»</li>
-            <li class="changed">«Old decision or action»
-              <ul class="branches">
-                <li><strong>If «condition»</strong>«outcome A»</li>
-                <li><strong>Otherwise</strong>«outcome B»</li>
-              </ul>
-            </li>
-            <li>Output / side effect: «old result for the shared input»</li>
-          </ol>
-        </section>
-        <section class="panel" aria-label="After change">
-          <h3>After</h3>
-          <ol class="flow">
-            <li>Input: «the same example»</li>
-            <li>«New step»</li>
-            <li class="changed">«New decision or action»
-              <ul class="branches">
-                <li><strong>If «condition»</strong>«outcome A»</li>
-                <li><strong>Otherwise</strong>«outcome B»</li>
-              </ul>
-            </li>
-            <li>Output / side effect: «new result for the shared input»</li>
-          </ol>
-        </section>
-      </div>
-      <figcaption>«One observation the reader should notice; identify the changed step.»</figcaption>
-    </figure>
+    <h2>1. What fundamentally changes</h2>
+    <p class="core"><strong>«One sentence: the core idea.»</strong></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Dimension</th><th>Before</th><th>After</th></tr></thead>
+      <tbody><tr><td>«who decides / unit of work / protection / failure mode»</td><td>«old»</td><td>«new»</td></tr></tbody>
+    </table></div>
 
-    <h2>Same input, different result</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Input</th><th>Before</th><th>After</th><th>Evidence</th></tr></thead>
-        <tbody><tr><td>«shared input»</td><td>«old output»</td>
-          <td>«new output»</td><td>«test or code citation»</td></tr></tbody>
-      </table>
-    </div>
+    <h2>2. Change map</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Area</th><th>What changed</th><th>Kind</th><th>Section</th></tr></thead>
+      <tbody><tr><td>«files or module»</td><td>«fragment»</td><td>«contract / entity / process / algorithm / UI / tests / config»</td><td><a href="#«id»">«section»</a></td></tr></tbody>
+    </table></div>
 
-    <h2>Code in context</h2>
-    <h3>«One step in execution order»</h3>
-    <div class="comparison">
-      <div>
-        <p>Before · <a href="«old SHA permalink with #Lx-Ly»">«path:lines»</a></p>
-        <div class="code-row">
-          <pre><code>«escaped real old code»</code></pre>
-          <p class="explain">«What these lines did for the shared input.»</p>
-        </div>
-      </div>
-      <div>
-        <p>After · <a href="«new SHA permalink with #Lx-Ly»">«path:lines»</a></p>
-        <div class="code-row">
-          <pre><code>«escaped real new code»</code></pre>
-          <p class="explain">«What changed and why the output differs.»</p>
-        </div>
-      </div>
-    </div>
+    <h2 id="contracts">3. Contracts</h2>
+    <h3>«Tools / endpoints»</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Name</th><th>Params</th><th>Returns</th><th>Errors</th><th>Status</th></tr></thead>
+      <tbody><tr><td><code>«name»</code></td><td><code>«param: type, required»</code></td><td>«shape»</td><td><code>«exact error string»</code></td><td>«added / changed / removed»</td></tr></tbody>
+    </table></div>
+    <h3>«DB columns / payload fields / metadata keys / config»</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Field</th><th>Type, default</th><th>Meaning</th><th>Status</th></tr></thead>
+      <tbody><tr><td><code>«field»</code></td><td>«type»</td><td>«fragment»</td><td>«added»</td></tr></tbody>
+    </table></div>
 
-    <details>
-      <summary>Background, boundaries, and investigation</summary>
-      <p>«Only context that supports the explanation, plus caveats and sources.»</p>
-    </details>
+    <h2 id="entities">4. Entities</h2>
+    <figure><div class="scroll">
+      <svg viewBox="0 0 «w» «h»" role="img" aria-label="«UML class diagram: X delegates to Y, persists Z»">
+        <!-- UML: name / fields / methods compartments; edges labeled: delegates, persists, renders; changed elements marked in text -->
+      </svg>
+    </div><figcaption>«One thing to notice; shortened names.»</figcaption></figure>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Component</th><th>Responsibility</th></tr></thead>
+      <tbody><tr><td><code>«Class»</code></td><td>«one responsibility»</td></tr></tbody>
+    </table></div>
+    <figure><div class="scroll">
+      <svg viewBox="0 0 «w» «h»" role="img" aria-label="«UML state diagram of Entity: open → applied / declined / expired»"></svg>
+    </div><figcaption>«Stored or derived state; what blocks which transition.»</figcaption></figure>
+    <!-- literate insert where code is the contract or order matters, see section 6 for form -->
+
+    <h2 id="processes">5. Processes</h2>
+    <figure><div class="scroll">
+      <svg viewBox="0 0 «w» «h»" role="img" aria-label="«BPMN: pools Human, Agent, Client, Server, DB; message flows labeled with calls»"></svg>
+    </div><figcaption>«What each party receives; where the decision happens.»</figcaption></figure>
+
+    <h2 id="algorithms">6. Algorithms</h2>
+    <h3>«Function or step, e.g. Atomic apply»</h3>
+    <figure><div class="scroll">
+      <svg viewBox="0 0 «w» «h»" role="img" aria-label="«flowchart: lock → token valid? → key valid? → save all → commit or rollback»"></svg>
+    </div><figcaption>«The branch that matters.»</figcaption></figure>
+    <section class="step">
+      <p><strong>Step 1. «Intent in one sentence.»</strong></p>
+      <p class="path"><a href="«SHA permalink #Lx-Ly»">«path:lines»</a></p>
+      <pre><code>«escaped real code»</code></pre>
+      <p>«What it makes true; why not the obvious alternative.»</p>
+    </section>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Check</th><th>What it guarantees</th></tr></thead>
+      <tbody><tr><td>«check»</td><td>«guarantee»</td></tr></tbody>
+    </table></div>
+    <p><strong>«Named scenario»:</strong> «input → outcome».</p>
+
+    <h2>7. Review risks</h2>
+    <ol class="risks">
+      <li><strong>«Risk title».</strong> «Gap and when it bites.»</li>
+    </ol>
+
+    <h2>8. Whole picture</h2>
+    <figure><div class="scroll">
+      <svg viewBox="0 0 «w» «h»" role="img" aria-label="«BPMN overview of the system after the change»"></svg>
+    </div><figcaption>«Architectural result in one sentence.»</figcaption></figure>
   </main>
+  <footer>«repo» @ «SHA». «What figures omit». «Not run: tests / clients». Risks are static analysis.</footer>
 </body>
 </html>
 ```
 
-For a structural change with no meaningful branch, remove the branch lists. For a longer path, add verified steps; avoid empty boxes. Never leave a placeholder, fictitious citation, or code sample in a finished page.
+Literate inserts (`.step`) go under any figure whose step needs the exact code, in any section. Use the before/after `.comparison` panels only when old and new code of one step must be read side by side. Never leave a placeholder, fictitious citation, or sample code in a finished page.

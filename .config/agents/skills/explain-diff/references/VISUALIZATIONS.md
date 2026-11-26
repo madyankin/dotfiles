@@ -1,18 +1,50 @@
-# Static diagram choices
+# Diagram choices
 
-Choose the smallest diagram that makes the behavior visible. Every essential path and label must appear in the HTML without JavaScript.
+Notation follows what is drawn: entities in UML, algorithms as flowcharts, processes in BPMN. Every essential path and label must appear in the HTML without JavaScript.
 
-| Change | Useful static form |
+## Entities — UML
+
+| Question | Diagram |
 | --- | --- |
-| Request path or algorithm | Two ordered flowcharts, before and after, with the same input and labeled branches |
-| Changed condition | Decision box with both outcomes, and the taken branch marked in words |
-| State transition | Two state diagrams or a transition table with named states and events |
-| Data structure | Before/after nodes or a compact table of keys and values |
-| Rename or extraction | Two-column mapping; do not invent runtime behavior |
-| Measured performance | Small table with units and measurement source; chart only if it helps compare real data |
+| What are the parts and who owns what? | Class diagram: three-compartment boxes (name, fields, methods with `+`/`-`), inheritance as hollow triangle, association as plain arrow, dependency as dashed arrow. Label edges: delegates, persists, renders. Follow with a responsibility table. |
+| What states can a record be in? | State diagram: rounded states, filled start circle, ringed end circle, events on transitions, self-loops for "stays open" cases. Say whether state is stored or derived. |
+| What changed in a record's shape? | Class box before/after, or a `field | before | after` table. |
 
-Place the figure beside the behavior it explains. Put a caption under it naming the important change. Label arrows and branches in text; do not rely on color or position alone. At narrow widths, stack before and after while preserving their headings. Use a table when connector lines would obscure the path. A static inline SVG is acceptable if its labels remain legible and the same information is available as text; CSS and semantic HTML are usually simpler.
+## Algorithms — flowchart
 
-Use the same concrete input across diagrams, outcome table, and code explanation. If an edge case requires a different input, label it separately. Never show a possible branch as the branch actually taken for the example. If the source does not establish a transition, mark it unverified rather than completing the picture from intuition.
+One call or function, branch by branch.
 
-Native `<details>` may hold additional traces, assumptions, or a larger evidence table. The main before/after behavior stays visible when every section is closed. JavaScript enhancements are optional and may only duplicate, not replace, essential information.
+- Terminator (stadium) for start and end, rectangle for a step, diamond for a decision, parallelogram for input/output.
+- Decisions phrased as questions; every outgoing edge labeled Yes/No or the value.
+- Merge error exits into one end node. Show rollback and commit as distinct steps.
+- Old vs new on one path: two flowcharts side by side, same input, changed step marked in words.
+
+## Processes — BPMN
+
+Work across actors over time: human, agent, MCP client, UI, server, DB, background job.
+
+- One pool per participant system or organization; lanes for roles inside it.
+- Thin circle start event, thick circle end event, double-ring intermediate event (timer for TTL, message for a callback).
+- Rounded rectangle tasks named verb + object.
+- Gateways as diamonds: `×` exclusive, `+` parallel. Label each outgoing flow.
+- Solid arrows for sequence flow inside a pool; dashed arrows with an open circle tail for message flow between pools, labeled with the call (`tools/call`, `create_campaign`).
+- Concurrency: two lanes of the same request type meeting at the lock; the waiting lane shows an intermediate event until the lock is released.
+- Trust boundary: put what each party receives on the message flow (payload with or without key); add a "who sees what" table if the flow gets crowded.
+
+## Other
+
+| Content | Form |
+| --- | --- |
+| Value derivation | Small data-flow: inputs → function → output, e.g. token + server secret → HMAC → key. |
+| Rename or extraction | Two-column mapping; do not invent runtime behavior. |
+| Measured performance | Table with units and source; chart only for real data. |
+
+## Drawing rules
+
+Place each figure right before the code it explains, with a caption naming the one thing to notice. Label arrows and branches in text; never rely on color or position alone. Abbreviate long class names in the figure and say so in the caption. At narrow widths stack panels and let wide SVG scroll horizontally. Use a table when connector lines would obscure the path.
+
+Draw as inline SVG (`viewBox`, `width="100%"`, `currentColor`, CSS variables for accent). Define arrowheads once in `<defs>` as markers: filled for sequence flow, open triangle for inheritance, open circle tail for message flow. Give each SVG a `<title>` or `aria-label`. Keep the same information available as text near the figure.
+
+Reuse the shared input across diagrams, tables, and code. Label any different input as its own scenario. Never show a possible branch as the one taken. If the source does not establish a transition, mark it unverified rather than completing the picture from intuition.
+
+Native `<details>` may hold extra traces or a larger evidence table. Core idea, mechanism diagrams, and literate steps stay visible with every section closed.
