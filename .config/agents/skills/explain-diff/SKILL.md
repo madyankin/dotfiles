@@ -5,6 +5,8 @@ description: Explain a code diff, commit, branch, or pull request as a single-fi
 
 # Explain Diff
 
+> Mirror: `remerge/dsp` → `plugins/dev/skills/dev-pr-overview` is the team copy for pull requests (Artifact-only, kept at the branch head by `dev-pr`). Change the shared rules, references and `scripts/bpmn_svg.py` in both.
+
 Produce one HTML page a reader understands without opening the code. Read it top-down: each layer is complete on its own, and the next one adds detail only for the reader who wants it. Write in the user's language unless they ask for another; keep identifiers, error messages and code as written.
 
 ## Explanation principles
@@ -135,7 +137,9 @@ Save the HTML where the user requested, or in the current working directory.
 
 **Publishing as an Artifact** (when the user asks to publish or share): call `Artifact` with `action: "quickstart"`, `intent: "other"` first, then publish the file. Keep the page in Artifact form as `example.html` is: no document skeleton, `<title>` a 2–4 word name (not a caption), `<meta name="claude:viewport-fit-sides" content="cover">` beside it, no Mermaid `<script>` (the viewer renders `<pre class="mermaid">` natively), no `alert`/`print`/downloads. Pass a one-word generic `icon` and a one-sentence `description`. The artifact is private; tell the user others need it shared from the page's Share menu.
 
-**Translating:** keep identifiers, file paths, error messages and code untouched; translate prose, captions, BPMN labels (regenerate the SVGs from translated specs, with new diagram ids) and Mermaid labels. If the user explicitly wants an Obsidian note, resolve the vault from the Obsidian configuration; never guess a path. Then use [references/STUB_TEMPLATE.md](references/STUB_TEMPLATE.md).
+**Translating:** keep identifiers, file paths, error messages and code untouched; translate prose, captions, BPMN labels (regenerate the SVGs from translated specs, with new diagram ids) and Mermaid labels.
+
+**Obsidian note:** only when the user explicitly wants one; resolve the vault from the Obsidian configuration, never guess a path, then use [references/STUB_TEMPLATE.md](references/STUB_TEMPLATE.md).
 
 Before handoff:
 
