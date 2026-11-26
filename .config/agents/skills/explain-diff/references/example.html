@@ -1,0 +1,529 @@
+<title>MCP Preview Approval</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticky contents rail + one reading column; delta colors only for new / changed / removed */
+:root {
+  --bg:#f4f5f8; --surface:#ffffff; --panel:#eef0f5; --ink:#141720; --ink-2:#3a4050; --muted:#687085; --line:#e0e3ea;
+  --accent:#4f46e5; --accent-soft:#eceefe; --add:#15803d; --add-soft:#e7f6ec; --chg:#b45309; --chg-soft:#fdf2e2;
+  --del:#c0352b; --del-soft:#fcebe9; --code:#f6f7fa; --shadow:0 1px 2px rgba(20,23,32,.04), 0 8px 24px -12px rgba(20,23,32,.14);
+  --sans:"Inter", system-ui, -apple-system, "Segoe UI", sans-serif; --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme:dark) { :root:not([data-theme="light"]) {
+  --bg:#0d0f15; --surface:#151821; --panel:#1c202b; --ink:#e9ebf2; --ink-2:#c3c8d5; --muted:#8e95a7; --line:#272c38;
+  --accent:#8f90f9; --accent-soft:#1f2148; --add:#4ade80; --add-soft:#12291c; --chg:#fbbf24; --chg-soft:#2b2312;
+  --del:#f87171; --del-soft:#2e1717; --code:#11141b; --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -16px rgba(0,0,0,.6); color-scheme:dark; } }
+:root[data-theme="dark"] {
+  --bg:#0d0f15; --surface:#151821; --panel:#1c202b; --ink:#e9ebf2; --ink-2:#c3c8d5; --muted:#8e95a7; --line:#272c38;
+  --accent:#8f90f9; --accent-soft:#1f2148; --add:#4ade80; --add-soft:#12291c; --chg:#fbbf24; --chg-soft:#2b2312;
+  --del:#f87171; --del-soft:#2e1717; --code:#11141b; --shadow:0 1px 2px rgba(0,0,0,.3), 0 12px 32px -16px rgba(0,0,0,.6); color-scheme:dark; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } * { transition:none !important; } }
+body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.65 var(--sans); -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+a:focus-visible, summary:focus-visible { outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
+code { font:.86em var(--mono); background:var(--panel); padding:.08em .35em; border-radius:.3em; }
+
+.layout { display:grid; grid-template-columns:200px minmax(0,820px); gap:56px; justify-content:center;
+  padding-block:56px 96px; padding-left:max(24px, env(safe-area-inset-left, 0px)); padding-right:max(24px, env(safe-area-inset-right, 0px)); }
+main { min-width:0; }
+.toc { position:sticky; top:calc(env(safe-area-inset-top, 0px) + 40px); align-self:start; font-size:.86rem; }
+.toc p { margin:0 0 .6rem; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+.toc a { display:block; padding:.28rem .7rem; margin-left:-.7rem; color:var(--ink-2); border-radius:.4rem; }
+.toc a:hover { text-decoration:none; background:var(--panel); color:var(--ink); }
+.toc .sub { padding-left:1.3rem; color:var(--muted); }
+@media (max-width:1100px) { .layout { grid-template-columns:minmax(0,820px); } .toc { display:none; } }
+@media (max-width:640px) { .layout { padding-block:32px 64px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); } }
+
+.eyebrow { font-size:.75rem; letter-spacing:.09em; text-transform:uppercase; color:var(--accent); font-weight:600; margin:0 0 .6rem; }
+h1 { font-size:clamp(1.9rem,4vw,2.6rem); line-height:1.12; letter-spacing:-.02em; margin:0 0 1.1rem; font-weight:700; text-wrap:balance; }
+h2 { font-size:1.5rem; letter-spacing:-.015em; line-height:1.25; margin:0; text-wrap:balance; }
+.lead { font-size:1.2rem; line-height:1.5; color:var(--ink-2); margin:0 0 1.2rem; max-width:52ch; }
+.prose { max-width:66ch; color:var(--ink-2); }
+.prose p { margin:0 0 1rem; }
+.chips { display:flex; flex-wrap:wrap; gap:.5rem; margin:0 0 2rem; }
+.context { display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:12px; margin:0 0 3rem; }
+.ctx { min-width:0; padding:.9rem 1rem; border-radius:12px; background:var(--surface); border:1px solid var(--line); font-size:.9rem; color:var(--ink-2); line-height:1.55; }
+.ctx p { margin:0; }
+.ctx p + p { margin-top:.5rem; }
+.ctx-label { font-size:.68rem; letter-spacing:.09em; text-transform:uppercase; font-weight:600; color:var(--muted); margin-bottom:.35rem !important; }
+.ctx--why .ctx-label { color:var(--accent); }
+.ctx-note { font-size:.84rem; color:var(--muted); }
+.ctx b { color:var(--ink); font-weight:600; }
+@media (max-width:760px) { .context { grid-template-columns:1fr; } }
+.chip-meta { font:.78rem var(--mono); padding:.3rem .65rem; border:1px solid var(--line); border-radius:999px; background:var(--surface); color:var(--ink-2); }
+.chip-meta b { color:var(--add); font-weight:500; } .chip-meta i { color:var(--del); font-style:normal; }
+section.block { margin:4.5rem 0 0; scroll-margin-top:24px; }
+
+.ba { display:grid; gap:14px; }
+.ba-row { display:grid; grid-template-columns:1fr 28px 1fr; align-items:stretch; }
+.ba-q { grid-column:1/-1; font-size:.8rem; font-weight:600; color:var(--ink); margin:0 0 .45rem; }
+.ba-card { padding:.8rem 1rem; border-radius:12px; font-size:.95rem; line-height:1.5; min-width:0; }
+.ba-card small { display:block; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600; margin-bottom:.25rem; }
+.ba-old { background:var(--panel); color:var(--muted); } .ba-old small { color:var(--muted); }
+.ba-new { background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow); color:var(--ink); } .ba-new small { color:var(--accent); }
+.ba-arrow { display:grid; place-items:center; color:var(--muted); }
+@media (max-width:640px) { .ba-row { grid-template-columns:1fr; gap:6px; } .ba-arrow { display:none; } }
+.unchanged { margin:14px 0 0; padding:.75rem 1rem; border-radius:12px; border:1px dashed var(--line); color:var(--ink-2); font-size:.92rem; }
+.unchanged b { color:var(--ink); }
+
+.fig { margin:1.6rem 0 2rem; }
+.fig-frame { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px; overflow-x:auto; }
+.fig figcaption { font-size:.86rem; color:var(--muted); margin-top:.7rem; padding-left:.2rem; }
+.mermaid { margin:0; background:none; border:0; text-align:center; }
+
+.cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; margin:1.2rem 0 0; }
+.card { display:block; padding:1rem 1.1rem; background:var(--surface); border:1px solid var(--line); border-radius:14px; color:var(--ink); transition:transform .15s, border-color .15s; }
+.card:hover { text-decoration:none; transform:translateY(-2px); border-color:var(--accent); }
+.card .n { font:600 .75rem var(--mono); color:var(--accent); }
+.card strong { display:block; font-size:.98rem; line-height:1.35; margin:.35rem 0 .3rem; }
+.card span.h { font-size:.85rem; color:var(--muted); }
+
+.callout { margin:2rem 0 0; border-radius:14px; background:var(--chg-soft); scroll-margin-top:24px; }
+.callout > summary { list-style:none; cursor:pointer; padding:1rem 1.25rem; display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; }
+.callout > summary::-webkit-details-marker { display:none; }
+.callout-title { display:flex; align-items:center; gap:.5rem; font-weight:600; font-size:.95rem; color:var(--chg); }
+.callout-title::before { content:"!"; display:inline-grid; place-items:center; width:20px; height:20px; border-radius:50%; background:var(--chg); color:var(--bg); font-size:.8rem; font-weight:700; }
+.callout > summary::after { content:""; margin-left:auto; width:8px; height:8px; border-right:2px solid var(--chg); border-bottom:2px solid var(--chg); transform:rotate(45deg); transition:transform .2s; }
+.callout[open] > summary::after { transform:rotate(-135deg); }
+.callout .risks { padding:0 1.25rem 1.25rem; }
+.callout .risks li { background:var(--surface); }
+
+.sec-head { display:flex; align-items:baseline; gap:.9rem; margin-bottom:.9rem; }
+.sec-num { flex:none; font:600 .8rem var(--mono); color:var(--accent); background:var(--accent-soft); padding:.2rem .55rem; border-radius:6px; }
+.before { margin:0 0 .7rem; color:var(--muted); font-size:.94rem; max-width:66ch; }
+.before b, .input b { font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; margin-right:.4rem; }
+.before b { color:var(--muted); }
+.input { margin:0 0 1.1rem; font-size:.94rem; color:var(--ink-2); max-width:66ch; }
+.input b { color:var(--accent); }
+
+.step { margin:1.6rem 0 2rem; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--surface); }
+.step-head { display:flex; gap:.7rem; align-items:baseline; flex-wrap:wrap; padding:.8rem 1.05rem .7rem; border-bottom:1px solid var(--line); }
+.step-tag { font:600 .72rem var(--mono); color:var(--accent); text-transform:uppercase; letter-spacing:.06em; }
+.step-title { font-weight:600; font-size:.97rem; flex:1 1 18rem; min-width:0; }
+.step-path { font:.76rem var(--mono); }
+.step pre { margin:0; padding:1rem 1.1rem; background:var(--code); overflow-x:auto; font:.82rem/1.6 var(--mono); color:var(--ink); }
+.step .why { margin:0; padding:.8rem 1.05rem; font-size:.93rem; color:var(--ink-2); border-top:1px solid var(--line); }
+.kw { color:var(--accent); } .str { color:var(--add); } .sym { color:var(--chg); }
+.example { margin:1.2rem 0; padding:.9rem 1.1rem; border-radius:12px; background:var(--accent-soft); color:var(--ink-2); font-size:.94rem; }
+.example b { color:var(--ink); }
+.proof { display:flex; gap:.6rem; align-items:baseline; margin:1rem 0 0; padding:.6rem .9rem; border-radius:10px; background:var(--add-soft); font-size:.88rem; color:var(--ink-2); }
+.proof::before { content:"✓"; color:var(--add); font-weight:700; }
+.proof--none { background:var(--del-soft); } .proof--none::before { content:"✕"; color:var(--del); }
+.proof b { color:var(--ink); }
+.inferred { display:inline-block; font-size:.7rem; font-weight:600; padding:.05rem .45rem; border-radius:999px; color:var(--muted); border:1px dashed var(--muted); vertical-align:1px; }
+
+.ref-intro { color:var(--muted); font-size:.92rem; margin:.4rem 0 1.2rem; }
+details.acc { border:1px solid var(--line); border-radius:14px; background:var(--surface); margin:0 0 12px; overflow:hidden; }
+details.acc > summary { list-style:none; cursor:pointer; padding:1rem 1.2rem; font-weight:600; display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; }
+details.acc > summary::-webkit-details-marker { display:none; }
+details.acc > summary::after { content:""; margin-left:auto; width:8px; height:8px; border-right:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(45deg); transition:transform .2s; }
+details.acc[open] > summary::after { transform:rotate(-135deg); }
+.count { font:500 .75rem var(--mono); color:var(--muted); background:var(--panel); padding:.1rem .5rem; border-radius:999px; }
+.acc-body { padding:0 1.2rem 1.2rem; }
+.api-group { margin:.4rem 0 .6rem; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+.api-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; margin-bottom:1rem; }
+.api { border:1px solid var(--line); border-radius:12px; padding:.8rem .95rem; background:var(--bg); min-width:0; }
+.api header { display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-bottom:.5rem; }
+.api__name { font:600 .86rem var(--mono); background:none; padding:0; }
+.badge { font-size:.7rem; font-weight:600; padding:.12rem .5rem; border-radius:999px; white-space:nowrap; }
+.badge--new { color:var(--add); background:var(--add-soft); } .badge--chg { color:var(--chg); background:var(--chg-soft); }
+.api p { margin:.35rem 0 0; font-size:.86rem; }
+.pchip { display:inline-block; font:.74rem var(--mono); padding:.12rem .45rem; margin:.15rem .2rem 0 0; border-radius:6px; background:var(--panel); white-space:nowrap; }
+.pchip--add { color:var(--add); background:var(--add-soft); } .pchip--add::before { content:"+ "; }
+.pchip--del { color:var(--del); background:var(--del-soft); text-decoration:line-through; }
+.pchip--opt::after { content:"?"; color:var(--muted); }
+.ret::before { content:"→ "; color:var(--muted); }
+.was { color:var(--del); text-decoration:line-through; }
+.api .note, .legend { color:var(--muted); font-size:.82rem; }
+.err-group { margin:0 0 1.1rem; }
+.err-group h4 { margin:0 0 .5rem; font-size:.9rem; display:flex; gap:.6rem; align-items:baseline; flex-wrap:wrap; }
+.err-group h4 small { font-weight:400; color:var(--muted); font-size:.8rem; }
+.err-list { margin:0; padding:0; list-style:none; border:1px solid var(--line); border-radius:12px; overflow:hidden; counter-reset:e; }
+.err-list li { display:grid; grid-template-columns:13rem minmax(0,1fr); gap:.25rem 1rem; padding:.6rem .9rem; border-top:1px solid var(--line); background:var(--bg); }
+.err-list li:first-child { border-top:0; }
+.err-list.ordered li { counter-increment:e; }
+.err-list.ordered .when::before { content:counter(e); display:inline-grid; place-items:center; width:18px; height:18px; margin-right:.5rem; border-radius:50%; background:var(--panel); color:var(--muted); font-size:.7rem; font-weight:600; }
+.when { font-size:.88rem; color:var(--ink-2); }
+.msg { font:.78rem/1.5 var(--mono); color:var(--del); }
+.msg--gone { text-decoration:line-through; color:var(--muted); }
+@media (max-width:640px) { .err-list li { grid-template-columns:1fr; } }
+.misc { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:10px; }
+.misc section { border:1px solid var(--line); border-radius:12px; background:var(--bg); padding:.9rem 1rem; min-width:0; }
+.misc section.wide { grid-column:1/-1; }
+.misc h4 { margin:0 0 .4rem; font-size:.93rem; }
+.misc p { margin:.3rem 0; font-size:.88rem; color:var(--ink-2); }
+.misc pre { margin:.6rem 0 .2rem; padding:.8rem .9rem; background:var(--code); border-radius:10px; overflow-x:auto; font:.76rem/1.55 var(--mono); }
+.cm { color:var(--muted); }
+.risks { margin:0; padding:0; list-style:none; counter-reset:r; display:grid; gap:10px; }
+.risks li { counter-increment:r; display:grid; grid-template-columns:28px minmax(0,1fr); gap:.8rem; padding:.85rem 1rem; border-radius:12px; background:var(--bg); border:1px solid var(--line); font-size:.9rem; color:var(--ink-2); }
+.risks li::before { content:counter(r); display:grid; place-items:center; width:26px; height:26px; border-radius:8px; background:var(--chg-soft); color:var(--chg); font-weight:700; font-size:.8rem; }
+.risks strong { color:var(--ink); }
+.small { font-size:.88rem; color:var(--muted); }
+footer { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--line); font-size:.82rem; color:var(--muted); }
+.bpmn { display:block; margin:0 auto; width:100%; height:auto; color:var(--ink); font:13px Inter,system-ui,sans-serif; }
+.bpmn text { fill:currentColor; }
+.bpmn .bp { fill:none; stroke:currentColor; stroke-opacity:.45; }
+.bpmn .pl { font-weight:600; }
+.bpmn .bt { fill:var(--panel); stroke:currentColor; stroke-width:1.5; }
+.bpmn .be, .bpmn .bg { fill:var(--panel); stroke:currentColor; stroke-width:1.5; }
+.bpmn .be-end { stroke-width:4; }
+.bpmn .bx, .bpmn .bm { fill:none; stroke:currentColor; stroke-width:2.5; }
+.bpmn .bm { stroke-width:1.2; }
+.bpmn .fs { fill:none; stroke:currentColor; stroke-width:1.5; }
+.bpmn .fm { fill:none; stroke:currentColor; stroke-width:1.2; stroke-dasharray:6 4; }
+.bpmn .nl, .bpmn .fl { font-size:11px; }
+.bpmn .sm { font-size:10px; font-weight:600; }
+.bpmn .st-new .bt, .bpmn .st-new .be, .bpmn .st-new .bg { stroke:var(--add); fill:var(--add-soft); }
+.bpmn .st-new .sm { fill:var(--add); }
+.bpmn .st-changed .bt, .bpmn .st-changed .be, .bpmn .st-changed .bg { stroke:var(--chg); fill:var(--chg-soft); }
+.bpmn .st-changed .sm { fill:var(--chg); }
+.bpmn .st-removed .bt, .bpmn .st-removed .be, .bpmn .st-removed .bg { stroke:var(--del); fill:var(--del-soft); stroke-dasharray:5 4; }
+.bpmn .st-removed .sm { fill:var(--del); }
+.bpmn .fl { paint-order:stroke; stroke:var(--bg); stroke-width:4px; stroke-linejoin:round; }
+
+</style>
+
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+  <p>On this page</p>
+  <a href="#top">Summary</a>
+  <a href="#ba">Before and after</a>
+  <a href="#flow">The whole process</a>
+  <a href="#key" class="sub">1 · The key</a>
+  <a href="#apply" class="sub">2 · Server checks</a>
+  <a href="#card" class="sub">3 · The card</a>
+  <a href="#dialog" class="sub">4 · The dialog</a>
+  <a href="#batch" class="sub">5 · Many campaigns</a>
+  <a href="#ref">Reference</a>
+</nav>
+
+<main>
+<header id="top">
+  <p class="eyebrow"><a href="https://remerge.atlassian.net/browse/DSP-2188">DSP-2188</a> · <a href="https://github.com/remerge/api/pull/6008">Pull request #6008</a></p>
+  <h1>Let only the person approve MCP previews</h1>
+  <p class="lead">Only a person can now create campaigns through MCP: creating or cancelling a preview takes a key that only the person’s interface receives. The agent can prepare campaigns but no longer approve them.</p>
+  <div class="chips">
+    <a class="chip-meta" href="https://github.com/remerge/api/pull/6008">remerge/api#6008</a>
+    <span class="chip-meta">a74e0dd → 1737258</span>
+    <span class="chip-meta">105 files · <b>+4982</b> <i>−407</i></span>
+  </div>
+  <div class="context">
+    <div class="ctx ctx--why">
+      <p class="ctx-label">Why</p>
+      <p>Part of the <a href="https://remerge.atlassian.net/browse/DSP-2188">Admin MCP GA bet</a>: one shared preview for every tool that changes data. The <a href="https://github.com/remerge/api/pull/6008">PR</a> adds that only the person decides.</p>
+      <p class="ctx-note"><span class="inferred">inference</span> The old 3-second wait never proved a person decided: the agent could just wait.</p>
+    </div>
+    <div class="ctx">
+      <p class="ctx-label">Client</p>
+      <p>The app the chat runs in: Claude Desktop, the Code tab, ChatGPT or Claude Code in a terminal.</p>
+    </div>
+    <div class="ctx">
+      <p class="ctx-label">Example</p>
+      <p>Ticket <b>AO-35520</b> with two campaigns, “Acme RT DE” and “Acme RT AT”, followed through every section.</p>
+    </div>
+  </div>
+</header>
+
+<section class="block" id="ba" style="margin-top:0">
+  <div class="ba">
+    <div class="ba-row"><p class="ba-q">Who creates the campaigns?</p>
+      <div class="ba-card ba-old"><small>Before</small>The agent called <code>create_campaign</code> itself whenever it decided the person agreed.</div><div class="ba-arrow" aria-hidden="true">→</div>
+      <div class="ba-card ba-new"><small>After</small>Campaigns are created only when the person presses Create on the card or Accept in the dialog.</div></div>
+    <div class="ba-row"><p class="ba-q">What stops the agent from deciding for the person?</p>
+      <div class="ba-card ba-old"><small>Before</small>Almost nothing: the server only refused a create that came less than 3 seconds after the preview.</div><div class="ba-arrow" aria-hidden="true">→</div>
+      <div class="ba-card ba-new"><small>After</small>The server requires a key. Only the person’s interface gets it; the agent never sees it.</div></div>
+    <div class="ba-row"><p class="ba-q">How many campaigns does one preview cover?</p>
+      <div class="ba-card ba-old"><small>Before</small>One. The campaigns of a ticket were approved one by one.</div><div class="ba-arrow" aria-hidden="true">→</div>
+      <div class="ba-card ba-new"><small>After</small>Every campaign of the ticket, up to 50. One decision for all: they are created together or not at all.</div></div>
+    <div class="ba-row"><p class="ba-q">How does the agent learn what was created?</p>
+      <div class="ba-card ba-old"><small>Before</small>From the reply to its own <code>create_campaign</code> call.</div><div class="ba-arrow" aria-hidden="true">→</div>
+      <div class="ba-card ba-new"><small>After</small>The button creates them, so the agent asks the new <code>preview_status</code> tool for the outcome.</div></div>
+  </div>
+  <p class="unchanged"><b>Unchanged:</b> which campaigns can be created and who may create them, the 30-minute preview lifetime, and the find_ tools for looking up records. Campaigns are still created paused.</p>
+</section>
+
+<section class="block" id="flow">
+  <p class="eyebrow">The whole process</p>
+  <h2>The key goes to the person; the agent gets only the preview and the outcome</h2>
+  <figure class="fig"><div class="fig-frame"><svg class="bpmn" viewBox="0 0 982 440" style="max-width:982px" role="img" aria-label="BPMN"><defs><marker id="overview-en-seq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker><marker id="overview-en-msg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--bg)" stroke="currentColor"/></marker><marker id="overview-en-dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7"><circle cx="5" cy="5" r="4" style="fill:var(--bg)" stroke="currentColor"/></marker></defs><rect class="bp" x="6" y="6" width="970" height="120"/><line class="bp" x1="46" y1="6" x2="46" y2="126"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 66) rotate(-90)"><tspan x="0" y="0">Agent</tspan></text><rect class="bp" x="6" y="160" width="970" height="120"/><line class="bp" x1="46" y1="160" x2="46" y2="280"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 220) rotate(-90)"><tspan x="0" y="0">Server</tspan></text><rect class="bp" x="6" y="314" width="970" height="120"/><line class="bp" x1="46" y1="314" x2="46" y2="434"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 374) rotate(-90)"><tspan x="0" y="0">Person</tspan></text><path class="fs" d="M153 66 L224 66" marker-end="url(#overview-en-seq)"/><path class="fs" d="M348 66 L419 66" marker-end="url(#overview-en-seq)"/><path class="fs" d="M453 66 L674 66" marker-end="url(#overview-en-seq)"/><path class="fs" d="M798 66 L869 66" marker-end="url(#overview-en-seq)"/><path class="fm" d="M286 96 L286 190" marker-start="url(#overview-en-dot)" marker-end="url(#overview-en-msg)"/><path class="fm" d="M286 250 L286 304 L436 304 L436 344" marker-start="url(#overview-en-dot)" marker-end="url(#overview-en-msg)"/><path class="fs" d="M498 374 L524 374" marker-end="url(#overview-en-seq)"/><path class="fm" d="M586 344 L586 250" marker-start="url(#overview-en-dot)" marker-end="url(#overview-en-msg)"/><path class="fs" d="M648 220 L674 220" marker-end="url(#overview-en-seq)"/><path class="fm" d="M736 190 L736 96" marker-start="url(#overview-en-dot)" marker-end="url(#overview-en-msg)"/><circle class="be be-start" cx="136.0" cy="66.0" r="17.0"/><text class="nl" text-anchor="middle" dominant-baseline="middle"><tspan x="136" y="99">Ticket</tspan></text><rect class="bt" x="224.0" y="36.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="286" y="59">Preview all</tspan><tspan x="286" y="73">campaigns</tspan></text><g class="st-new"><circle class="be be-catch" cx="436.0" cy="66.0" r="17.0"/><circle class="be" cx="436.0" cy="66.0" r="13.0"/><rect class="bm" x="428.0" y="60.5" width="16" height="11"/><path class="bm" d="M428.0 60.5 L436.0 67.0 L444.0 60.5"/><text class="nl" text-anchor="middle" dominant-baseline="middle"><tspan x="436" y="92">Waits for</tspan><tspan x="436" y="106">decision</tspan></text><text class="sm" x="453" y="43" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="674.0" y="36.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="736" y="66">preview_status</tspan></text><text class="sm" x="798" y="30" text-anchor="end">«new»</text></g><circle class="be be-end" cx="886.0" cy="66.0" r="17.0"/><text class="nl" text-anchor="middle" dominant-baseline="middle"><tspan x="886" y="99">Done</tspan></text><g class="st-changed"><rect class="bt" x="224.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="286" y="213">Store preview,</tspan><tspan x="286" y="227">derive key</tspan></text><text class="sm" x="348" y="184" text-anchor="end">«changed»</text></g><g class="st-new"><rect class="bt" x="524.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="586" y="220">Check key</tspan></text><text class="sm" x="648" y="184" text-anchor="end">«new»</text></g><rect class="bt" x="674.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="736" y="213">Create all</tspan><tspan x="736" y="227">campaigns</tspan></text><g class="st-new"><rect class="bt" x="374.0" y="344.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="436" y="374">Reviews preview</tspan></text><text class="sm" x="498" y="338" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="524.0" y="344.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="586" y="374">Presses Create</tspan></text><text class="sm" x="648" y="338" text-anchor="end">«new»</text></g><text class="fl" text-anchor="start" dominant-baseline="middle"><tspan x="293" y="143">preview_campaign</tspan></text><text class="fl" text-anchor="middle" dominant-baseline="middle"><tspan x="361" y="294">preview + key</tspan></text><text class="fl" text-anchor="start" dominant-baseline="middle"><tspan x="593" y="297">key</tspan></text><text class="fl" text-anchor="start" dominant-baseline="middle"><tspan x="743" y="143">results</tspan></text></svg></div>
+    <figcaption>Green «new» marks new steps, amber «changed» marks changed ones. Dashed arrows are messages between participants; solid arrows are steps inside one participant.</figcaption></figure>
+
+  <div class="cards">
+    <a class="card" href="#key"><span class="n">01</span><strong>How the key reaches only the person</strong><span class="h">An HMAC of the token, sent in the reply’s hidden part.</span></a>
+    <a class="card" href="#apply"><span class="n">02</span><strong>What the server checks before creating</strong><span class="h">Lock, status, key, rollback.</span></a>
+    <a class="card" href="#card"><span class="n">03</span><strong>How the card works</strong><span class="h">Buttons, warning ticks, the chat fallback.</span></a>
+    <a class="card" href="#dialog"><span class="n">04</span><strong>How the Claude Code dialog works</strong><span class="h">Accept / Decline; the key never leaves the server.</span></a>
+    <a class="card" href="#batch"><span class="n">05</span><strong>How one preview covers many campaigns</strong><span class="h">Up to 50 campaigns, all or nothing.</span></a>
+  </div>
+
+  <details class="callout" id="risks">
+    <summary><span class="callout-title">Look at in review</span><span class="count">6 risks · from reading the code</span></summary>
+    <ol class="risks">
+      <li><div><strong>The card’s key depends on the client.</strong> <code>preview_card_key</code> returns the key in a normal reply. It is marked app-only, but a client that ignores the mark lets the agent take the key and create campaigns without the person.</div></li>
+      <li><div><strong>One key for Create and Cancel.</strong> On the fallback path the key lands in the chat, and the agent could technically make the opposite decision. Separate keys would close this.</div></li>
+      <li><div><strong>Only the browser checks the card’s ticks.</strong> In the Claude Code dialog the server checks every tick itself. From the card it receives only the key, so the two paths give different guarantees.</div></li>
+      <li><div><strong>Campaigns are rebuilt at create time.</strong> The server rebuilds them from the agent’s input with current defaults and compares only the warnings. If a default changed within the 30 minutes, for example in the budget pool, the campaign is created differently from what the person saw.</div></li>
+      <li><div><strong>The preview may leave traces outside the database.</strong> <span class="inferred">inference</span> The preview really saves the campaigns and rolls the transaction back. The rollback does not undo external calls or background jobs from model callbacks, if any; not checked.</div></li>
+      <li><div><strong>The session header never expires.</strong> <code>Mcp-Session-Id</code> is signed without an expiry. It grants no access, only tells the server which interface the client has; the worst case is the client getting the wrong path.</div></li>
+    </ol>
+  </details>
+</section>
+
+<section class="block" id="key">
+  <div class="sec-head"><span class="sec-num">01</span><h2>How the key reaches only the person</h2></div>
+  <p class="before"><b>Before</b>There was no key. The preview returned JSON, and the agent decided when to call create.</p>
+  <p class="input"><b>AO-35520</b>The preview of two campaigns gives the agent a table with the token, and gives the card the key as well.</p>
+  <div class="prose">
+    <p>The key is an HMAC of the preview token under the server secret: nothing needs to be stored, and the token alone cannot produce it. An MCP reply has three parts: text, data, and a hidden part called <code>_meta</code>. The client shows the model the text and the data and passes <code>_meta</code> only to the card, so that is where the server puts the key.</p>
+  </div>
+  <figure class="fig"><div class="fig-frame"><svg class="bpmn" viewBox="0 0 382 440" style="max-width:382px" role="img" aria-label="BPMN"><defs><marker id="key-en-seq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker><marker id="key-en-msg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--bg)" stroke="currentColor"/></marker><marker id="key-en-dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7"><circle cx="5" cy="5" r="4" style="fill:var(--bg)" stroke="currentColor"/></marker></defs><rect class="bp" x="6" y="6" width="370" height="120"/><line class="bp" x1="46" y1="6" x2="46" y2="126"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 66) rotate(-90)"><tspan x="0" y="0">Server</tspan></text><rect class="bp" x="6" y="160" width="370" height="120"/><line class="bp" x1="46" y1="160" x2="46" y2="280"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 220) rotate(-90)"><tspan x="0" y="0">Client</tspan></text><rect class="bp" x="6" y="314" width="370" height="120"/><line class="bp" x1="46" y1="314" x2="46" y2="434"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 374) rotate(-90)"><tspan x="0" y="0">Agent</tspan></text><path class="fm" d="M136 96 L136 190" marker-start="url(#key-en-dot)" marker-end="url(#key-en-msg)"/><path class="fs" d="M198 220 L224 220" marker-end="url(#key-en-seq)"/><path class="fm" d="M136 250 L136 344" marker-start="url(#key-en-dot)" marker-end="url(#key-en-msg)"/><g class="st-new"><rect class="bt" x="74.0" y="36.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="136" y="59">Reply: preview +</tspan><tspan x="136" y="73">_meta with key</tspan></text><text class="sm" x="198" y="30" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="74.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="136" y="220">Split reply</tspan></text><text class="sm" x="198" y="184" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="224.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="286" y="220">Card keeps key</tspan></text><text class="sm" x="348" y="184" text-anchor="end">«new»</text></g><rect class="bt" x="74.0" y="344.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="136" y="367">Sees preview and</tspan><tspan x="136" y="381">token</tspan></text><text class="fl" text-anchor="start" dominant-baseline="middle"><tspan x="143" y="297">no key</tspan></text></svg></div>
+    <figcaption>The key reaches the card and never reaches the model.</figcaption></figure>
+
+  <div class="step">
+    <div class="step-head"><span class="step-tag">Step 1</span><span class="step-title">The key is derived from the token and compared in constant time</span>
+      <a class="step-path" href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/models/change_request.rb#L55-L63">models/change_request.rb:55</a></div>
+<pre><span class="kw">def</span> approval_key
+  OpenSSL::HMAC.hexdigest(<span class="str">'SHA256'</span>, Rails.application.secret_key_base, <span class="str">"#{APPROVAL_KEY_PURPOSE}#{token}"</span>)
+<span class="kw">end</span>
+
+<span class="kw">def</span> approval_key_matches?(given_key)
+  <span class="kw">return</span> <span class="sym">false</span> <span class="kw">if</span> given_key.blank?
+
+  ActiveSupport::SecurityUtils.secure_compare(given_key, approval_key)
+<span class="kw">end</span></pre>
+    <p class="why">The agent knows the token, but without <code>secret_key_base</code> it cannot get the key.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><span class="step-tag">Step 2</span><span class="step-title">The only place the key leaves the server</span>
+      <a class="step-path" href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/server/preview_resource.rb#L35-L37">server/preview_resource.rb:35</a></div>
+<pre><span class="kw">def</span> self.result_meta(approval_key)
+  tool_meta.merge(APPROVAL_KEY_META =&gt; approval_key)
+<span class="kw">end</span></pre>
+    <p class="why">If the client did not pass <code>_meta</code> to the card, the card asks <code>preview_card_key</code> for the key — an app-only tool the client hides from the model.</p>
+  </div>
+  <p class="proof"><span><b>Proven by:</b> <a href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/spec/server/change_requests_spec.rb#L128">change_requests_spec — the key only in _meta</a>, <a href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/spec/requests/preview_card_spec.rb#L90">preview_card_spec — no create or cancel without the key</a>.</span></p>
+</section>
+
+<section class="block" id="apply">
+  <div class="sec-head"><span class="sec-num">02</span><h2>What the server checks before creating</h2></div>
+  <p class="before"><b>Before</b>The server checked the token, the expiry and the 3-second wait, and created one campaign.</p>
+  <p class="input"><b>AO-35520</b>Create with a valid key saves “Acme RT DE” and “Acme RT AT” in one transaction. A second identical call arriving at the same moment waits, then gets “token already used” — no duplicates.</p>
+  <div class="prose">
+    <p><code>create_campaign</code> first locks the preview row in the database (<code>SELECT … FOR UPDATE</code>): until this call finishes, any other call with the same token waits. The server then checks that the preview is still open and the key is right, rebuilds the campaigns from the stored input and saves them all at once. If any one fails to save, or the warnings changed since the preview, everything rolls back.</p>
+    <p>If the preview had warnings, the call carries their fingerprint, <code>warnings_digest</code>. It tells the server the create relies on the same warnings the person saw.</p>
+  </div>
+  <figure class="fig"><div class="fig-frame">
+<pre class="mermaid">
+flowchart TD
+  classDef new fill:#e7f6ec,stroke:#15803d
+  start(["create_campaign"]) --> open{"Still open?"}
+  open -- "no" --> e1(["Error: created, cancelled or expired"])
+  open -- "yes" --> key{"Key valid? «new»"}
+  key -- "no" --> e2(["Error: only the person can apply"])
+  key -- "yes" --> save["Rebuild and save all campaigns"]
+  save --> ok{"All saved?"}
+  ok -- "no" --> e3(["Rollback: nothing created"])
+  ok -- "yes" --> done(["Commit: campaigns created"])
+  class key new
+</pre></div>
+    <figcaption>“All saved” means every campaign saved and the warnings match what the person saw. The key check is the new gate.</figcaption></figure>
+
+  <figure class="fig"><div class="fig-frame">
+<pre class="mermaid">
+stateDiagram-v2
+  [*] --> open : preview
+  open --> applied : Create + key
+  open --> declined : Cancel + key «new»
+  open --> expired : 30 minutes
+  applied --> [*]
+  declined --> [*]
+  expired --> [*]
+</pre></div>
+    <figcaption>The status is not stored: it is derived from when the preview was created, cancelled or expired. “Declined” is new.</figcaption></figure>
+
+  <div class="step">
+    <div class="step-head"><span class="step-tag">Step 3</span><span class="step-title">The key is checked last</span>
+      <a class="step-path" href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/server/change_requests.rb#L124-L131">server/change_requests.rb:124</a></div>
+<pre><span class="kw">def</span> token_error(request, approval_key)
+  <span class="kw">return</span> Responses.error(<span class="str">'unknown token; preview again'</span>) <span class="kw">unless</span> request
+  <span class="kw">return</span> already_used(request) <span class="kw">if</span> request.applied?
+  <span class="kw">return</span> Responses.error(<span class="str">'preview declined; preview again'</span>) <span class="kw">if</span> request.declined?
+  <span class="kw">return</span> Responses.error(<span class="str">'preview expired; preview again'</span>) <span class="kw">if</span> request.expired?
+
+  not_approved <span class="kw">unless</span> request.approval_key_matches?(approval_key)
+<span class="kw">end</span></pre>
+    <p class="why">A repeat call after a successful create gets links to what was created, not “no key”. The old 3-second check is gone.</p>
+  </div>
+  <p class="proof"><span><b>Proven by:</b> <a href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/spec/server/change_requests_spec.rb#L78">change_requests_spec — apply without the key is refused, the token stays usable</a>. Two concurrent calls are not tested.</span></p>
+</section>
+
+<section class="block" id="card">
+  <div class="sec-head"><span class="sec-num">03</span><h2>How the card works</h2></div>
+  <p class="before"><b>Before</b>There was no card. The agent retold the preview as text and waited for the person’s answer in the chat.</p>
+  <p class="input"><b>AO-35520</b>The card “Create 2 campaigns” shows the shared fields once and the differences per campaign; after Create it says “Created 2 campaigns, paused.”</p>
+  <div class="prose">
+    <p>Claude Desktop, the Code tab and ChatGPT draw the preview as a card with Cancel and Create buttons. Create stays disabled until every warning is ticked. Normally the card calls <code>create_campaign</code> with the key itself.</p>
+    <p>Some clients do not let the card call tools. Then the card prepares a chat message, “Approve preview &lt;token&gt;, key &lt;key&gt;”. The person sends it like any other message, and the agent reads the key from it and calls <code>create_campaign</code>. The key reaches the agent only after the person has decided.</p>
+  </div>
+  <figure class="fig"><div class="fig-frame"><svg class="bpmn" viewBox="0 0 1132 532" style="max-width:1132px" role="img" aria-label="BPMN"><defs><marker id="card-en-seq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker><marker id="card-en-msg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--bg)" stroke="currentColor"/></marker><marker id="card-en-dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7"><circle cx="5" cy="5" r="4" style="fill:var(--bg)" stroke="currentColor"/></marker></defs><rect class="bp" x="6" y="6" width="1120" height="120"/><line class="bp" x1="46" y1="6" x2="46" y2="126"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 66) rotate(-90)"><tspan x="0" y="0">Person</tspan></text><rect class="bp" x="6" y="160" width="1120" height="212"/><line class="bp" x1="46" y1="160" x2="46" y2="372"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 266) rotate(-90)"><tspan x="0" y="0">Card</tspan></text><rect class="bp" x="6" y="406" width="1120" height="120"/><line class="bp" x1="46" y1="406" x2="46" y2="526"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 466) rotate(-90)"><tspan x="0" y="0">Server</tspan></text><path class="fm" d="M136 96 L136 150 L286 150 L286 197" marker-start="url(#card-en-dot)" marker-end="url(#card-en-msg)"/><path class="fs" d="M309 220 L374 220" marker-end="url(#card-en-seq)"/><path class="fs" d="M286 243 L286 312 L674 312" marker-end="url(#card-en-seq)"/><path class="fm" d="M436 250 L436 396 L586 396 L586 436" marker-start="url(#card-en-dot)" marker-end="url(#card-en-msg)"/><path class="fm" d="M586 436 L586 382 L1036 382 L1036 250" marker-start="url(#card-en-dot)" marker-end="url(#card-en-msg)"/><path class="fm" d="M736 282 L736 96" marker-start="url(#card-en-dot)" marker-end="url(#card-en-msg)"/><g class="st-new"><rect class="bt" x="74.0" y="36.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="136" y="59">Ticks warnings,</tspan><tspan x="136" y="73">presses Create</tspan></text><text class="sm" x="198" y="30" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="674.0" y="36.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="736" y="66">Sends message</tspan></text><text class="sm" x="798" y="30" text-anchor="end">«new»</text></g><g class="st-new"><polygon class="bg" points="286.0,197.0 309.0,220.0 286.0,243.0 263.0,220.0"/><path class="bx" d="M277.0 211.0 L295.0 229.0 M295.0 211.0 L277.0 229.0"/><text class="nl" text-anchor="end" dominant-baseline="middle"><tspan x="255" y="213">Client allows</tspan><tspan x="255" y="227">tool call?</tspan></text><text class="sm" x="309" y="191" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="374.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="436" y="213">create_campaign</tspan><tspan x="436" y="227">with key</tspan></text><text class="sm" x="498" y="184" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="674.0" y="282.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="736" y="305">Put key message</tspan><tspan x="736" y="319">in chat</tspan></text><text class="sm" x="798" y="276" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="974.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="1036" y="220">Show outcome</tspan></text><text class="sm" x="1098" y="184" text-anchor="end">«new»</text></g><rect class="bt" x="524.0" y="436.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="586" y="459">Check key,</tspan><tspan x="586" y="473">create</tspan></text><text class="fl" text-anchor="middle" dominant-baseline="middle"><tspan x="342" y="210">yes</tspan></text><text class="fl" text-anchor="start" dominant-baseline="middle"><tspan x="293" y="278">no</tspan></text><text class="fl" text-anchor="middle" dominant-baseline="middle"><tspan x="811" y="372">campaigns</tspan></text><text class="fl" text-anchor="start" dominant-baseline="middle"><tspan x="743" y="189">agent calls create</tspan></text></svg></div>
+    <figcaption>On the fallback path the agent gets the key, but only after the person’s decision.</figcaption></figure>
+  <p class="proof proof--none"><span><b>Not covered:</b> the card’s behavior in the browser (<code>bridge.js</code>) — buttons, ticks, the fallback — has no specs. Server side: <a href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/spec/requests/preview_card_spec.rb#L90">preview_card_spec</a>.</span></p>
+</section>
+
+<section class="block" id="dialog">
+  <div class="sec-head"><span class="sec-num">04</span><h2>How the Claude Code dialog works</h2></div>
+  <p class="before"><b>Before</b>There was no dialog; the terminal client used the same text path as everyone else.</p>
+  <p class="input"><b>AO-35520</b>The dialog shows a row per campaign and a tick box per warning; Accept with every box ticked creates both.</p>
+  <div class="prose">
+    <p>Claude Code in a terminal cannot draw the card, but it can show forms. The agent calls <code>create_campaign</code> without a key, and instead of an error the server asks the client to show an Accept / Decline dialog with the preview fields and a tick box for each warning. The client sends the person’s answer to the server itself, bypassing the agent.</p>
+    <p>Here the key never leaves the server: the server derives it from the token, as it did for the preview, and fills it in itself when Accept arrives. The agent cannot skip the dialog — without a key the create is refused, and an answer counts only for the preview whose token the client returns with it.</p>
+  </div>
+  <figure class="fig"><div class="fig-frame"><svg class="bpmn" viewBox="0 0 832 532" style="max-width:832px" role="img" aria-label="BPMN"><defs><marker id="dialog-en-seq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="currentColor"/></marker><marker id="dialog-en-msg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--bg)" stroke="currentColor"/></marker><marker id="dialog-en-dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="7" markerHeight="7"><circle cx="5" cy="5" r="4" style="fill:var(--bg)" stroke="currentColor"/></marker></defs><rect class="bp" x="6" y="6" width="820" height="120"/><line class="bp" x1="46" y1="6" x2="46" y2="126"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 66) rotate(-90)"><tspan x="0" y="0">Agent</tspan></text><rect class="bp" x="6" y="160" width="820" height="212"/><line class="bp" x1="46" y1="160" x2="46" y2="372"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 266) rotate(-90)"><tspan x="0" y="0">Server</tspan></text><rect class="bp" x="6" y="406" width="820" height="120"/><line class="bp" x1="46" y1="406" x2="46" y2="526"/><text class="pl" text-anchor="middle" dominant-baseline="middle" transform="translate(26 466) rotate(-90)"><tspan x="0" y="0">Claude Code</tspan></text><path class="fm" d="M136 96 L136 190" marker-start="url(#dialog-en-dot)" marker-end="url(#dialog-en-msg)"/><path class="fm" d="M136 250 L136 396 L286 396 L286 436" marker-start="url(#dialog-en-dot)" marker-end="url(#dialog-en-msg)"/><path class="fs" d="M348 466 L374 466" marker-end="url(#dialog-en-seq)"/><path class="fm" d="M436 436 L436 382 L586 382 L586 243" marker-start="url(#dialog-en-dot)" marker-end="url(#dialog-en-msg)"/><path class="fs" d="M609 220 L674 220" marker-end="url(#dialog-en-seq)"/><path class="fs" d="M586 243 L586 312 L719 312" marker-end="url(#dialog-en-seq)"/><path class="fm" d="M736 190 L736 96" marker-start="url(#dialog-en-dot)" marker-end="url(#dialog-en-msg)"/><rect class="bt" x="74.0" y="36.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="136" y="59">create_campaign</tspan><tspan x="136" y="73">without key</tspan></text><rect class="bt" x="674.0" y="36.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="736" y="66">Gets campaigns</tspan></text><g class="st-new"><rect class="bt" x="74.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="136" y="213">Return dialog</tspan><tspan x="136" y="227">form</tspan></text><text class="sm" x="198" y="184" text-anchor="end">«new»</text></g><g class="st-new"><polygon class="bg" points="586.0,197.0 609.0,220.0 586.0,243.0 563.0,220.0"/><path class="bx" d="M577.0 211.0 L595.0 229.0 M595.0 211.0 L577.0 229.0"/><text class="nl" text-anchor="end" dominant-baseline="middle"><tspan x="555" y="213">Accept, all</tspan><tspan x="555" y="227">ticked?</tspan></text><text class="sm" x="609" y="191" text-anchor="end">«new»</text></g><rect class="bt" x="674.0" y="190.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="736" y="213">Create with</tspan><tspan x="736" y="227">server key</tspan></text><g class="st-new"><circle class="be be-end" cx="736.0" cy="312.0" r="17.0"/><text class="nl" text-anchor="middle" dominant-baseline="middle"><tspan x="736" y="345">Nothing created</tspan></text><text class="sm" x="753" y="289" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="224.0" y="436.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="286" y="459">Show Accept /</tspan><tspan x="286" y="473">Decline</tspan></text><text class="sm" x="348" y="430" text-anchor="end">«new»</text></g><g class="st-new"><rect class="bt" x="374.0" y="436.0" width="124" height="60" rx="10"/><text class="" text-anchor="middle" dominant-baseline="middle"><tspan x="436" y="459">Person ticks,</tspan><tspan x="436" y="473">accepts</tspan></text><text class="sm" x="498" y="430" text-anchor="end">«new»</text></g><text class="fl" text-anchor="middle" dominant-baseline="middle"><tspan x="211" y="386">input_required</tspan></text><text class="fl" text-anchor="middle" dominant-baseline="middle"><tspan x="511" y="372">answer</tspan></text><text class="fl" text-anchor="middle" dominant-baseline="middle"><tspan x="642" y="210">yes</tspan></text><text class="fl" text-anchor="start" dominant-baseline="middle"><tspan x="593" y="278">no</tspan></text><text class="fl" text-anchor="start" dominant-baseline="middle"><tspan x="743" y="143">campaigns</tspan></text></svg></div>
+    <figcaption>Accept without every tick creates nothing; closing the dialog leaves the preview open.</figcaption></figure>
+
+  <div class="step">
+    <div class="step-head"><span class="step-tag">Step 4</span><span class="step-title">Accept counts only when every warning is ticked</span>
+      <a class="step-path" href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/server/change_requests/dialog.rb#L81-L83">change_requests/dialog.rb:81</a></div>
+<pre><span class="kw">def</span> warnings_ticked?(request, content)
+  Preview::DialogForm.warning_keys(request.warnings.size).all? { |key| content[key] == <span class="sym">true</span> }
+<span class="kw">end</span></pre>
+    <p class="why">A client with neither a card nor forms gets “only the person can apply this preview”, and nothing is created.</p>
+  </div>
+  <p class="proof"><span><b>Proven by:</b> <a href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/spec/requests/create_campaign_dialog_spec.rb#L63">create_campaign_dialog_spec — Accept creates every campaign</a>, <a href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/spec/requests/create_campaign_dialog_spec.rb#L129">an answer for another preview is refused</a>.</span></p>
+</section>
+
+<section class="block" id="batch">
+  <div class="sec-head"><span class="sec-num">05</span><h2>How one preview covers many campaigns</h2></div>
+  <p class="before"><b>Before</b>One preview meant one campaign, each approved separately.</p>
+  <div class="prose">
+    <p><code>preview_campaign</code> now takes a <code>campaigns</code> array: up to 50 campaigns of one organization. All of them share one token, one card and one decision. Global experiments are still previewed one at a time; the shared code handles a list in both cases.</p>
+  </div>
+  <figure class="fig"><div class="fig-frame">
+<pre class="mermaid">
+classDiagram
+  class Operation {
+    +inputs(input) «new»
+    +listed?() «new»
+  }
+  class CampaignCreateOperation {
+    RECORDS_KEY = campaigns «new»
+  }
+  class ChangeRequest {
+    results «new»
+    declined_at «new»
+  }
+  Operation &lt;|-- CampaignCreateOperation
+  ChangeRequests --> Operation : uses
+  ChangeRequests --> ChangeRequest : locks
+</pre></div>
+    <figcaption><code>Operation</code> describes one kind of record. When it sets <code>RECORDS_KEY</code>, the server reads a list of records from the input, otherwise one. <code>ChangeRequest</code> now remembers every record it created and the cancellation.</figcaption></figure>
+
+  <div class="step">
+    <div class="step-head"><span class="step-tag">Step 5</span><span class="step-title">Save every campaign, even after the first failure</span>
+      <a class="step-path" href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/server/change_requests.rb#L197-L199">server/change_requests.rb:197</a></div>
+<pre><span class="kw">def</span> save_all(records)
+  records.map(&amp;<span class="sym">:save</span>).all?
+<span class="kw">end</span></pre>
+    <p class="why"><code>all?(&amp;:save)</code> would stop at the first failure; <code>map</code> saves each one, so the error names every invalid campaign.</p>
+  </div>
+  <div class="example"><b>Example.</b> AO-35520 with “Acme RT DE” and “Acme RT AT”. If the second is invalid, the first rolls back too and the preview stays open. Two campaigns with the same name raise a warning, not an error.</div>
+  <p class="proof"><span><b>Proven by:</b> <a href="https://github.com/remerge/api/blob/173725888582b2540e32f86fdc978d40de6236c0/app/packs/mcp_server/spec/server/change_requests_spec.rb#L196">change_requests_spec — “several campaigns in one preview”</a>: one token, all or nothing, the 50 limit, one organization.</span></p>
+</section>
+
+<section class="block" id="ref">
+  <p class="eyebrow">For review and maintenance</p>
+  <h2>Reference</h2>
+  <p class="ref-intro">The specifics a reviewer checks against the code. You do not need them to understand the change.</p>
+
+  <details class="acc"><summary>Tools <span class="count">3 new · 4 changed</span></summary><div class="acc-body">
+    <p class="api-group">New</p>
+    <div class="api-grid">
+      <article class="api"><header><code class="api__name">decline_preview</code><span class="badge badge--new">new</span></header>
+        <p><span class="pchip">token</span><span class="pchip">approval_key</span></p><p class="ret">preview cancelled</p>
+        <p class="note">The card calls it when the person presses Cancel. Without the key it changes nothing.</p></article>
+      <article class="api"><header><code class="api__name">preview_status</code><span class="badge badge--new">new</span></header>
+        <p><span class="pchip">token</span></p><p class="ret">open / applied / declined / expired + created records</p>
+        <p class="note">The agent asks how a preview ended. Changes nothing.</p></article>
+      <article class="api"><header><code class="api__name">preview_card_key</code><span class="badge badge--new">new</span></header>
+        <p><span class="pchip">token</span></p><p class="ret">the key</p>
+        <p class="note">The card’s fallback when the client did not pass the key in the reply. Hidden from the model.</p></article>
+    </div>
+    <p class="api-group">Changed</p>
+    <div class="api-grid">
+      <article class="api"><header><code class="api__name">preview_campaign</code><span class="badge badge--chg">changed</span></header>
+        <p><span class="pchip">ticket</span><span class="pchip pchip--add">campaigns[1..50]</span><span class="pchip pchip--del">single-campaign fields</span></p>
+        <p class="ret">text for the agent · data for the card · key in the hidden part</p><p class="ret was">JSON of one campaign</p>
+        <p class="note">Previews every campaign of a ticket at once.</p></article>
+      <article class="api"><header><code class="api__name">create_campaign</code><span class="badge badge--chg">changed</span></header>
+        <p><span class="pchip">token</span><span class="pchip pchip--add pchip--opt">approval_key</span><span class="pchip pchip--opt">warnings_digest</span></p>
+        <p class="ret">every created campaign, or a request to show the dialog</p><p class="ret was">one campaign</p>
+        <p class="note">Without a key: opens the dialog in Claude Code, refuses in other clients.</p></article>
+      <article class="api"><header><code class="api__name">preview_global_experiment</code><span class="badge badge--chg">changed</span></header>
+        <p><span class="pchip">same parameters</span></p>
+        <p class="ret">text for the agent · data for the card · key in the hidden part</p></article>
+      <article class="api"><header><code class="api__name">create_global_experiment</code><span class="badge badge--chg">changed</span></header>
+        <p><span class="pchip">token</span><span class="pchip pchip--add pchip--opt">approval_key</span><span class="pchip pchip--opt">warnings_digest</span></p>
+        <p class="ret">the created experiment, or a request to show the dialog</p>
+        <p class="note">Without a key: opens the dialog in Claude Code, refuses in other clients.</p></article>
+    </div>
+    <p class="legend"><span class="pchip pchip--add">x</span> added · <span class="pchip pchip--del">x</span> removed · <span class="pchip pchip--opt">x</span> optional</p>
+  </div></details>
+
+  <details class="acc"><summary>Errors <span class="count">by call, in check order</span></summary><div class="acc-body">
+    <div class="err-group"><h4><code>preview_campaign</code><small>the preview is not stored</small></h4><ul class="err-list">
+      <li><span class="when">more than 50 campaigns</span><span class="msg">at most 50 campaigns in one preview; split them into several previews</span></li>
+      <li><span class="when">campaigns of several organizations</span><span class="msg">the campaigns belong to several organizations; preview each organization on its own</span></li>
+      <li><span class="when">invalid campaigns</span><span class="msg">invalid campaigns  + errors by each campaign name</span></li></ul></div>
+    <div class="err-group"><h4><code>create_campaign · create_global_experiment</code><small>in check order; nothing is created</small></h4><ul class="err-list ordered">
+      <li><span class="when">token missing or someone else’s</span><span class="msg">unknown token; preview again</span></li>
+      <li><span class="when">already created</span><span class="msg">token already used  + results</span></li>
+      <li><span class="when">cancelled</span><span class="msg">preview declined; preview again</span></li>
+      <li><span class="when">30 minutes passed</span><span class="msg">preview expired; preview again</span></li>
+      <li><span class="when">key missing or wrong</span><span class="msg">only the person can apply this preview: use the card button. Nothing was created</span></li>
+      <li><span class="when">the agent did not confirm it showed the warnings</span><span class="msg">show the warnings to the user, then pass warnings_digest from the preview</span></li>
+      <li><span class="when">warnings changed</span><span class="msg">warnings changed since the preview; nothing was created. Show these warnings to the user, and preview again only after they confirm</span></li></ul></div>
+    <div class="err-group"><h4><code>decline_preview</code><small>nothing changes</small></h4><ul class="err-list ordered">
+      <li><span class="when">token missing or someone else’s</span><span class="msg">unknown token</span></li>
+      <li><span class="when">already created</span><span class="msg">already applied; nothing to decline</span></li>
+      <li><span class="when">already cancelled</span><span class="msg">already declined</span></li>
+      <li><span class="when">30 minutes passed</span><span class="msg">preview expired; nothing to decline</span></li>
+      <li><span class="when">key missing or wrong</span><span class="msg">only the person can cancel this preview: use the card button. Nothing changed</span></li></ul></div>
+    <div class="err-group"><h4><code>Claude Code dialog</code><small>the preview stays open</small></h4><ul class="err-list">
+      <li><span class="when">Accept without every tick</span><span class="msg">the person accepted without ticking every warning; nothing was created. Call again to reopen the dialog</span></li>
+      <li><span class="when">dialog closed</span><span class="msg">the person closed the dialog without deciding; nothing changed and the preview stays open</span></li></ul></div>
+    <div class="err-group"><h4><code>Removed</code><small>together with the 3-second wait</small></h4><ul class="err-list">
+      <li><span class="when">create within 3 seconds</span><span class="msg msg--gone">must be explicitly approved by a human; this token is cancelled, preview again</span></li></ul></div>
+  </div></details>
+
+  <details class="acc"><summary>Other changes <span class="count">6</span></summary><div class="acc-body"><div class="misc">
+    <section class="wide"><h4>What the card gets instead of a campaign’s JSON</h4>
+      <p>The preview became one model shared by the card, the agent’s text and the dialog: fields are named and grouped by tab as in the Admin form, what all campaigns share is shown once, differences per campaign. The key is not in this data.</p>
+<pre>{ "title": "Create 2 campaigns",
+  "ticket": "AO-35520",
+  "shared":  [ { "tab": "Settings", "fields": [ ... ] } ],   <span class="cm">// the same for all</span>
+  "differs": { "records": [ { "name": "Acme RT DE" }, { "name": "Acme RT AT" } ],
+               "fields": [ ... ] },                         <span class="cm">// how they differ</span>
+  "warnings": [ ... ],
+  "token": "...", "apply_tool": "create_campaign" }</pre>
+      <p class="small">Trimmed example; the full field list is in <code>preview/payload.rb</code>.</p></section>
+    <section><h4>What is stored in the database</h4><p><code>mcp_change_requests</code> gets two columns: <code>results</code> — which records the preview created, <code>declined_at</code> — when the person pressed Cancel. The status for <code>preview_status</code> is derived from them.</p></section>
+    <section><h4>How the server knows the client draws the card</h4><p>A client declares its capabilities once, when it connects, while requests arrive without state. The server hands the client a signed <code>Mcp-Session-Id</code> header with those capabilities and reads it on every request.</p></section>
+    <section><h4>What goes into analytics</h4><p>Mixpanel gets the person’s decision events, <code>Preview Accept</code> and <code>Preview Decline</code>, with the time from preview to decision and the number of campaigns.</p></section>
+    <section><h4>Security around it</h4><p><code>approval_key</code> is filtered from logs. The local <code>X-Dev-User</code> sign-in no longer works through a tunnel: otherwise a public tunnel would let anyone sign in as any user.</p></section>
+    <section><h4>What the agent is now told</h4><p>Preview all campaigns of a ticket in one call; when the client draws the card, do not retell the preview and create nothing without the person’s key; after the decision, ask <code>preview_status</code>.</p></section>
+  </div></div></details>
+
+  
+  <details class="acc"><summary>Basis and what was not run</summary><div class="acc-body">
+    <p class="small">Branch <code>DSP-2188-generic-preview</code> at <code>1737258</code> against master <code>a74e0dd</code>, matching the PR head. All 105 files: the PR’s <a href="https://github.com/remerge/api/pull/6008/files">Files changed</a> tab or <code>git diff a74e0dd..1737258</code>. Specs, the benchmark and MCP clients were not run. Diagrams omit tracking, value formatting and card styling.</p>
+  </div></details>
+</section>
+
+<footer>Explainer for PR #6008 · built from the branch at commit 1737258.</footer>
+</main>
+</div>

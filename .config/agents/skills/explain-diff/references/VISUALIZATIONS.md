@@ -1,50 +1,85 @@
 # Diagram choices
 
-Notation follows what is drawn: entities in UML, algorithms as flowcharts, processes in BPMN. Every essential path and label must appear in the HTML without JavaScript.
+Entities in UML and algorithms as flowcharts, drawn in Mermaid; processes in BPMN, drawn by `scripts/bpmn_svg.py`. One idea per diagram, at most 8 nodes (6 for the overview), labels ≤ 5 words. Every diagram marks the delta: new, changed, removed.
 
 ## Entities — UML
 
-| Question | Diagram |
-| --- | --- |
-| What are the parts and who owns what? | Class diagram: three-compartment boxes (name, fields, methods with `+`/`-`), inheritance as hollow triangle, association as plain arrow, dependency as dashed arrow. Label edges: delegates, persists, renders. Follow with a responsibility table. |
-| What states can a record be in? | State diagram: rounded states, filled start circle, ringed end circle, events on transitions, self-loops for "stays open" cases. Say whether state is stored or derived. |
-| What changed in a record's shape? | Class box before/after, or a `field | before | after` table. |
+```mermaid
+classDiagram
+  class ChangeRequest {
+    token
+    declined_at «new»
+    +approval_key() «new»
+  }
+  ChangeRequests --> ChangeRequest : locks
+  Operation <|-- CreateOperation
+```
+
+- Only classes the change adds or alters, 2–4 members each. Mark `«new»`, `«changed»`, `«removed»` in member text.
+- Edges labeled with a verb: uses, locks, builds, renders.
+
+```mermaid
+stateDiagram-v2
+  [*] --> open : preview
+  open --> applied : key ok
+  open --> declined : decline
+  open --> expired : 30 min
+```
+
+- Events on transitions. Say in the caption whether state is stored or derived.
 
 ## Algorithms — flowchart
 
-One call or function, branch by branch.
+```mermaid
+flowchart TB
+  classDef new fill:#e9f7ee,stroke:#15803d
+  classDef changed fill:#fdf3e3,stroke:#b45309
+  classDef removed stroke:#c0352b,stroke-dasharray:5 4
+  start([create with token]) --> found{token found?}
+  found -- no --> e1([unknown token])
+  found -- yes --> key{key matches?}
+  key -- no --> e2([only the person can apply])
+  key -- yes --> save[save all in savepoint] --> done([commit])
+  class key new
+```
 
-- Terminator (stadium) for start and end, rectangle for a step, diamond for a decision, parallelogram for input/output.
-- Decisions phrased as questions; every outgoing edge labeled Yes/No or the value.
-- Merge error exits into one end node. Show rollback and commit as distinct steps.
-- Old vs new on one path: two flowcharts side by side, same input, changed step marked in words.
+Mark the delta with the three `classDef`s and repeat the mark in the label text («new», «changed», «removed»): color alone is not enough.
+
+- `([ ])` start/end, `[ ]` step, `{ }` decision phrased as a question, every exit labeled.
+- Merge error exits when they share a meaning; list exact error strings in the reference layer, not in the diagram.
 
 ## Processes — BPMN
 
-Work across actors over time: human, agent, MCP client, UI, server, DB, background job.
+Real BPMN notation drawn as inline SVG by `scripts/bpmn_svg.py` — no library, no network. Spec:
 
-- One pool per participant system or organization; lanes for roles inside it.
-- Thin circle start event, thick circle end event, double-ring intermediate event (timer for TTL, message for a callback).
-- Rounded rectangle tasks named verb + object.
-- Gateways as diamonds: `×` exclusive, `+` parallel. Label each outgoing flow.
-- Solid arrows for sequence flow inside a pool; dashed arrows with an open circle tail for message flow between pools, labeled with the call (`tools/call`, `create_campaign`).
-- Concurrency: two lanes of the same request type meeting at the lock; the waiting lane shows an intermediate event until the lock is released.
-- Trust boundary: put what each party receives on the message flow (payload with or without key); add a "who sees what" table if the flow gets crowded.
+```json
+{"id": "card",
+ "pools": [{"id": "human", "name": "Person"}, {"id": "card", "name": "Card"}, {"id": "server", "name": "Server"}],
+ "nodes": [
+  {"id": "p1", "pool": "human", "type": "task", "label": "Press Create", "col": 0},
+  {"id": "c1", "pool": "card", "type": "xor", "label": "Tool call allowed?", "col": 1},
+  {"id": "c2", "pool": "card", "type": "task", "label": "Call create", "col": 2},
+  {"id": "c3", "pool": "card", "type": "task", "label": "Put key in chat", "col": 3, "row": 1, "status": "new"},
+  {"id": "s1", "pool": "server", "type": "task", "label": "Apply", "col": 2}],
+ "flows": [
+  {"from": "p1", "to": "c1"}, {"from": "c1", "to": "c2", "label": "yes"},
+  {"from": "c1", "to": "c3", "label": "no"}, {"from": "c2", "to": "s1"}]}
+```
+
+- Types: `start`, `end`, `task`, `xor`, `catch` (message intermediate event).
+- `status`: `new`, `changed` or `removed` on a node colors it and adds the text mark under it; omit for unchanged nodes.
+- Pools are stacked top to bottom in spec order; `col` is shared by all pools; `row` 0 or 1 inside a pool.
+- Same pool → sequence flow; different pools → message flow, drawn vertically between pools.
+- Layout rules that keep lines clean: put a message flow's two ends in the same `col` when possible; never put a node on the column a message flow passes through on its way to a farther pool; a gateway's lower branch goes to `row: 1`.
+- At most 3 pools and 8 nodes. Split a bigger process.
+- Look at the rendered page: if a label sits on a line or a line crosses a node, move a node one column and regenerate.
 
 ## Other
 
 | Content | Form |
 | --- | --- |
-| Value derivation | Small data-flow: inputs → function → output, e.g. token + server secret → HMAC → key. |
-| Rename or extraction | Two-column mapping; do not invent runtime behavior. |
-| Measured performance | Table with units and source; chart only for real data. |
+| Who sees what | Small table |
+| Value derivation | Flowchart: inputs → function → output |
+| Rename or extraction | Two-column table |
 
-## Drawing rules
-
-Place each figure right before the code it explains, with a caption naming the one thing to notice. Label arrows and branches in text; never rely on color or position alone. Abbreviate long class names in the figure and say so in the caption. At narrow widths stack panels and let wide SVG scroll horizontally. Use a table when connector lines would obscure the path.
-
-Draw as inline SVG (`viewBox`, `width="100%"`, `currentColor`, CSS variables for accent). Define arrowheads once in `<defs>` as markers: filled for sequence flow, open triangle for inheritance, open circle tail for message flow. Give each SVG a `<title>` or `aria-label`. Keep the same information available as text near the figure.
-
-Reuse the shared input across diagrams, tables, and code. Label any different input as its own scenario. Never show a possible branch as the one taken. If the source does not establish a transition, mark it unverified rather than completing the picture from intuition.
-
-Native `<details>` may hold extra traces or a larger evidence table. Core idea, mechanism diagrams, and literate steps stay visible with every section closed.
+Place each diagram right before the code it explains, with a one-sentence caption. Reuse the shared input across diagrams. Never show a possible branch as the one taken; mark an unverified transition in its label.
