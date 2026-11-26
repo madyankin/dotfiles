@@ -320,7 +320,7 @@ footer { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--line); 
   <figure class="fig"><div class="fig-frame">
 <pre class="mermaid">
 flowchart TD
-  classDef new fill:#e7f6ec,stroke:#15803d
+  classDef new stroke:#22a35a,stroke-width:3px
   start(["create_campaign"]) --> open{"Still open?"}
   open -- "no" --> e1(["Error: created, cancelled or expired"])
   open -- "yes" --> key{"Key valid? «new»"}

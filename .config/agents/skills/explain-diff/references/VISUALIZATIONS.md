@@ -32,9 +32,9 @@ stateDiagram-v2
 
 ```mermaid
 flowchart TB
-  classDef new fill:#e9f7ee,stroke:#15803d
-  classDef changed fill:#fdf3e3,stroke:#b45309
-  classDef removed stroke:#c0352b,stroke-dasharray:5 4
+  classDef new stroke:#22a35a,stroke-width:3px
+  classDef changed stroke:#d97706,stroke-width:3px
+  classDef removed stroke:#dc2626,stroke-width:3px,stroke-dasharray:5 4
   start([create with token]) --> found{token found?}
   found -- no --> e1([unknown token])
   found -- yes --> key{key matches?}
@@ -43,7 +43,7 @@ flowchart TB
   class key new
 ```
 
-Mark the delta with the three `classDef`s and repeat the mark in the label text («new», «changed», «removed»): color alone is not enough.
+Mark the delta with the three `classDef`s and repeat the mark in the label text («new», «changed», «removed»): color alone is not enough. Set only `stroke`, `stroke-width` and `stroke-dasharray` in a `classDef`, never `fill` or `color`: the viewer renders Mermaid in the reader's theme, and a fixed light fill under theme-colored text makes the label invisible in dark mode.
 
 - `([ ])` start/end, `[ ]` step, `{ }` decision phrased as a question, every exit labeled.
 - Merge error exits when they share a meaning; list exact error strings in the reference layer, not in the diagram.
