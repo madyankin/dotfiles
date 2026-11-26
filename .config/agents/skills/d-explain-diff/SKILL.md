@@ -14,7 +14,7 @@ Produce one HTML page a reader understands without opening the code. Read it top
 - **Reader:** two at once — an engineer on the team who has not read the change and will review it, and the author coming back months later. Both know the stack, not this code. The reviewer needs proof and risks; the returning author needs the motive and the decisions. If the user names another reader, write for that one and say so in the hero.
 - **Why comes from a source.** Take the motive from the PR body, ticket or commit messages and link it. If none states it, write "motive not stated" and mark your own reading as inference.
 - **Show the delta.** Every diagram marks what is new, changed or removed. A picture of only the new state explains a system, not a change.
-- **One input, start to end.** The same realistic input runs through the top, every mechanism and every diagram.
+- **One input per chain, start to end.** The same realistic input runs through the top, every mechanism and every diagram. A change with separate chains (offline tooling and production, two services) gets one input per chain.
 - **Draw the boundary.** Say what stayed the same and what the change leaves out on purpose.
 - **Say what proves it.** Each mechanism names the test that covers it, or says none does.
 - **Detail moves down, never up.** A fact not needed to understand its layer goes one layer lower.
@@ -37,7 +37,7 @@ Produce one HTML page a reader understands without opening the code. Read it top
    - A refactor with no behavior change: mechanisms are the structural moves; each says what proves behavior stayed the same.
    - A change of under ~30 lines with one mechanism: Layer 1 plus one section, no reference.
    Order them along the execution path of the shared input.
-6. Pick one realistic input from the code or a test and follow it through every mechanism. Never invent results or claim a test passed unless it ran.
+6. Pick one realistic input from the code or a test and follow it through every mechanism. When the change has separate chains, pick one per chain and say which chain each section follows. Never invent results or claim a test passed unless it ran.
 7. Extract exactly what the reference will need (signatures, error messages, columns, config keys).
 8. Map tests to mechanisms: which spec covers which behavior, what is uncovered, what you ran.
 
@@ -46,10 +46,11 @@ Produce one HTML page a reader understands without opening the code. Read it top
 Start from [references/example.html](references/example.html): copy its `<style>`, layout and components, replace the content. [references/HTML_TEMPLATE.md](references/HTML_TEMPLATE.md) lists the components; [references/DESIGN.md](references/DESIGN.md) holds the visual rules.
 
 **Layer 1 — top (~150 words plus one diagram):**
-- **Title (h1) = the name of what is explained, verbatim**, without the ticket-key prefix: the PR title for a PR; the ticket's name when explaining a ticket's work or when there is no PR; the commit subject for a single commit. The eyebrow above it links the ticket key and the PR. The page's own one-line takeaway opens the lead, not the h1.
+- **Title (h1) = the name of what is explained, verbatim**, without the ticket-key prefix: the PR title for a PR; the ticket's name when explaining a ticket's work or when there is no PR; the commit subject for a single commit. The eyebrow above it links the ticket key and the PR. Capitalize its first letter and change nothing else. The page's own one-line takeaway opens the lead, not the h1.
 - **Lead:** one or two sentences, ≤ 35 words: what changed, for whom. No "before" story, no definitions, no motive here.
 - **Meta chips** right under the lead: PR link, commits, size.
 - **Context tiles:** a row of 2–3 small labelled tiles instead of paragraphs — **Why** (motive with source links, 1–2 sentences; an inference goes on its own line under it with the badge first), **terms** the page relies on (one tile per term, one sentence), **Example** (the shared input). Never a stack of prose paragraphs in the hero.
+- **Measured change:** when the point of the change is a number (benchmark, latency, memory), one line with the main figure and where it was measured, e.g. "p99 decode −18% on 250 production requests (PR benchmark)". Mark a number you did not reproduce.
 - **Before / after:** paired cards labelled Before / After, 3–4 rows. Each row asks a plain question ("Who creates the campaigns?"); before and after each answer it in a full sentence that names the actor and the action.
 - **Unchanged:** one line on what stays as it was or is out of scope.
 - **Overview diagram:** the whole after the change, at most 6 nodes, delta marked. BPMN with one pool per actor when the change touches a process across actors; otherwise the notation its content calls for.
@@ -65,7 +66,7 @@ No contracts, error messages, field lists or code at this layer.
 - One small diagram with new, changed and removed elements marked (color plus the text mark «new», «changed», «removed»).
 - The shared input at this step: what goes in, what comes out.
 - 1–3 literate inserts where the exact code is the point.
-- **Proven by:** the spec that covers it, linked, or "not covered".
+- **Proven by:** the spec that covers it, or the CI or workflow run that exercises it, linked; otherwise "not covered".
 
 **Layer 3 — reference, collapsed.** The source is the full record; the reference holds what a reviewer checks against it. Add a block only for a kind the change touches:
 
@@ -77,9 +78,12 @@ No contracts, error messages, field lists or code at this layer.
 | Payloads and messages | Trimmed, commented example |
 | UI | Before / after screenshot or mock |
 | Config and deploy | Key, old value, new value, who reads it |
+| Measurements (benchmarks, load tests) | Metric, before, after, change, where measured; mark numbers you did not reproduce |
 | Tests | Behavior → spec, and what is uncovered |
 | Other behavior changes | One short block each, heading as a question, 1–3 sentences on what and why |
 | Basis, what was not run | As in example.html |
+
+Link a changed line in config, a manifest or a lockfile (`go.mod`, YAML) to its anchor in the PR's Files changed tab, not to a blob line: a blob shows only the new state.
 
 Files: link the PR's Files changed tab; for a working tree or local commit, give the `git diff` command instead.
 
@@ -148,6 +152,6 @@ Before handoff:
 - Every mechanism has its "before" sentence, the shared input and a Proven-by line.
 - Every signature, error message and column in the reference matches the source exactly.
 - Diagram branches, states and messages match the source, old revision included.
-- **Cold read, always:** give a subagent only the HTML and ask the questions from the before/after rows and the mechanism headings, plus "why was this changed?", "what did not change?" and "what is untested?". Rewrite every section it answers wrong or cannot answer.
+- **Cold read, always:** give a subagent only the HTML and ask the questions from the before/after rows and the mechanism headings, plus "why was this changed?", "what did not change?" and "what is untested?". Rewrite every section it answers wrong or cannot answer. Where you cannot start a subagent (you run as a fork or a subagent), reread only the HTML text without opening the code, answer the same questions, and say in your report that the cold read was a self-read.
 - Render at desktop and narrow width. State any check you could not perform.
 - Report the file path, comparison used, and material uncertainty.

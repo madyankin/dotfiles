@@ -31,7 +31,7 @@ mermaid.initialize({ startOnLoad: true, securityLevel: 'strict', theme: 'base', 
 | Mechanism cards | `.cards` > `a.card` (`.n`, `strong`, `.h`) | Links from the top to each mechanism section |
 | Review risks | `details.callout#risks` > `ol.risks` | Every risk, collapsed, right after the mechanism cards |
 | Section head | `.sec-head` (`.sec-num`, `h2`) | Each mechanism section |
-| Code step | `.step` (`.step-head`, `pre`, `.why`) | Literate inserts; highlight with `.kw`, `.str`, `.sym` |
+| Code step | `.step` (`.step-head`, `pre`, `.why`) | Literate inserts; highlight with `.kw`, `.str`, `.sym`, `.cm` (comment) |
 | Example | `.example` | Named scenario or boundary case |
 | Accordion | `details.acc` + `.acc-body`, `.count` | Reference blocks |
 | Tool cards | `.api-grid` > `.api`, `.pchip--add/--del/--opt`, `.badge--new/--chg` | Tools / endpoints |
