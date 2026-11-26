@@ -1,9 +1,9 @@
 ---
-name: explain-diff
+name: d-explain-diff
 description: Explain a code diff, commit, branch, or pull request as a single-file HTML page in layers — a short top (why, before/after, what stays the same, one overview diagram, links to the key mechanisms), then one section per mechanism that shows the delta on a diagram, follows one shared input, cites the code and names the test that proves it, then a collapsed reference shaped by what the diff touches. Entities as UML, algorithms as flowcharts, processes as BPMN. Use when the user asks to understand, explain, diagram, or write up a code change.
 ---
 
-# Explain Diff
+# D Explain Diff
 
 > Mirror: `remerge/dsp` → `plugins/dev/skills/dev-pr-overview` is the team copy for pull requests (Artifact-only, kept at the branch head by `dev-pr`). Change the shared rules, references and `scripts/bpmn_svg.py` in both.
 

@@ -1,6 +1,6 @@
 # Resolving the vault and explainer config
 
-Shared by `explain-concept`, `explain-diff` and `explain-german`. None of them
+Shared by `explain-concept`, `d-explain-diff` and `explain-german`. None of them
 may contain a vault path, a folder name, or a deck name. All of it is
 configuration and lives in Obsidian.
 
@@ -26,7 +26,7 @@ Each explainer names one MOC note whose frontmatter holds its settings:
 | Skill | Config note |
 |---|---|
 | `explain-concept` | `Explainers` |
-| `explain-diff` | `Explainers` |
+| `d-explain-diff` | `Explainers` |
 | `explain-german` | `Deutsch` |
 
 ```bash

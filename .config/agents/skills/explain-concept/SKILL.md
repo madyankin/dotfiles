@@ -5,7 +5,7 @@ description: Build a rich HTML explainer of an academic or technical concept —
 
 # Explain Concept → Obsidian
 
-Turn one concept into a document that teaches it. Same deliverable as `explain-diff`,
+Turn one concept into a document that teaches it. Same deliverable as `d-explain-diff`,
 different subject matter: instead of a diff, the source is books, papers, existing vault notes,
 and the web.
 
