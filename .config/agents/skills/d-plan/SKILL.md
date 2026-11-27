@@ -127,6 +127,9 @@ last_updated: [YYYY-MM-DD]
 
 # [Feature/Task Name] Implementation Plan
 
+<!-- toc -->
+<!-- /toc -->
+
 ## Overview
 
 [What we are implementing and why]
@@ -214,6 +217,15 @@ last_updated: [YYYY-MM-DD]
 - [Unit]: [what it would buy]
 ```
 
+Then fill the contents block, a list of links to every `##` section:
+
+```bash
+python3 -I <this skill's dir>/scripts/plan_toc.py <plan>
+```
+
+Run it again after every later edit to the plan's headings. Never write the
+links by hand; the script gets the anchors right.
+
 ## Writing for the Reader
 
 The user reads the outline, open questions and summary without the code open.
@@ -237,6 +249,7 @@ The user reads the outline, open questions and summary without the code open.
 
 - Plan document written to the correct `_scratchpad/plans/` (per context detection)
 - Plan not staged or committed
+- Contents block lists every `##` section, written by `plan_toc.py`
 - In workspace mode: umbrella plan references per-repo sub-plans, each sub-plan
   is self-contained
 - Frontmatter complete with origin references
@@ -248,3 +261,7 @@ The user reads the outline, open questions and summary without the code open.
   changes reflects it
 - Every design choice sits under Decisions with its rejected options
 
+
+## Changelog
+
+- 2026-11-27 — contents block under the title, filled by `scripts/plan_toc.py` (GitHub anchors, idempotent, skips code fences and frontmatter); never hand-written links. User asked to click through plan sections.

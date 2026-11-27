@@ -89,6 +89,8 @@ Get user confirmation before proceeding.
   under "Optional, not in plan"
 - Update success criteria if needed
 - If adding a phase, follow the existing pattern
+- After the edits, refresh the contents block:
+  `python3 -I <d-plan skill dir>/scripts/plan_toc.py <plan>`
 - If modifying scope, update the "What We Are NOT Doing" section
 - Log answers to questions asked in this run under `## Clarifications`, in
   `### Session YYYY-MM-DD`. Create the section if the plan has none. Never
