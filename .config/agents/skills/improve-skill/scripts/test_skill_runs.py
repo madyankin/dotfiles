@@ -249,6 +249,18 @@ class SkillRunsTest(unittest.TestCase):
         self.assertEqual([(i[1], i[3]) for i in run.items],
                          [("> [pasted text]\noutline tickets this way", False), ("no, [pasted text] is wrong", True)])
 
+    def test_app_prompt_blocks_are_not_user_turns(self):
+        self.write("s1.jsonl", [
+            slash(1, "dev-commit"),
+            skill_load(2),
+            user(3, "<create-pr-command>\n## Overview\nCreate a pull request. Don't use a draft.\n</create-pr-command>"),
+            user(4, [text("<scheduled-task name=\"x\">Run again; stop if wrong</scheduled-task>\nno, amend it")]),
+            user(5, "<cross-session-message from=\"s2\">stop that"),
+            user(6, "<div> is wrong"),
+        ])
+        run = self.runs("dev-commit")[0]
+        self.assertEqual([(i[1], i[3]) for i in run.items], [("no, amend it", True), ("<div> is wrong", True)])
+
     def test_agent_call_mid_conversation_keeps_first_reply_only(self):
         self.write("s1.jsonl", [
             user(1, "compare the benchmark tools"),

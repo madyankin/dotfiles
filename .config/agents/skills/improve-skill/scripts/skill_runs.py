@@ -39,6 +39,9 @@ CODEX_SKIP_PREFIXES = ("<environment_context", "<user_instructions", "# AGENTS.m
 REMINDER = re.compile(r"<system-reminder>.*?</system-reminder>", re.S)
 # Pasted plans or tickets are not the user's words; their hint words are not disagreement.
 PASTED = re.compile(r"<pasted_content\b[^>]*>.*?</pasted_content\b[^>]*>", re.S)
+# App prompts (<create-pr-command>, <scheduled-task>, <cross-session-message>, ...) open a turn with a
+# hyphenated tag; drop the block, or the whole turn if it never closes. User HTML like <div> has no hyphen.
+APP_BLOCK = re.compile(r"\A<([a-z]+(?:[-_][a-z]+)+)\b[^>]*>(?:.*?</\1\b[^>]*>|.*\Z)", re.S)
 
 
 @dataclass
@@ -126,7 +129,11 @@ def turn_text(content):
 
 def add_user_text(session, ts, text):
     text = PASTED.sub("[pasted text]", REMINDER.sub("", text)).strip()
-    if not text or text == "[image]" or text.startswith(SKIP_PREFIXES):
+    if text.startswith(SKIP_PREFIXES):
+        return
+    while (m := APP_BLOCK.match(text)):
+        text = text[m.end():].strip()
+    if not text or text == "[image]":
         return
     if text.startswith("[Request interrupted"):
         session.events.append(Event("interrupt", ts))

@@ -75,6 +75,13 @@ Lenses are machine-local. Never copy lens content into this skill.
 Before writing pages, call Artifact `quickstart` and follow
 `artifact-diagramming` rules. Page layouts: `references/method.md#pages`.
 
+**Page gate.** Before every publish, and before you say a visual fix is done:
+`python3 -I scripts/check_page.py <page.html>`. It renders both themes in Docker
+Chrome, checks the real colour behind every text node (SVG too) and SVG labels
+that spill out of their box. Publish only on `PASS`, then Read both PNGs it
+names. Token-pair math is not proof: it misses text with no colour set. The
+browser pane cannot screenshot a local file.
+
 ## Rules
 
 - Lead with the answer, then evidence. Nothing decorative.
@@ -86,3 +93,7 @@ Before writing pages, call Artifact `quickstart` and follow
 - Link the artifacts to each other. They are private — tell the user to share
   via the page's Share menu.
 - Ask the user only for decisions that are theirs; otherwise choose and say so.
+
+## Changelog
+
+- 2026-11-27 — shipped `scripts/check_page.py` (both-theme Docker Chrome render, computed contrast incl. SVG, label overflow) as a publish gate; replay of the 2026-11-19 feeds map: broken version 20 contrast + 1 overflow FAIL, fixed version PASS.
